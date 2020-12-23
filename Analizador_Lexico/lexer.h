@@ -3,4 +3,6 @@
 
 // Aquí se ponen los prototipos de las funciones.
 
+int leeLinea(FILE *archivo, char *linea, int num_chars);
+
 #endif
