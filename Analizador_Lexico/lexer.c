@@ -44,7 +44,9 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int chars, cha
 
     while(1)
     {
-        if(fgets(cadena[i], chars, archivo) != NULL) 
+        // Se guarda la línea del archivo en el arreglo:
+        //if(fgets(cadena[i], chars, archivo) != NULL) 
+        if(fgets(cadena[i], sizeof(cadena[i]), archivo) != NULL)
         {
             printf("%s", cadena[i]);
             i++;
@@ -63,6 +65,11 @@ void generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][
 
     for(i = 0; i < lineas; i++)
     {
+        if(cadena[i][0] == comentario)
+        {
+            continue;
+        }
+        
         token = strtok_r(cadena[i], " \n", &ptr);
         
         while (token != NULL)
