@@ -3,20 +3,20 @@
 #include "lexer.h"
 
 /* TOKENS ACEPTADOS QUE SON PARTE DEL LENGUAJE MIO */
-char palabras_reservadas[] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE"};
+//char palabras_reservadas[] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE"};
 
-char operadores_relacionales[] = {">", "<", "=="};
+//char operadores_relacionales[] = {">", "<", "=="};
 
-char operadores_aritmeticos[] = {'+', '-', '*', '/'};
+//char operadores_aritmeticos[] = {'+', '-', '*', '/'};
 
-char asignacion = '=';
+//char asignacion = '=';
 
 char comentario = '#';
 
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 
 /* La función halla la cantidad de líneas de un texto */
-int contarLineaArchivo(FILE *archivo)
+int __contarLineasArchivo(FILE *archivo)
 {
     int numero_lineas = 0;
     char c; // Almacena el caracter leído del archivo.
@@ -38,24 +38,91 @@ int contarLineaArchivo(FILE *archivo)
 }
 
 /* La función almacena las líneas del archivo dentro de un vector */
-char *guardarLineas(char *nombre_archivo)
+void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
 {
-    FILE *archivo = fopen(nombre_archivo, "r"); // Puntero al principio del archivo.
-    FILE *puntero_archivo = fopen(nombre_archivo, "r");
-    int cantidad_lineas = contarLineaArchivo(archivo); // Se cuenta el número de líneas del archivo.
+    unsigned int i = 0;
 
-    char lineas[cantidad_lineas][256]; // Arreglo que almacena las líneas del archivo.
-
-    unsigned int i = 0; // Contador
-
-    // Se lee cada línea del archivo y se almacena en el arreglo:
-    while(fgets(lineas[i], 256, puntero_archivo) != NULL)
-    {   
-        printf("%s", lineas[i]);    
-        i++; // Se aumenta el contador
+    while(1)
+    {
+        if(fgets(cadena[i], chars, archivo) != NULL) 
+        {
+            printf("%s", cadena[i]);
+            i++;
+        }
+        else
+        {
+            break;
+        }
     }
-
-    fclose(archivo); // Se cierra el archivo
-    fclose(puntero_archivo);
 }
 
+void generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
+{
+    char *ptr, *token;
+    unsigned int i;
+
+    for(i = 0; i < lineas; i++)
+    {
+        token = strtok_r(cadena[i], " \n", &ptr);
+        
+        while (token != NULL)
+        {
+            printf("\n%s", token);
+            token = strtok_r(NULL, " \n", &ptr);
+        }
+    }
+}
+
+/* La función imprime un arreglo con las líneas del archivo */
+void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[lineas][chars])
+{
+    unsigned int i;
+
+    for(i = 0; i < lineas; i++)
+        printf("\n%s", arreglo[i]);
+}
+
+int main(int argc, char **argv)
+{   
+    if (argc>1)
+    {
+        // Puntero al archivo:
+        FILE *archivo = fopen(argv[1], "r");
+    
+        // Se cuenta la cantidad de líneas del archivo:
+        unsigned int lineas;
+        lineas = __contarLineasArchivo(archivo);
+        fclose(archivo); // Se cierra el archivo
+
+        // Cantidad de caracteres máximos de cada archivo:
+        unsigned int caracteres = 256;
+
+        // Arreglo que almacenará cada línea del archivo:
+        char array[lineas][caracteres];
+
+        // Puntero al archivo:
+        FILE *parchivo = fopen(argv[1], "r");
+        
+        // Se guarda cada línea del archivo:
+        __guardarLineas(parchivo, lineas, caracteres, array);
+        fclose(parchivo); // Se cierra el archivo
+
+        // Se imprime cada línea del archivo:
+        printf("\n\n\nSe imprime lo del documento.\n");
+        __imprimeLineas(lineas, caracteres, array);
+        printf("\n\n\n");
+
+        // Se generan los tokens:
+        generarTokens(lineas, caracteres, array);
+        
+
+        // Se genera el archivo .lex:
+        //generarLexer(lineas, array);
+
+        // Se imprime la última línea del archivo:
+        //printf("\nEl numero de caracteres de la ultima linea es: %d", strlen(array[lineas-1]));
+        
+    }
+
+    return 0;
+}

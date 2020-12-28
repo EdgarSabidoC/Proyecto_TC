@@ -3,6 +3,9 @@
 
 // Aquí se ponen los prototipos de las funciones.
 
-int leeLinea(FILE *archivo, char *linea, int num_chars);
+int __contarLineasArchivo(FILE *archivo);
+void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int chars, char cadena[lineas][chars]);
+void generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars]);
+void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[lineas][chars]);
 
 #endif
