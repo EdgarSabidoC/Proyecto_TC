@@ -183,7 +183,7 @@ char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas]
         if(strchr(cadena[i], '\"') != 0)
         {   
             // Se genera el primer token:
-            token = strtok(cadena[i], "\"");
+            token = strtok(cadena[i], "\"\n");
         
             while(token != NULL) 
             {  
@@ -192,11 +192,17 @@ char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas]
                 {
                     break;
                 }
+                
+                if(__esVarValid(token, i+1) == true)
+                {
+                    printf("Es reservada: ");
+                    printf("%s\n", token);
+                }
 
-                printf("%s\n", token);
+                else printf("%s\n", token);
 
                 // Se generan los tokens siguientes:
-                token = strtok(NULL, "\"");
+                token = strtok(NULL, "\"\n");
 
             }// Fin While
         }// Fin if  
@@ -226,6 +232,8 @@ char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas]
                 }// Fin While
             }
         }*/
+
+        // Si sólo son palabras dentro de la línea:
         else
         {
             // Se genera el primer token:
@@ -239,7 +247,13 @@ char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas]
                     break;
                 }
 
-                printf("%s\n", token);
+                if(__esVarValid(token, i+1) == true)
+                {
+                    printf("Es reservada: ");
+                    printf("%s\n", token);
+                }
+
+                else printf("%s\n", token);
 
                 // Se generan los tokens siguientes:
                 token = strtok(NULL, " \n\t");
