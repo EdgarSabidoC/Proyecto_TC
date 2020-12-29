@@ -66,6 +66,18 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, ch
 }
 
 
+/* Genera un archivo .lex e imprime una cadena en él */
+void generarLexer(char *cadena)
+{
+    FILE *lexer = fopen("Programa.lex", "a+");
+
+    // Se imprime la cadena en el archivo .lex:
+    fprintf(lexer, "%s", cadena);
+
+    fclose(lexer);
+}
+
+
 // Retorna 'true' si el char es un OPERADOR. 
 bool __esOperadorAr(char ch) 
 { 
@@ -75,17 +87,8 @@ bool __esOperadorAr(char ch)
         return (false); 
 }
 
-bool __esTexto(char ch)
-{
-    // 34 == " en ASCII
-    char comilla = '\"';
 
-	if (ch == comilla)
-		return (true); 
-	else
-        return (false); 
-}
-
+/* Valida si la cadena es una palabra reservada */
 bool __esReservada(char *str)
 {
     unsigned int i = 0;
@@ -103,6 +106,39 @@ bool __esReservada(char *str)
     
 }
 
+
+/* Valida si el token es una cadena de texto */
+bool __esTexto(char *token, unsigned int num_linea)
+{
+    // Se verifica si el primer elemento es una letra:
+    if (isalpha(*token))
+    {    
+        // Se verifica que no sea una palabra reservada:
+        if(__esReservada(token) == false)
+        {   
+            // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
+            printf("Es una cadena de texto: ");
+            return (true);
+        }
+
+        // Si es una palabra reservada:
+        else
+        {
+            printf("Es palabra reservada: ");
+            return (false);
+        }        
+    } 
+    else
+    {
+        // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
+        printf("Es una cadena de texto: ");
+        return (true);    
+    }
+    
+}
+
+
+
 bool __esComentario(char ch)
 {
     char comentario = '#';
@@ -112,6 +148,8 @@ bool __esComentario(char ch)
     return (false);
 }
 
+
+/* Verifica si una variable numérica está en la tabla de símbolos */
 bool __estaEnTabSim(char *str, char **tabla_sim)
 {
     unsigned int i = 0;
@@ -127,6 +165,8 @@ bool __estaEnTabSim(char *str, char **tabla_sim)
     return (false);
 }
 
+
+
 /* Valida si el token es una variable o una palabra reservada */
 bool __esVarValid(char *token, unsigned int num_linea)
 {
@@ -137,6 +177,7 @@ bool __esVarValid(char *token, unsigned int num_linea)
         if(__esReservada(token) == false)
         {   
             // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
+            printf("Es una variable: ");
             return (true);
         }
 
@@ -151,135 +192,155 @@ bool __esVarValid(char *token, unsigned int num_linea)
     // Es un número:
     else if (isdigit(*token))
     {
-        printf("ERROR en línea %d: Las variables no pueden iniciar con un número: ", num_linea);
+        printf("ERROR en línea %u: Las variables no pueden iniciar con un número: ", num_linea);
         return (false);
     }
 
     // Es un símbolo que no es dígito ni letra:
     else
     {
-        printf("ERROR en línea %d: Las variables no pueden iniciar con un símbolo: ", num_linea);
+        printf("ERROR en línea %u: Las variables no pueden iniciar con un símbolo: ", num_linea);
         return (false);
-    }
-    
+    }   
 }
 
-void generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
+
+/* Genera los tokens cuando hay strings en la línea */
+void genTokTex(char *cadena, unsigned int num_linea)
 {
-    unsigned int i, j; 
-    char *token, *ptr;
     unsigned int cont_txt = 0;
+    char *token;
+
+    // Se genera el primer token:
+    token = strtok(cadena, "\"\n");
+
+    // Se elimina el último espacio de la cadena:
+    token[strlen(token)-1] = '\0';
+
+    while(token != NULL) 
+    {  
+        // Se ignoran los comentarios:
+        if(__esComentario(*token) == true)
+        {
+            break;
+        }
+        
+        //  Se verifica si son variables de texto:
+        if(__esTexto(token, num_linea) == true)
+        {
+            printf("%s\n", token);
+        }
+
+        //
+        else
+        {
+            printf("%s\n", token);
+        }
+
+        // Se generan los tokens siguientes:
+        token = strtok(NULL, "\"\n");
+
+    }// Fin While
+}
+
+
+/* Genera los tokens cuando hay declaración y asignación de variables numéricas en la línea */
+void genTokVar(char *cadena, unsigned int num_linea)
+{
+    unsigned int cont_var;
+    char *token;
+
+    // Se genera el primer token:
+    token = strtok(cadena, " \n\t");
+        
+    while(token != NULL) 
+    {  
+        // Se ignoran los comentarios:
+        if(__esComentario(*token) == true)
+        {
+            break;
+        }
+
+        if(__esVarValid(token, num_linea) == true)
+        {
+            printf("%s\n", token);
+        }
+
+        else printf("%s\n", token);
+
+        // Se generan los tokens siguientes:
+        token = strtok(NULL, " \n\t");
+
+    }// Fin While
+}
+
+
+/* Genera los tokens cuando no hay cadenas ni declaración/asignación de variables en la línea */
+void genTok(char *cadena, unsigned int num_linea)
+{
+    char *token;
+
+    // Se genera el primer token:
+    token = strtok(cadena, " \n\t");
+        
+    while(token != NULL) 
+    {  
+        // Se ignoran los comentarios:
+        if(__esComentario(*token) == true)
+        {
+            break;
+        }
+
+        if(__esVarValid(token, num_linea) == true)
+        {
+            printf("%s\n", token);
+        }
+
+        else printf("%s\n", token);
+
+        // Se generan los tokens siguientes:
+        token = strtok(NULL, " \n\t");
+
+    }// Fin While
+}
+
+
+/* Analizador léxico, aquí se generan los tokens del programa y también se generan los archivos .lex y .sim */
+void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
+{
+    unsigned int i; 
+    char *token;
 
     // Se recorre cada línea:
     for(i = 0; i < lineas; i++)
     {
         // Se ignoran los comentarios:
-        if(cadena[i][0] == '#')
+        if(__esComentario(cadena[i][0]) == true)
         {
             continue;
         }
 
-        // Se genera una copia de la cadena:
-        //char *copia = (char *)malloc(strlen(cadena[i]) + 1);
-        //strcpy(copia, cadena[i]);
-
         /* Si hay un string en la linea */
         if(strchr(cadena[i], '\"') != 0)
-        {   
-            // Se genera el primer token:
-            token = strtok(cadena[i], "\"\n");
-
-            // Se elimina el último espacio de la cadena:
-            token[strlen(token)-1] = '\0';
-
-            while(token != NULL) 
-            {  
-                // Se ignoran los comentarios:
-                if(*token == '#')
-                {
-                    break;
-                }
-                
-                if(__esVarValid(token, i+1) == true)
-                {
-                    printf("%s\n", token);
-                }
-
-                else
-                {
-                    printf("%s\n", token);
-                }
-
-                // Se generan los tokens siguientes:
-                token = strtok(NULL, "\"\n");
-
-            }// Fin While
+        {  
+            genTokTex(cadena[i], i+1);
         }// Fin if  
 
-        /*else if(strchr(cadena[i], '='))
-        {
-        
-            // Si hay un asinación de variable númerica en la linea 
-            if(strchr(cadena[i], '\"') != 0)
-            {   
-                // Se genera el primer token:
-                token = strtok(cadena[i], "\"");
-        
-                while(token != NULL) 
-                {  
-                    // Se ignoran los comentarios:
-                    if(*token == '#')
-                    {
-                        break;
-                    }
-
-                    printf("%s\n", token);
-
-                    // Se generan los tokens siguientes:
-                    token = strtok(NULL, "\"");
-
-                }// Fin While
-            }
-        }*/
+        /* Si hay una asignación en la línea */
+        else if(strchr(cadena[i], '='))
+        {   
+            genTokVar(cadena[i], i+1);
+        } // Fin else if
 
         // Si sólo son palabras dentro de la línea:
         else
         {
-            // Se genera el primer token:
-            token = strtok(cadena[i], " \n\t");
-        
-            while(token != NULL) 
-            {  
-                // Se ignoran los comentarios:
-                if(*token == '#')
-                {
-                    break;
-                }
-
-                if(__esVarValid(token, i+1) == true)
-                {
-                    printf("%s\n", token);
-                }
-
-                else printf("%s\n", token);
-
-                // Se generan los tokens siguientes:
-                token = strtok(NULL, " \n\t");
-
-            }// Fin While
+            genTok(cadena[i], i+1);
         } // Fin else
         
     } // Fin for
 }
 
-void generarLexer(char *cadena)
-{
-    FILE *lexer = fopen("Programa.lex", "a+");
-
-    fprintf(lexer, "%s\n", cadena);
-
-    fclose(lexer);
-}
 
 /* La función imprime un arreglo con las líneas del archivo */
 void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[lineas][chars])
@@ -290,6 +351,8 @@ void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[linea
         printf("\n%s", arreglo[i]);
 }
 
+
+/* Función principal */
 int main(int argc, char **argv)
 {   
     if (argc>1)
@@ -322,7 +385,7 @@ int main(int argc, char **argv)
 
         // Se generan los tokens:
         printf("\n\n\nSe verifican los tokens:\n");
-        generarTokens(lineas, caracteres, array);
+        anaLex(lineas, caracteres, array);
 
         // Se genera el archivo .lex:
         //generarLexer(lineas, array);
@@ -331,6 +394,5 @@ int main(int argc, char **argv)
         //printf("\nEl numero de caracteres de la ultima linea es: %d", strlen(array[lineas-1]));
         
     }
-
     return 0;
 }

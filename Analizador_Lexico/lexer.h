@@ -11,7 +11,7 @@
 
 int __contarLineasArchivo(FILE *archivo);
 void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int chars, char cadena[lineas][chars]);
-void generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars]);
+void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars]);
 void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[lineas][chars]);
 
 #endif
