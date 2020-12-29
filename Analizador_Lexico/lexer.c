@@ -249,7 +249,6 @@ char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas]
 
                 if(__esVarValid(token, i+1) == true)
                 {
-                    printf("Es reservada: ");
                     printf("%s\n", token);
                 }
 
