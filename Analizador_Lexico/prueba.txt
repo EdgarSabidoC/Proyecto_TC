@@ -1,16 +1,18 @@
-#1 # Programa que calcula el factorial de un número
-2 PROGRAMA factorial
-#3 # VarX acumula los productos por iteración
-4 VarX = 1
-#5 # VarY contiene el iterador del factor
-6 VarY = 0
-7 LEE Num
-#8 # Aplica Num! = 1 * 2 * 3 * … * Num
-9 REPITE Num VECES
-10 VarY = VarY + 1
-11 VarX = VarX * VarY
-12 FINREP
-13 IMPRIME “Factorial de ”
-14 IMPRIME Num
-15 IMPRIME “ es “
-16 IMPRIME VarX
+# Programa que calcula el factorial de un número
+PROGRAMA factorial
+# VarX acumula los productos por iteración
+VarX = 1
+# VarY contiene el iterador del factor
+VarY = 0
+LEE Num
+# Aplica Num! = 1 * 2 * 3 * … * Num
+REPITE Num VECES
+    VarY = VarY + 1
+    VarX = VarX * VarY
+FINREP
+IMPRIME "Factorial de "
+IMPRIME Num
+IMPRIME " es " 
+IMPRIME VarX
+1 2 3 # Este es un comentario.
+FINPROG

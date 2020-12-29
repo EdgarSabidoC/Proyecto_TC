@@ -1,17 +1,29 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
 #include "lexer.h"
 
+// VARIABLES
+
+typedef struct _variable_numerica 
+{
+    char nombre[17]; // Nombre del identificador
+    char *id; // Clave del identificador
+    int valor; // Número
+    unsigned int num_linea;
+} num_var;
+
 /* TOKENS ACEPTADOS QUE SON PARTE DEL LENGUAJE MIO */
-//char palabras_reservadas[] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE"};
 
 //char operadores_relacionales[] = {">", "<", "=="};
 
 //char operadores_aritmeticos[] = {'+', '-', '*', '/'};
 
-//char asignacion = '=';
+char asignacion = '=';
 
-char comentario = '#';
+
 
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 
@@ -38,7 +50,7 @@ int __contarLineasArchivo(FILE *archivo)
 }
 
 /* La función almacena las líneas del archivo dentro de un vector */
-void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
+void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, char cadena[lineas][caracteres])
 {
     unsigned int i = 0;
 
@@ -58,26 +70,193 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int chars, cha
     }
 }
 
-void generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
-{
-    char *ptr, *token;
-    unsigned int i;
 
+// Retorna 'true' si el char es un OPERADOR. 
+bool __esOperadorAr(char ch) 
+{ 
+	if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
+		return (true); 
+	else
+        return (false); 
+}
+
+bool __esTexto(char ch)
+{
+    // 34 == " en ASCII
+    char comilla = '\"';
+
+	if (ch == comilla)
+		return (true); 
+	else
+        return (false); 
+}
+
+bool __esReservada(char *str)
+{
+    unsigned int i = 0;
+    char *palabras_reservadas[12] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE", 0};
+
+    while(palabras_reservadas[i])
+    {
+        if(strncmp(str, palabras_reservadas[i], sizeof(palabras_reservadas[i])) == 0)
+        {   
+            return (true);
+        }
+        i++;
+    }
+    return (false);
+    
+}
+
+bool __esComentario(char ch)
+{
+    char comentario = '#';
+
+    if(ch == comentario)
+        return (true);
+    return (false);
+}
+
+bool __estaEnTabSim(char *str, char **tabla_sim)
+{
+    unsigned int i = 0;
+
+    while(tabla_sim[i])
+    {
+        if(strncmp(str, tabla_sim[i], sizeof(tabla_sim[i])) == 0)
+        {   
+            return (true);
+        }
+        i++;
+    }
+    return (false);
+}
+
+/* Valida los tokens y los imprime */
+bool __esVarValid(char *token, unsigned int num_linea)
+{
+    // Se verifica si el primer elemento es una letra:
+    if (isalpha(*token))
+    {    
+        // Se verifica que no sea una palabra reservada:
+        if(__esReservada(token) == false)
+        {    
+            return (true);
+        }
+
+        // Si es una palabra reservada:
+        else
+        {
+            printf("Es palabra reservada: ");
+            return (false);
+        }        
+    } 
+
+    // Es un número:
+    else if (isdigit(*token))
+    {
+        printf("ERROR en línea %d: Las variables no pueden iniciar con un número: ", num_linea);
+        return (false);
+    }
+}
+
+char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
+{
+    unsigned int i, j; 
+    char *token, *ptr;
+    unsigned int cont_txt = 0;
+
+    // Se recorre cada línea:
     for(i = 0; i < lineas; i++)
     {
-        if(cadena[i][0] == comentario)
+        // Se ignoran los comentarios:
+        if(cadena[i][0] == '#')
         {
             continue;
         }
+
+        // Se genera una copia de la cadena:
+        //char *copia = (char *)malloc(strlen(cadena[i]) + 1);
+        //strcpy(copia, cadena[i]);
+
+        /* Si hay un string en la linea */
+        if(strchr(cadena[i], '\"') != 0)
+        {   
+            // Se genera el primer token:
+            token = strtok(cadena[i], "\"");
         
-        token = strtok_r(cadena[i], " \n", &ptr);
-        
-        while (token != NULL)
+            while(token != NULL) 
+            {  
+                // Se ignoran los comentarios:
+                if(*token == '#')
+                {
+                    break;
+                }
+
+                printf("%s\n", token);
+
+                // Se generan los tokens siguientes:
+                token = strtok(NULL, "\"");
+
+            }// Fin While
+        }// Fin if  
+
+        /*else if(strchr(cadena[i], '='))
         {
-            printf("\n%s", token);
-            token = strtok_r(NULL, " \n", &ptr);
-        }
-    }
+        
+            // Si hay un asinación de variable númerica en la linea 
+            if(strchr(cadena[i], '\"') != 0)
+            {   
+                // Se genera el primer token:
+                token = strtok(cadena[i], "\"");
+        
+                while(token != NULL) 
+                {  
+                    // Se ignoran los comentarios:
+                    if(*token == '#')
+                    {
+                        break;
+                    }
+
+                    printf("%s\n", token);
+
+                    // Se generan los tokens siguientes:
+                    token = strtok(NULL, "\"");
+
+                }// Fin While
+            }
+        }*/
+        else
+        {
+            // Se genera el primer token:
+            token = strtok(cadena[i], " \n\t");
+        
+            while(token != NULL) 
+            {  
+                // Se ignoran los comentarios:
+                if(*token == '#')
+                {
+                    break;
+                }
+
+                printf("%s\n", token);
+
+                // Se generan los tokens siguientes:
+                token = strtok(NULL, " \n\t");
+
+            }// Fin While
+        } // Fin else
+        
+    } // Fin for
+}
+
+void generarLexer(char *cadena)
+{
+    FILE *lexer = fopen("Programa.lex", "a+");
+
+    fprintf(lexer, "%s\n", cadena);
+
+    fclose(lexer);
 }
 
 /* La función imprime un arreglo con las líneas del archivo */
@@ -120,8 +299,8 @@ int main(int argc, char **argv)
         printf("\n\n\n");
 
         // Se generan los tokens:
+        printf("\n\n\nSe verifican los tokens:\n");
         generarTokens(lineas, caracteres, array);
-        
 
         // Se genera el archivo .lex:
         //generarLexer(lineas, array);
