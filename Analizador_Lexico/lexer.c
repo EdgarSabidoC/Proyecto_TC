@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <ctype.h>
 #include "lexer.h"
 
 // VARIABLES
@@ -94,9 +89,9 @@ bool __esTexto(char ch)
 bool __esReservada(char *str)
 {
     unsigned int i = 0;
-    char *palabras_reservadas[12] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE", 0};
+    char *palabras_reservadas[11] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE"};
 
-    while(palabras_reservadas[i])
+    while(i < 11)
     {
         if(strncmp(str, palabras_reservadas[i], sizeof(palabras_reservadas[i])) == 0)
         {   
@@ -132,7 +127,7 @@ bool __estaEnTabSim(char *str, char **tabla_sim)
     return (false);
 }
 
-/* Valida los tokens y los imprime */
+/* Valida si el token es una variable o una palabra reservada */
 bool __esVarValid(char *token, unsigned int num_linea)
 {
     // Se verifica si el primer elemento es una letra:
@@ -140,7 +135,8 @@ bool __esVarValid(char *token, unsigned int num_linea)
     {    
         // Se verifica que no sea una palabra reservada:
         if(__esReservada(token) == false)
-        {    
+        {   
+            // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
             return (true);
         }
 
@@ -158,9 +154,17 @@ bool __esVarValid(char *token, unsigned int num_linea)
         printf("ERROR en línea %d: Las variables no pueden iniciar con un número: ", num_linea);
         return (false);
     }
+
+    // Es un símbolo que no es dígito ni letra:
+    else
+    {
+        printf("ERROR en línea %d: Las variables no pueden iniciar con un símbolo: ", num_linea);
+        return (false);
+    }
+    
 }
 
-char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
+void generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
 {
     unsigned int i, j; 
     char *token, *ptr;
@@ -184,7 +188,10 @@ char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas]
         {   
             // Se genera el primer token:
             token = strtok(cadena[i], "\"\n");
-        
+
+            // Se elimina el último espacio de la cadena:
+            token[strlen(token)-1] = '\0';
+
             while(token != NULL) 
             {  
                 // Se ignoran los comentarios:
@@ -195,11 +202,13 @@ char *generarTokens(unsigned int lineas, unsigned int chars, char cadena[lineas]
                 
                 if(__esVarValid(token, i+1) == true)
                 {
-                    printf("Es reservada: ");
                     printf("%s\n", token);
                 }
 
-                else printf("%s\n", token);
+                else
+                {
+                    printf("%s\n", token);
+                }
 
                 // Se generan los tokens siguientes:
                 token = strtok(NULL, "\"\n");

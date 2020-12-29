@@ -14,5 +14,5 @@ IMPRIME "Factorial de "
 IMPRIME Num
 IMPRIME " es "
 IMPRIME VarX
-1 2 3 # Este es un comentario.
+!var 2 3 # Este es un comentario.
 FINPROG
