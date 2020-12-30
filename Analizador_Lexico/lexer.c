@@ -10,6 +10,14 @@ typedef struct _variable_numerica
     unsigned int num_linea;
 } num_var;
 
+typedef struct _cadena_texto
+{
+    char nombre[17]; // Nombre del identificador
+    char *id; // Clave del identificador
+    char *cadena; // Número
+    unsigned int num_linea;
+} var_txt;
+
 /* TOKENS ACEPTADOS QUE SON PARTE DEL LENGUAJE MIO */
 
 //char operadores_relacionales[] = {">", "<", "=="};
@@ -285,31 +293,19 @@ bool __estaOpRel(char *cadena)
 /* Valida si el token es una cadena de texto */
 bool __esTexto(char *token, unsigned int num_linea)
 {
-    // Se verifica si el primer elemento es una letra:
-    if (isalpha(*token))
-    {    
-        // Se verifica que no sea una palabra reservada:
-        if(__esReservada(token) == false)
-        {   
-            // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
-            printf("Es una cadena de texto: ");
-            return (true);
-        }
-
-        // Si es una palabra reservada:
-        else
-        {
-            printf("Es palabra reservada: ");
-            return (false);
-        }        
-    } 
-    else
+    // Se verifica si es una palabra reservada:
+    if(__esReservada(token) == true)    
     {
-        // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
-        printf("Es una cadena de texto: ");
-        return (true);    
+        printf("Es palabra reservada: ");
+         return (false);
     }
-    
+
+    // Si no es una palabra reservada, entonces es una cadena:
+    else 
+    {
+        printf("Es una cadena de texto: ");
+        return (true);
+    }
 }
 
 
@@ -342,13 +338,13 @@ bool __estaEnTabSim(char *str, char **tabla_sim)
 
 
 /* Genera los tokens cuando hay strings en la línea */
-void genTokTex(char *cadena, unsigned int num_linea)
+bool genTokTex(char *cadena, unsigned int num_linea)
 {
     unsigned int cont_txt = 0;
     char *token;
 
     // Se genera el primer token:
-    token = strtok(cadena, "\"\n");
+    token = strtok(cadena, " \t");
 
     // Se elimina el último espacio de la cadena:
     token[strlen(token)-1] = '\0';
@@ -367,21 +363,23 @@ void genTokTex(char *cadena, unsigned int num_linea)
             printf("%s\n", token);
         }
 
-        //
+        // Si son palabras reservadas:
         else
         {
             printf("%s\n", token);
         }
 
         // Se generan los tokens siguientes:
-        token = strtok(NULL, "\"\n");
+        token = strtok(NULL, "\n");
 
     }// Fin While
+    
+    return (true);
 }
 
 
 /* Genera los tokens cuando hay declaración y asignación de variables numéricas en la línea */
-void genTokVar(char *cadena, unsigned int num_linea)
+bool genTokVar(char *cadena, unsigned int num_linea)
 {
     unsigned int cont_var;
     char *token;
@@ -410,7 +408,7 @@ void genTokVar(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando hay un operador relacional en la línea */
-void genTokRel(char *cadena, unsigned int num_linea)
+bool genTokRel(char *cadena, unsigned int num_linea)
 {
     char *token;
 
@@ -440,7 +438,7 @@ void genTokRel(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando hay un operador aritmético en la línea */
-void genTokAr(char *cadena, unsigned int num_linea)
+bool genTokAr(char *cadena, unsigned int num_linea)
 {
     char *token;
 
@@ -468,7 +466,7 @@ void genTokAr(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando no hay cadenas ni declaración/asignación de variables en la línea */
-void genTok(char *cadena, unsigned int num_linea)
+bool genTok(char *cadena, unsigned int num_linea)
 {
     char *token;
 
@@ -542,8 +540,8 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         else if(strchr(cadena[i], '='))
         {   
             // Se generan los tokens:
-            genTokAr(cadena[i], i+1);
-            continue;
+            if(genTokAr(cadena[i], i+1) == true)
+                continue;
 
         } // Fin else if
 
