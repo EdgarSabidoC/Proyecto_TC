@@ -1,22 +1,7 @@
-#include "lexer.h"
+#include "lexer.h" // Funciones del analizador léxico.
+ // Funciones de las listas.
 
 // VARIABLES
-
-typedef struct _variable_numerica 
-{
-    char nombre[17]; // Nombre del identificador
-    char *id; // Clave del identificador
-    int valor; // Número
-    unsigned int num_linea;
-} num_var;
-
-typedef struct _cadena_texto
-{
-    char nombre[17]; // Nombre del identificador
-    char *id; // Clave del identificador
-    char *cadena; // Número
-    unsigned int num_linea;
-} var_txt;
 
 /* TOKENS ACEPTADOS QUE SON PARTE DEL LENGUAJE MIO */
 
@@ -387,7 +372,7 @@ bool __estaEnTabSim(char *str, char **tabla_sim)
 
 
 /* Genera los tokens cuando hay strings en la línea VERIFICADA*/
-void genTokTex(char *cadena, unsigned int num_linea)
+void genTokTex(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas)
 {
     unsigned int cont_txt = 0;
     char *token;
@@ -426,7 +411,7 @@ void genTokTex(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando hay declaración y asignación de variables numéricas en la línea VERIFICADA*/
-void genTokVar(char *cadena, unsigned int num_linea)
+void genTokVar(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas)
 {
     unsigned int cont_var;
     char *token;
@@ -455,7 +440,7 @@ void genTokVar(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando hay un operador relacional en la línea */
-void genTokRel(char *cadena, unsigned int num_linea)
+void genTokRel(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas)
 {
     char *token;
 
@@ -485,7 +470,7 @@ void genTokRel(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando hay un operador aritmético en la línea VERIFICADA*/
-void genTokAr(char *cadena, unsigned int num_linea)
+void genTokAr(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas)
 {
     char *token;
 
@@ -513,8 +498,9 @@ void genTokAr(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando no hay cadenas ni declaración/asignación de variables en la línea */
-void genTok(char *cadena, unsigned int num_linea)
+void genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas)
 {
+    unsigned int cont_var;
     char *token;
 
     // Se genera el primer token:
@@ -531,6 +517,7 @@ void genTok(char *cadena, unsigned int num_linea)
         // Si es variable:
         if(__esVarValid(token, num_linea) == true)
         {
+
             printf("%s\n", token);
         }
 
@@ -545,7 +532,7 @@ void genTok(char *cadena, unsigned int num_linea)
 
 
 /* Analizador léxico, aquí se generan los tokens del programa y también se generan los archivos .lex y .sim */
-void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
+void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_cadenas)
 {
     unsigned int i; 
     char *token;
@@ -563,7 +550,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         else if(strchr(cadena[i], '\"') != 0)
         {  
             // Se generan los tokens:
-            genTokTex(cadena[i], i+1);
+            genTokTex(cadena[i], i+1, lista_vars, lista_cadenas);
             continue;
 
         }// Fin else if  
@@ -572,7 +559,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         else if(__estaOpRel(cadena[i]) == true)
         {
             // Se generan los tokens:
-            genTokRel(cadena[i], i+1);
+            genTokRel(cadena[i], i+1, lista_vars, lista_cadenas);
             continue;
 
         } // Fin else if
@@ -581,7 +568,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         else if(__estaOpAr(cadena[i]) == true)
         {
             // Se generan los tokens:
-            genTokAr(cadena[i], i+1);
+            genTokAr(cadena[i], i+1, lista_vars, lista_cadenas);
             continue;
 
         }// Fin else if
@@ -590,7 +577,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         else if(strchr(cadena[i], '='))
         {   
             // Se generan los tokens:
-            genTokAr(cadena[i], i+1);
+            genTokAr(cadena[i], i+1, lista_vars, lista_cadenas);
             continue;
 
         } // Fin else if
@@ -599,7 +586,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         else
         {
             // Se generan el resto de los tokens:
-            genTok(cadena[i], i+1);
+            genTok(cadena[i], i+1, lista_vars, lista_cadenas);
 
         } // Fin else
         
@@ -613,7 +600,7 @@ void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[linea
     unsigned int i;
 
     for(i = 0; i < lineas; i++)
-        printf("\n%s", arreglo[i]);
+        printf("%s", arreglo[i]);
 }
 
 
@@ -634,7 +621,14 @@ int main(int argc, char **argv)
 
         // Puntero al archivo:
         FILE *archivo = fopen(argv[1], "r");
-    
+        
+        // Se inicializan las listas para almacenar la tabla de símbolos.
+        listaVarNum lista_var;
+        listaText lista_txt;
+
+        iniListaVarNum(&lista_var);
+        iniListaTxt(&lista_txt);
+
         // Se cuenta la cantidad de líneas del archivo:
         unsigned int lineas;
         lineas = __contarLineasArchivo(archivo);
@@ -660,7 +654,7 @@ int main(int argc, char **argv)
 
         // Se generan los tokens:
         printf("\n\n\nSe verifican los tokens:\n");
-        anaLex(lineas, caracteres, array);
+        anaLex(lineas, caracteres, array, &lista_var, &lista_txt);
 
         // Se genera el archivo .lex:
         //generarLexer(lineas, array);
