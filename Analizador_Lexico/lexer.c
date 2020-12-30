@@ -16,7 +16,7 @@ typedef struct _variable_numerica
 
 //char operadores_aritmeticos[] = {'+', '-', '*', '/'};
 
-char asignacion = '=';
+//char asignacion = '=';
 
 
 
@@ -46,53 +46,50 @@ bool __esReservada(char *str)
 bool __esVarValid(char *token, unsigned int num_linea)
 {
     // Se verifica si el primer elemento es una letra:
-    if (isalpha(*token))
-    {    
-        // Se verifica que no sea una palabra reservada:
-        if(__esReservada(token) == false)
-        {   
-            // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
-            printf("Es una variable: ");
-            return (true);
-        }
-
-        // Si es una palabra reservada:
-        else
+    if (isalpha(*token) != 0)
+    {   
+        // Se valida si es o no una palabra reservada:
+        if(__esReservada(token) == true)
         {
             printf("Es palabra reservada: ");
             return (false);
-        }        
-    } 
-
-    // Es un número:
-    else if (isdigit(*token) != 0)
-    {
-        char *tmp = token;
-
-        while(*tmp != '\0')
-        {
-            if(*token == token[strlen(token)])
-            {
-                printf("ERROR en línea %u. Las variables no pueden ser números: ", num_linea);
-                return (false);
-            }
-
-            else if(isdigit(*tmp))
-                tmp++;
-            else
-                break;
         }
 
-        printf("ERROR en línea %u. Las variables no pueden contener números al principio: ", num_linea);
-        return (false);
+        // Se valida si es un nombre de variable correcto:
+        char *tmp = token;
+        
+        while(isalpha(*tmp) != 0 || isdigit(*tmp) != 0)
+        {
+            // El puntero se mueve al siguiente char:
+            tmp = tmp + 1;
+
+        } // Fin while
+
+        // Si el char al que apunta tmp es nulo:
+        if(*tmp == '\0')
+        {   
+            printf("Es una variable: ");
+            return (true); 
+        }
+        
+        // Si el char al que apunta tmp es un símbolo:
+        else
+            printf("ERROR en línea [%u] --Caracteres no válidos en variable: ", num_linea);    
     }
 
-    // Es un símbolo que no es dígito ni letra:
+    // Si el token inicia con número
+    else if(isdigit(*token) != 0)
+    {
+        printf("ERROR en la línea [%u] --Las variables no pueden iniciar con números: ", num_linea);
+    }
+
+    // Si el token inicia con un símbolo:
     else
     {
-        printf("ERROR en línea %u. Las variables no pueden iniciar con un símbolo: ", num_linea);
-        return (false);
-    }   
+        printf("ERROR en la línea [%u] --Primer caracter de variable no válido: ", num_linea);
+    }
+    
+    return (false);
 }
 
 
@@ -186,30 +183,27 @@ bool __esOpAr(char *cadena, unsigned int num_linea)
         
         while(isalpha(*tmp) != 0 || isdigit(*tmp) != 0)
         {
-            // Si se llega antes del char nulo, se rompe el ciclo.
-            if(*tmp == cadena[strlen(tmp)])
-            {    
-                printf("Es una variable: ");
-                break;
-            }
-
             // El puntero se mueve al siguiente char:
             tmp = tmp + 1;
 
         } // Fin while
-        
+
+        if(*tmp == '\0')
+            printf("Es una variable: ");        
+        else
+            printf("ERROR en línea [%u]: Caracteres no válidos en variable.", num_linea);
         return (false);      
     }
 
     // Si el primer char es un número:
-    else if (isdigit(*cadena) != 0 || *cadena == ' ')
+    else if (isdigit(*cadena) != 0)
     {
         char *tmp = cadena;
 
         while(isdigit(*tmp) != 0)
             tmp++;
         
-        // Si el char al que apunta tmp es un número:
+        // Si el char al que apunta tmp es nulo:
         if(*tmp == '\0')
             printf("Es un número: ");
         
@@ -220,12 +214,15 @@ bool __esOpAr(char *cadena, unsigned int num_linea)
         // Si el char al que apunta tmp es un símbolo:
         else
             printf("ERROR en línea [%u]: Variable numérica contiene caracteres no válidos: ");
-                    
+        
+        return (false);
     } // Fin else if    
 
+    // Si en la cadena hay un símbolo no válido:
     else
     {
-        printf("ERROR: Operador o símbolo no válido: ");
+        printf("ERROR en la línea [%u]: Operador o símbolo no válido: ", num_linea);
+        return (false);
     }
     
 }
@@ -267,7 +264,7 @@ bool __estaOpAr(char *cadena)
 }
 
 
-/* Valida si aparece un operador relacional en la cadena */
+/* Valida si aparece un operador relacional en la cadalena */
 bool __estaOpRel(char *cadena)
 {
     unsigned int i = 0;
@@ -400,12 +397,10 @@ void genTokVar(char *cadena, unsigned int num_linea)
             break;
         }
 
-        if(__esVarValid(token, num_linea) == true)
-        {
-            printf("%s\n", token);
-        }
+        __esVarValid(token, num_linea);
 
-        else printf("%s\n", token);
+        // Se imprime el token en pantalla:
+        printf("%s\n", token);
 
         // Se generan los tokens siguientes:
         token = strtok(NULL, " \n\t");
@@ -447,7 +442,7 @@ void genTokRel(char *cadena, unsigned int num_linea)
 /* Genera los tokens cuando hay un operador aritmético en la línea */
 void genTokAr(char *cadena, unsigned int num_linea)
 {
-   char *token;
+    char *token;
 
     // Se genera el primer token:
     token = strtok(cadena, " \n\t");
@@ -462,6 +457,7 @@ void genTokAr(char *cadena, unsigned int num_linea)
 
         __esOpAr(token, num_linea);
 
+        // Se imprime el token en pantalla:
         printf("%s\n", token);
 
         // Se generan los tokens siguientes:
