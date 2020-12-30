@@ -14,5 +14,8 @@ IMPRIME "Factorial de "
 IMPRIME Num
 IMPRIME " es "
 IMPRIME VarX
+SI VarX == Num ENTONCES
+    IMPRIME VarX
+FINSI
 !var 2 3 # Este es un comentario.
 FINPROG

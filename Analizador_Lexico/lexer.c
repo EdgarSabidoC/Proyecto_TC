@@ -22,6 +22,80 @@ char asignacion = '=';
 
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 
+
+/* Valida si la cadena es una palabra reservada */
+bool __esReservada(char *str)
+{
+    unsigned int i = 0;
+    char *palabras_reservadas[11] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE"};
+
+    while(i < 11)
+    {
+        if(strncmp(str, palabras_reservadas[i], sizeof(palabras_reservadas[i])) == 0)
+        {   
+            return (true);
+        }
+        i++;
+    }
+    return (false);
+    
+}
+
+
+/* Valida si el token es una variable o una palabra reservada */
+bool __esVarValid(char *token, unsigned int num_linea)
+{
+    // Se verifica si el primer elemento es una letra:
+    if (isalpha(*token))
+    {    
+        // Se verifica que no sea una palabra reservada:
+        if(__esReservada(token) == false)
+        {   
+            // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
+            printf("Es una variable: ");
+            return (true);
+        }
+
+        // Si es una palabra reservada:
+        else
+        {
+            printf("Es palabra reservada: ");
+            return (false);
+        }        
+    } 
+
+    // Es un número:
+    else if (isdigit(*token) != 0)
+    {
+        char *tmp = token;
+
+        while(*tmp != '\0')
+        {
+            if(*token == token[strlen(token)])
+            {
+                printf("ERROR en línea %u. Las variables no pueden ser números: ", num_linea);
+                return (false);
+            }
+
+            else if(isdigit(*tmp))
+                tmp++;
+            else
+                break;
+        }
+
+        printf("ERROR en línea %u. Las variables no pueden contener números al principio: ", num_linea);
+        return (false);
+    }
+
+    // Es un símbolo que no es dígito ni letra:
+    else
+    {
+        printf("ERROR en línea %u. Las variables no pueden iniciar con un símbolo: ", num_linea);
+        return (false);
+    }   
+}
+
+
 /* La función halla la cantidad de líneas de un texto */
 int __contarLineasArchivo(FILE *archivo)
 {
@@ -43,6 +117,7 @@ int __contarLineasArchivo(FILE *archivo)
     printf("La cantidad de lineas es: %d\n", numero_lineas+1);
     return numero_lineas+1; // Se retorna la cantidad de líneas del archivo.
 }
+
 
 /* La función almacena las líneas del archivo dentro de un vector */
 void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, char cadena[lineas][caracteres])
@@ -78,32 +153,135 @@ void generarLexer(char *cadena)
 }
 
 
-// Retorna 'true' si el char es un OPERADOR. 
-bool __esOperadorAr(char ch) 
+/* Retorna 'true' si el char es un OPERADOR ARITMÉTICO. */
+bool __esOpAr(char *cadena, unsigned int num_linea) 
 { 
-	if (ch == '+' || ch == '-' || ch == '*' || ch == '/')
-		return (true); 
-	else
-        return (false); 
+    unsigned int i = 0;
+    char *op_ar[4] = {"+","-","*","/"};
+    char *asignacion = "=";
+
+    // Se verifica si es un operador aritmético:
+    while(i < 4)
+    {
+        if(strncmp(cadena, op_ar[i], sizeof(op_ar[i])) == 0)
+        {       
+            printf("Es operador aritmético: ");
+            return (true); 
+        }
+        i++;
+    }
+    
+    // Se verifica si es una asignación:
+    if(strncmp(cadena, asignacion, sizeof(asignacion)) == 0)
+    {
+        printf("Es asignación: ");
+        return (false);
+    }
+
+	// Se verifica si el primer elemento es una letra:
+    else if (isalpha(*cadena) != 0)
+    {    
+        // Se valida si es un nombre de variable correcto:
+        char *tmp = cadena;
+        
+        while(isalpha(*tmp) != 0 || isdigit(*tmp) != 0)
+        {
+            // Si se llega antes del char nulo, se rompe el ciclo.
+            if(*tmp == cadena[strlen(tmp)])
+            {    
+                printf("Es una variable: ");
+                break;
+            }
+
+            // El puntero se mueve al siguiente char:
+            tmp = tmp + 1;
+
+        } // Fin while
+        
+        return (false);      
+    }
+
+    // Si el primer char es un número:
+    else if (isdigit(*cadena) != 0 || *cadena == ' ')
+    {
+        char *tmp = cadena;
+
+        while(isdigit(*tmp) != 0)
+            tmp++;
+        
+        // Si el char al que apunta tmp es un número:
+        if(*tmp == '\0')
+            printf("Es un número: ");
+        
+        // Si el char al que apunta tmp es una letra:
+        else if(isalpha(*tmp) != 0)
+            printf("ERROR en línea [%u]: Las variables no pueden iniciar con un número: ", num_linea);
+        
+        // Si el char al que apunta tmp es un símbolo:
+        else
+            printf("ERROR en línea [%u]: Variable numérica contiene caracteres no válidos: ");
+                    
+    } // Fin else if    
+
+    else
+    {
+        printf("ERROR: Operador o símbolo no válido: ");
+    }
+    
 }
 
 
-/* Valida si la cadena es una palabra reservada */
-bool __esReservada(char *str)
+/* Valida si la cadena es una PALABRA RESERVADA */
+bool __esOpRel(char *cadena)
 {
     unsigned int i = 0;
-    char *palabras_reservadas[11] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE"};
+    char *op_rel[3] = {"<", ">", "=="};
 
-    while(i < 11)
+    while(i < 3)
     {
-        if(strncmp(str, palabras_reservadas[i], sizeof(palabras_reservadas[i])) == 0)
-        {   
-            return (true);
+        if(strncmp(cadena, op_rel[i], sizeof(op_rel[i])) == 0)
+        {       
+           return (true);
         }
         i++;
     }
     return (false);
+}
+
+
+/* Valida si aparece un operador aritmético en la cadena */
+bool __estaOpAr(char *cadena)
+{
+    unsigned int i = 0;
+    char *op_ar = "+-*/";
     
+    while(i < 4)
+    {
+        if(strchr(cadena, op_ar[i]))
+        {       
+           return (true);
+        }
+        i++;
+    }
+    return (false);
+}
+
+
+/* Valida si aparece un operador relacional en la cadena */
+bool __estaOpRel(char *cadena)
+{
+    unsigned int i = 0;
+    char *op_rel[3] = {"<", ">", "=="};
+    
+    while(i < 3)
+    {
+        if(strstr(cadena, op_rel[i]))
+        {       
+           return (true);
+        }
+        i++;
+    }
+    return (false);
 }
 
 
@@ -138,7 +316,7 @@ bool __esTexto(char *token, unsigned int num_linea)
 }
 
 
-
+/* Verifica si el char que se le pasa es un # */
 bool __esComentario(char ch)
 {
     char comentario = '#';
@@ -163,45 +341,6 @@ bool __estaEnTabSim(char *str, char **tabla_sim)
         i++;
     }
     return (false);
-}
-
-
-
-/* Valida si el token es una variable o una palabra reservada */
-bool __esVarValid(char *token, unsigned int num_linea)
-{
-    // Se verifica si el primer elemento es una letra:
-    if (isalpha(*token))
-    {    
-        // Se verifica que no sea una palabra reservada:
-        if(__esReservada(token) == false)
-        {   
-            // FALTA VERIFICAR QUE SEA UN NOMBRE DE VARIABLE VALIDO. 
-            printf("Es una variable: ");
-            return (true);
-        }
-
-        // Si es una palabra reservada:
-        else
-        {
-            printf("Es palabra reservada: ");
-            return (false);
-        }        
-    } 
-
-    // Es un número:
-    else if (isdigit(*token))
-    {
-        printf("ERROR en línea %u: Las variables no pueden iniciar con un número: ", num_linea);
-        return (false);
-    }
-
-    // Es un símbolo que no es dígito ni letra:
-    else
-    {
-        printf("ERROR en línea %u: Las variables no pueden iniciar con un símbolo: ", num_linea);
-        return (false);
-    }   
 }
 
 
@@ -275,6 +414,63 @@ void genTokVar(char *cadena, unsigned int num_linea)
 }
 
 
+/* Genera los tokens cuando hay un operador relacional en la línea */
+void genTokRel(char *cadena, unsigned int num_linea)
+{
+    char *token;
+
+    // Se genera el primer token:
+    token = strtok(cadena, " \n\t");
+        
+    while(token != NULL) 
+    {  
+        // Se ignoran los comentarios:
+        if(__esComentario(*token) == true)
+        {
+            break;
+        }
+
+        if(__esVarValid(token, num_linea) == true)
+        {
+            printf("%s\n", token);
+        }
+
+        else printf("%s\n", token);
+
+        // Se generan los tokens siguientes:
+        token = strtok(NULL, " \n\t");
+
+    }// Fin While
+}
+
+
+/* Genera los tokens cuando hay un operador aritmético en la línea */
+void genTokAr(char *cadena, unsigned int num_linea)
+{
+   char *token;
+
+    // Se genera el primer token:
+    token = strtok(cadena, " \n\t");
+        
+    while(token != NULL) 
+    {  
+        // Se ignoran los comentarios:
+        if(__esComentario(*token) == true)
+        {
+            break;
+        }
+
+        __esOpAr(token, num_linea);
+
+        printf("%s\n", token);
+
+        // Se generan los tokens siguientes:
+        token = strtok(NULL, " \n\t");
+
+    }// Fin While 
+}
+
+
 /* Genera los tokens cuando no hay cadenas ni declaración/asignación de variables en la línea */
 void genTok(char *cadena, unsigned int num_linea)
 {
@@ -321,21 +517,47 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         }
 
         /* Si hay un string en la linea */
-        if(strchr(cadena[i], '\"') != 0)
+        else if(strchr(cadena[i], '\"') != 0)
         {  
+            // Se generan los tokens:
             genTokTex(cadena[i], i+1);
-        }// Fin if  
+            continue;
+
+        }// Fin else if  
+
+        /* Si hay un operador relacional en la línea */
+        else if(__estaOpRel(cadena[i]) == true)
+        {
+            // Se generan los tokens:
+            genTokRel(cadena[i], i+1);
+            continue;
+
+        } // Fin else if
+
+        else if(__estaOpAr(cadena[i]) == true)
+        {
+            // Se generan los tokens:
+            genTokAr(cadena[i], i+1);
+            continue;
+
+        }// Fin else if
 
         /* Si hay una asignación en la línea */
         else if(strchr(cadena[i], '='))
         {   
-            genTokVar(cadena[i], i+1);
+            // Se generan los tokens:
+            genTokAr(cadena[i], i+1);
+            continue;
+
         } // Fin else if
 
-        // Si sólo son palabras dentro de la línea:
+        // Si sólo son palabras dentro de la línea (reservadas o variables):
         else
         {
+            // Se generan el resto de los tokens:
             genTok(cadena[i], i+1);
+            continue;
+
         } // Fin else
         
     } // Fin for
