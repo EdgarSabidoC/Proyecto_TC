@@ -20,13 +20,11 @@ typedef struct _cadena_texto
 
 /* TOKENS ACEPTADOS QUE SON PARTE DEL LENGUAJE MIO */
 
-//char operadores_relacionales[] = {">", "<", "=="};
+// operadores relacionales: ">", "<", "=="
 
-//char operadores_aritmeticos[] = {'+', '-', '*', '/'};
+// operadores aritméticos: '+', '-', '*', '/'
 
-//char asignacion = '=';
-
-
+// asignacion: '='
 
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 
@@ -94,7 +92,7 @@ bool __esVarValid(char *token, unsigned int num_linea)
     // Si el token inicia con un símbolo:
     else
     {
-        printf("ERROR en la línea [%u] --Primer caracter de variable no válido: ", num_linea);
+        printf("ERROR en la línea [%u] --Primer caracter de variable no válido, sólo se admiten letras: ", num_linea);
     }
     
     return (false);
@@ -199,7 +197,7 @@ bool __esOpAr(char *cadena, unsigned int num_linea)
         if(*tmp == '\0')
             printf("Es una variable: ");        
         else
-            printf("ERROR en línea [%u]: Caracteres no válidos en variable.", num_linea);
+            printf("ERROR léxico en línea [%u] --Caracteres no válidos en variable: ", num_linea);
         return (false);      
     }
 
@@ -217,11 +215,11 @@ bool __esOpAr(char *cadena, unsigned int num_linea)
         
         // Si el char al que apunta tmp es una letra:
         else if(isalpha(*tmp) != 0)
-            printf("ERROR en línea [%u]: Las variables no pueden iniciar con un número: ", num_linea);
+            printf("ERROR en línea [%u] --Las variables no pueden iniciar con un número: ", num_linea);
         
         // Si el char al que apunta tmp es un símbolo:
         else
-            printf("ERROR en línea [%u]: Variable numérica contiene caracteres no válidos: ");
+            printf("ERROR léxico en línea [%u] --Variable numérica contiene caracteres no válidos: ");
         
         return (false);
     } // Fin else if    
@@ -229,7 +227,7 @@ bool __esOpAr(char *cadena, unsigned int num_linea)
     // Si en la cadena hay un símbolo no válido:
     else
     {
-        printf("ERROR en la línea [%u]: Operador o símbolo no válido: ", num_linea);
+        printf("ERROR léxico en la línea [%u] --Operador o símbolo no válido: ", num_linea);
         return (false);
     }
     
@@ -237,20 +235,71 @@ bool __esOpAr(char *cadena, unsigned int num_linea)
 
 
 /* Valida si la cadena es una PALABRA RESERVADA */
-bool __esOpRel(char *cadena)
+bool __esOpRel(char *cadena, unsigned int num_linea)
 {
     unsigned int i = 0;
     char *op_rel[3] = {"<", ">", "=="};
 
+    // Se verifica si es un operador aritmético:
     while(i < 3)
     {
         if(strncmp(cadena, op_rel[i], sizeof(op_rel[i])) == 0)
         {       
-           return (true);
+            printf("Es operador relacional: ");
+            return (true); 
         }
         i++;
+    } // Fin while
+
+    // Se verifica si el primer elemento es una letra:
+    if (isalpha(*cadena) != 0)
+    {    
+        // Se valida si es un nombre de variable correcto:
+        char *tmp = cadena;
+        
+        while(isalpha(*tmp) != 0 || isdigit(*tmp) != 0)
+        {
+            // El puntero se mueve al siguiente char:
+            tmp = tmp + 1;
+
+        } // Fin while
+
+        if(*tmp == '\0')
+            printf("Es una variable: ");        
+        else
+            printf("ERROR en línea [%u] --Caracteres no válidos en variable: ", num_linea);
+        return (false);      
     }
-    return (false);
+
+    // Si el primer char es un número:
+    else if (isdigit(*cadena) != 0)
+    {
+        char *tmp = cadena;
+
+        while(isdigit(*tmp) != 0)
+            tmp++;
+        
+        // Si el char al que apunta tmp es nulo:
+        if(*tmp == '\0')
+            printf("Es un número: ");
+        
+        // Si el char al que apunta tmp es una letra:
+        else if(isalpha(*tmp) != 0)
+            printf("ERROR léxico en línea [%u] --Las variables no pueden iniciar con un número: ", num_linea);
+        
+        // Si el char al que apunta tmp es un símbolo:
+        else
+            printf("ERROR léxico en línea [%u] --Variable numérica contiene caracteres no válidos: ");
+        
+        return (false);
+    } // Fin else if    
+
+    // Si en la cadena hay un símbolo no válido:
+    else
+    {
+        printf("ERROR léxico en la línea [%u] --Operador o símbolo no válido: ", num_linea);
+        return (false);
+    }
 }
 
 
@@ -337,8 +386,8 @@ bool __estaEnTabSim(char *str, char **tabla_sim)
 }
 
 
-/* Genera los tokens cuando hay strings en la línea */
-bool genTokTex(char *cadena, unsigned int num_linea)
+/* Genera los tokens cuando hay strings en la línea VERIFICADA*/
+void genTokTex(char *cadena, unsigned int num_linea)
 {
     unsigned int cont_txt = 0;
     char *token;
@@ -351,35 +400,33 @@ bool genTokTex(char *cadena, unsigned int num_linea)
 
     while(token != NULL) 
     {  
-        // Se ignoran los comentarios:
+        // Se ignora si es comentario:
         if(__esComentario(*token) == true)
         {
             break;
         }
         
-        //  Se verifica si son variables de texto:
+        //  Se verifica si es cadena de texto:
         if(__esTexto(token, num_linea) == true)
         {
             printf("%s\n", token);
         }
 
-        // Si son palabras reservadas:
+        // Es palabra reservada:
         else
         {
             printf("%s\n", token);
         }
 
-        // Se generan los tokens siguientes:
+        // Se genera el token siguiente:
         token = strtok(NULL, "\n");
 
     }// Fin While
-    
-    return (true);
 }
 
 
-/* Genera los tokens cuando hay declaración y asignación de variables numéricas en la línea */
-bool genTokVar(char *cadena, unsigned int num_linea)
+/* Genera los tokens cuando hay declaración y asignación de variables numéricas en la línea VERIFICADA*/
+void genTokVar(char *cadena, unsigned int num_linea)
 {
     unsigned int cont_var;
     char *token;
@@ -408,7 +455,7 @@ bool genTokVar(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando hay un operador relacional en la línea */
-bool genTokRel(char *cadena, unsigned int num_linea)
+void genTokRel(char *cadena, unsigned int num_linea)
 {
     char *token;
 
@@ -423,7 +470,7 @@ bool genTokRel(char *cadena, unsigned int num_linea)
             break;
         }
 
-        if(__esVarValid(token, num_linea) == true)
+        if(__esOpRel(token, num_linea) == true)
         {
             printf("%s\n", token);
         }
@@ -437,8 +484,8 @@ bool genTokRel(char *cadena, unsigned int num_linea)
 }
 
 
-/* Genera los tokens cuando hay un operador aritmético en la línea */
-bool genTokAr(char *cadena, unsigned int num_linea)
+/* Genera los tokens cuando hay un operador aritmético en la línea VERIFICADA*/
+void genTokAr(char *cadena, unsigned int num_linea)
 {
     char *token;
 
@@ -466,7 +513,7 @@ bool genTokAr(char *cadena, unsigned int num_linea)
 
 
 /* Genera los tokens cuando no hay cadenas ni declaración/asignación de variables en la línea */
-bool genTok(char *cadena, unsigned int num_linea)
+void genTok(char *cadena, unsigned int num_linea)
 {
     char *token;
 
@@ -475,20 +522,22 @@ bool genTok(char *cadena, unsigned int num_linea)
         
     while(token != NULL) 
     {  
-        // Se ignoran los comentarios:
+        // Se ignora si es comentario:
         if(__esComentario(*token) == true)
         {
             break;
         }
 
+        // Si es variable:
         if(__esVarValid(token, num_linea) == true)
         {
             printf("%s\n", token);
         }
 
+        // Si es palabra reservada:
         else printf("%s\n", token);
 
-        // Se generan los tokens siguientes:
+        // Se genera el token siguiente:
         token = strtok(NULL, " \n\t");
 
     }// Fin While
@@ -504,7 +553,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
     // Se recorre cada línea:
     for(i = 0; i < lineas; i++)
     {
-        // Se ignoran los comentarios:
+        // Se ignora si es comentario:
         if(__esComentario(cadena[i][0]) == true)
         {
             continue;
@@ -528,6 +577,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
 
         } // Fin else if
 
+        // Si hay un operador aritmético en la línea:
         else if(__estaOpAr(cadena[i]) == true)
         {
             // Se generan los tokens:
@@ -540,8 +590,8 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         else if(strchr(cadena[i], '='))
         {   
             // Se generan los tokens:
-            if(genTokAr(cadena[i], i+1) == true)
-                continue;
+            genTokAr(cadena[i], i+1);
+            continue;
 
         } // Fin else if
 
@@ -550,7 +600,6 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars])
         {
             // Se generan el resto de los tokens:
             genTok(cadena[i], i+1);
-            continue;
 
         } // Fin else
         
@@ -573,6 +622,16 @@ int main(int argc, char **argv)
 {   
     if (argc>1)
     {
+        char *punto = strchr(argv[1], '.');
+        char *mio = ".mio";
+
+        // Se verifica que la extensión sea .mio
+        if(strncmp(punto, mio, sizeof(".mio")))
+        {
+            printf("ERROR, no se encontró archivo .mio\n\n");
+            return -1;
+        }
+
         // Puntero al archivo:
         FILE *archivo = fopen(argv[1], "r");
     
