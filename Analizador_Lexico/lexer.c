@@ -70,13 +70,12 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, ch
     while(1)
     {
         // Se guarda la línea del archivo en el arreglo:
-        //if(fgets(cadena[i], chars, archivo) != NULL) 
         if(fgets(cadena[i], sizeof(cadena[i]), archivo) != NULL)
         {
             // Se cambia el caracter \n por \0;
-            //cadena[i][strlen(cadena[i])-1] = '\0';
+            cadena[i][strlen(cadena[i])-1] = '\0';
 
-            printf("%s", cadena[i]);
+            printf("%s\n", cadena[i]);
             i++;
         }
 
@@ -358,6 +357,35 @@ char __Identifica(char *token, unsigned int num_linea)
 }
 
 
+/* Genera el token para cadenas */
+char *tokenCadena(char *cadena)
+{
+    char *token, *tmp;
+    
+    tmp = cadena;
+
+    unsigned int cont = 0;
+    // " == 34 en ASCII.
+    // espacio == 32 en ASCII.
+
+    // Se recorre la cadena:
+     while(*tmp != '\0' || *tmp != '\n')
+    {
+        if(strstr(tmp, "\"") || strstr(tmp, "\"\0"))
+        { 
+            break;
+        }
+        tmp++;
+    }
+
+    token = malloc(strlen(tmp) * sizeof(char));
+    strcpy(token, tmp);
+    
+    //printf("EL TOKEN ES: %s", token);
+    return token;
+}
+
+
 /* Retorna un token */
 char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas)
 {
@@ -460,7 +488,8 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
         // Es cadena:
         case 'C':
         // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, "\n", &aux);
+        //ptr_strok = strtok_r(copia, "\n\0", &aux);
+        ptr_strok = tokenCadena(copia);
         printf("Es cadena: ");
         break;
 
@@ -472,13 +501,13 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
         break;
     }
 
-    // Se crea un arreglo dinámico del tamaño de la cadena:
+    // Se crea un arreglo dinámico del tamaño de la cadena:    
     char *token = malloc(strlen(ptr_strok)+1 * sizeof(char));
 
     // Se genera una copia dinámica de la cadena:
     strncpy(token, ptr_strok, strlen(ptr_strok)+1);    
 
-    printf("%s\n", token);
+    printf("[%s]\n", token);
 
     // Si es una variable:
     if(ident == 'V')
@@ -588,7 +617,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
         token = genTok(copia, i+1, lista_vars, lista_cadenas);
 
         // Si sólo hay un token en la línea:
-        if(strlen(token) == strlen(cadena[i])-1)
+        if(strlen(token) == strlen(cadena[i]))
         {
             printf("\n\n");
             
@@ -622,7 +651,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
                 token = genTok(ptr, i+1, lista_vars, lista_cadenas);
 
                 // Se genera el último o único token en la línea:
-                if(strlen(token) == strlen(ptr)-1)
+                if(strlen(token) == strlen(ptr))
                 {
                     printf("\n\n");
 
@@ -652,7 +681,7 @@ void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[linea
     unsigned int i;
 
     for(i = 0; i < lineas; i++)
-        printf("%s", arreglo[i]);
+        printf("%s\n", arreglo[i]);
 }
 
 
@@ -736,7 +765,7 @@ int main(int argc, char **argv)
         printf("\n\nLista de cadenas de texto:\n\n");
         while(cont2)
         {
-            printf("%s, ID%02u\n", cont2->cadena, cont2->ID);
+            printf("%s, TX%02u\n", cont2->cadena, cont2->ID);
             cont2 = cont2->sig;
         }
 
