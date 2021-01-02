@@ -60,7 +60,9 @@ int __contarLineasArchivo(FILE *archivo)
 }
 
 
-/* La función almacena las líneas del archivo dentro de un vector */
+/* La función almacena las líneas del archivo dentro de un vector 
+    Retorna la cantidad de espacios en blanco que hay al principio de la línea.
+*/
 void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, char cadena[lineas][caracteres])
 {
     unsigned int i = 0;
@@ -71,13 +73,16 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, ch
         //if(fgets(cadena[i], chars, archivo) != NULL) 
         if(fgets(cadena[i], sizeof(cadena[i]), archivo) != NULL)
         {
+            // Se cambia el caracter \n por \0;
+            //cadena[i][strlen(cadena[i])-1] = '\0';
+
             printf("%s", cadena[i]);
             i++;
         }
+
+        // Si se llega al final del archivo:
         else
-        {
             break;
-        }
     }
 }
 
@@ -376,8 +381,8 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
     char *lexema; // Puntero al token que pasará por la función __Identifica.
     
     // Se genera el puntero del lexema:
-    lexema = strtok_r(copia_lex, " \n\0", &aux);
-
+    lexema = strtok_r(copia_lex, " \n\t\0", &aux);
+    
     // Se identifica el tipo de unidad léxica:
     char ident = __Identifica(lexema, num_linea);
     
@@ -475,6 +480,62 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
 
     printf("%s\n", token);
 
+    // Si es una variable:
+    if(ident == 'V')
+    { 
+        // Puntero a un nodo de variable;
+        nodo_VarNum *nodo;
+        nodo = buscaVarNum(lista_vars, token);
+
+        if (nodo)
+        {
+            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        }
+
+        // Si el nodo no existe:
+        else
+        {   
+            // Se aumenta el contador:
+            cont_var++;
+
+            // Se crea el nodo y se ingresa a la lista:
+            nodo = creaNodoVarNum(token, cont_var);
+            pushBackVarNum(lista_vars, nodo);
+
+            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        }
+        
+    }
+
+    // Si es cadena de texto:
+    else if (ident == 'C')
+    {
+        // Puntero a un nodo de variable;
+        nodo_Txt *nodo;
+        nodo = buscaTxt(lista_cadenas, token);
+
+        // Si existe el nodo:
+        if(nodo)
+        {
+            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        }
+
+        // Si el nodo no existe:
+        else
+        {
+            nodo = NULL;
+
+            // Aumenta el contado:
+            cont_txt++;
+            
+            // Se crea el nodo y se ingresa en la lista:
+            nodo = creaNodoText(token, cont_txt);
+            pushBackTxt(lista_cadenas, nodo);
+
+            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        } 
+    }
+
     // Se apunta el puntero de lexema a NULL:
     lexema = NULL;
 
@@ -504,19 +565,33 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
             continue;
         }
 
-        // Se crea un arreglo dinámico del tamaño de la cadena:
-        char *copia = malloc(strlen(cadena[i])+1 * sizeof(char));
         
-        // Se genera una copia dinámica de la cadena:
-        strncpy(copia, cadena[i], strlen(cadena[i])+1);
+        unsigned int espacios = 0; // Contador de los espacios en blanco.
+        char *tmp = cadena[i]; // Puntero para recorrer la cadena.
+        
+        // Se cuentan los espacios en blanco al principio de la cadena:
+        // espacio == 32 en ASCII.
+        while(*tmp == 32)
+        {
+            espacios++;
+            tmp++;
+        }
 
-        // Se genera el token:
+        // Se crea un arreglo dinámico del tamaño de la cadena menos la cantidad de espacios al principio:
+        char *copia = malloc((strlen(cadena[i])+1-(espacios)) * sizeof(char));
+
+        // Se genera una copia dinámica de la cadena a partir del primero caracter que no sea espacio:
+        strncpy(copia, cadena[i]+espacios, strlen(cadena[i]) - (espacios) + 1);
+
+        // Se genera el primer token:
         char *token;
-        token = genTok(cadena[i], i+1, lista_vars, lista_cadenas);
+        token = genTok(copia, i+1, lista_vars, lista_cadenas);
 
         // Si sólo hay un token en la línea:
         if(strlen(token) == strlen(cadena[i])-1)
         {
+            printf("\n\n");
+            
             // Se libera la memoria del token:
             free(token);
             token = NULL;
@@ -529,7 +604,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
         else
         {
             // Puntero que apunta al resto de la cadena.
-            char *ptr = cadena[i];
+            char *ptr = copia;
 
             // Se apunta a la siguiente unidad léxica de la cadena
             // (la siguiente porción de la cadena):
@@ -538,16 +613,19 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
             // Se libera la memoria del token:
             free(token);
             token = NULL;
-        
+
+            // Se generan el resto de tokens:
             while(*ptr != 10 && *ptr != 35 && *ptr != 0)
             {   
                 
                 // Se genera el siguiente token de la línea:
                 token = genTok(ptr, i+1, lista_vars, lista_cadenas);
 
+                // Se genera el último o único token en la línea:
                 if(strlen(token) == strlen(ptr)-1)
                 {
                     printf("\n\n");
+
                     // Se libera la memoria del token:
                     free(token);
                     token = NULL;
@@ -616,7 +694,7 @@ int main(int argc, char **argv)
         fclose(archivo); // Se cierra el archivo
 
         // Cantidad de caracteres máximos de cada archivo:
-        unsigned int caracteres = 256;
+        unsigned int caracteres = 10000;
 
         // Arreglo que almacenará cada línea del archivo:
         char array[lineas][caracteres];
@@ -656,10 +734,10 @@ int main(int argc, char **argv)
         nodo_Txt *cont2 = lista_txt.raiz;
         
         printf("\n\nLista de cadenas de texto:\n\n");
-        while(cont)
+        while(cont2)
         {
             printf("%s, ID%02u\n", cont2->cadena, cont2->ID);
-            cont = cont->sig;
+            cont2 = cont2->sig;
         }
 
         // Se libera la memoria ocupada por las listas:

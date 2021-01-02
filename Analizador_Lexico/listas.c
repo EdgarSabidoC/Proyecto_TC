@@ -10,7 +10,7 @@ nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id)
 	nodo_VarNum *apu;
 	
 	if (basura_num == NULL) // Equivalente a if (!basura)
-		apu = (nodo_VarNum *)malloc(sizeof(nodo_VarNum)); // Creamos un espacio de memoria del tamaño de la struct nodoS
+		apu = (nodo_VarNum *)malloc(sizeof(nodo_VarNum)); // Creamos un espacio de memoria del tamaño de la struct nodo_VarNum
 	else
 	{
 		apu = basura_num; // Al nodo "apu" le asignamos el nodo "basura".
@@ -137,23 +137,19 @@ void imprimeListaVarNum(FILE *archivo, listaVarNum *Lista)
 // Lista de nodos eliminados:
 nodo_Txt *basura_txt = NULL;
 
-nodo_Txt *creaNodoText(char *cadena, unsigned int id, unsigned int num_linea)
+nodo_Txt *creaNodoText(char *cadena, unsigned int id)
 {
 	nodo_Txt *apu;
-	
-	if (basura_txt == NULL) // Equivalente a if (!basura)
-		apu = (nodo_Txt *)malloc(sizeof(nodo_Txt)); // Creamos un espacio de memoria del tamaño de la struct nodoS
-	else
-	{
-		apu = basura_txt; // Al nodo "apu" le asignamos el nodo "basura".
-		basura_txt = basura_txt->sig; // El nodo "basura" apunta al nodo siguiente.
-	}
+
+	apu = (nodo_Txt *)malloc(sizeof(nodo_Txt)); // Creamos un espacio de memoria del tamaño de la struct nodo_Txt
 
 	if (apu) //Equivalente a apu != NULL
 	{
-		strncpy(apu->cadena, cadena, strlen(cadena)); // Se copia la cadena en el nodo.
+		// Se crea un arreglo dinámico del tamaño de la cadena:
+		apu->cadena = (char *)malloc(strlen(cadena)+1 * sizeof(char));
+
+		strncpy(apu->cadena, cadena, strlen(cadena)+1); // Se copia la cadena en el nodo.
 		apu->ID = id; // Se asigna el valor del ID.
-		apu->num_linea = num_linea; // Se asigna el número de línea donde se encuentra la variable.
 		
 		apu->sig = NULL; // El apuntador del nodo "apu" apunta a NULL.
 	}
@@ -165,10 +161,9 @@ int liberaNodoTxt(nodo_Txt *nodo)
 {
 	if(nodo) //Equivalente a nodo != NULL
 	{
-		nodo->sig = basura_txt; // el nodo siguiente pasa a ser el nodo basura.
-		basura_txt = nodo; // basura pasa a convertirse en el nodo
-		
-		//free (nodo->sig);
+		free(nodo->cadena); // Se libera la memoria del string del nodo.
+		//nodo->sig = basura_txt; // el nodo siguiente pasa a ser el nodo basura.
+		//basura_txt = nodo; // basura pasa a convertirse en el nodo
 		
 		return 0;
 	}
@@ -237,7 +232,7 @@ nodo_Txt *buscaTxt(listaText *Lista, char *cadena)
 	}
 
 	// Si la cadena no se encuentra:
-	//return NULL;
+	return NULL;
 }
 
 //int borraNodoTxt(listaText *Lista, nodo_Txt *nd);

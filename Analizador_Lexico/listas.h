@@ -31,7 +31,6 @@ struct _nodoTxt // Nodo de cadena de texto
 {
 	char *cadena;
     unsigned int ID;
-    unsigned int num_linea;
 
 	struct _nodoTxt *sig;
 	
@@ -71,7 +70,7 @@ void imprimeListaVarNum(FILE *archivo, listaVarNum *Lista);
 
 extern nodo_Txt *basura_txt;
 
-nodo_Txt *creaNodoText(char *cadena, unsigned int id, unsigned int num_linea);
+nodo_Txt *creaNodoText(char *cadena, unsigned int id);
 
 int liberaNodoTxt(nodo_Txt *nodo);
 
