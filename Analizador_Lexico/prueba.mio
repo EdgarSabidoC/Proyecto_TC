@@ -1,7 +1,9 @@
 # Programa que calcula el factorial de un número
+"HOlA MUNDO"
+Hello WOrld "
 PROGRAMA factorial
 # VarX acumula los productos por iteración
-VarX = 1 
+VarX = 1
 # VarY contiene el iterador del factor
 VarY = 0
 LEE Num
@@ -14,7 +16,7 @@ IMPRIME "Factorial de "
 IMPRIME Num
 IMPRIME " es "
 IMPRIME VarX
-SI VarX == Num ENTONCES
+SI VarX == 1 ENTONCES
     IMPRIME VarX
 FINSI
 !var 2 3 # Este es un comentario.

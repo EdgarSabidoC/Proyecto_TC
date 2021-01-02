@@ -11,8 +11,6 @@ struct _nodoNum // Nodo de variable numérica
 {
 	char nombre[17];
     unsigned int ID;
-    int valor;
-    unsigned int num_linea;
 
 	struct _nodoNum *sig;
 	
@@ -52,7 +50,7 @@ struct
 
 extern nodo_VarNum *basura_num;
 
-nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id, int valor, unsigned int num_linea);
+nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id);
 
 int liberaNodoVarNum(nodo_VarNum *nodo);
 
@@ -62,7 +60,7 @@ void liberaListaVarNum(listaVarNum *Lista);
 
 void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo);
 
-int buscaVarNum(listaVarNum *Lista, char *nombre);
+nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre);
 
 //int borraNodoVarNum(listaVarNum *Lista, nodo_VarNum *nodo);
 
@@ -83,7 +81,7 @@ void liberaListaTxt(listaText*Lista);
 
 void pushBackTxt(listaText *Lista, nodo_Txt *nodo);
 
-int buscaTxt(listaText *Lista, char *cadena);
+nodo_Txt *buscaTxt(listaText *Lista, char *cadena);
 
 //int borraNodoTxt(listaText *Lista, nodo_Txt *nodo);
 

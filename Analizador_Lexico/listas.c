@@ -5,7 +5,7 @@
 // Lista de nodos eliminados:
 nodo_VarNum *basura_num = NULL;
 
-nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id, int valor, unsigned int num_linea)
+nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id)
 {
 	nodo_VarNum *apu;
 	
@@ -21,8 +21,6 @@ nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id, int valor, unsigned
 	{
 		strncpy(apu->nombre, variable, 16); // Se copia el nombre de la variable.
 		apu->ID = id; // Se asigna el valor del ID.
-		apu->valor = valor; // Se asigna el valor de la variable.
-		apu->num_linea = num_linea; // Se asigna el número de línea donde se encuentra la variable.
 		
 		apu->sig = NULL; // El apuntador del nodo "apu" apunta a NULL.
 	}
@@ -88,8 +86,8 @@ void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo)
 	}
 }
 
-int buscaVarNum(listaVarNum *Lista, char *nombre)
-{
+nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre)
+{	
 	nodo_VarNum *apu;
 	
 	// Se recorre la lista buscando la cadena:
@@ -98,15 +96,15 @@ int buscaVarNum(listaVarNum *Lista, char *nombre)
 	while (apu != NULL)
 	{
 		// Si se encuentra la cadena:
-		if(strncmp(nombre, apu->nombre, 16) == 0)
+		if(strncmp(nombre, apu->nombre, 17) == 0)
 		{
-			return 0;
+			return apu;
 		}
 		apu = apu->sig;
 	}
 
 	// Si la cadena no se encuentra:
-	return 1;	
+	return NULL;	
 }
 
 //int borraNodoVarNum(listaVarNum *Lista, nodo_VarNum *nd);
@@ -221,7 +219,7 @@ void pushBackTxt(listaText *Lista, nodo_Txt *nodo)
 	}
 }
 
-int buscaTxt(listaText *Lista, char *cadena)
+nodo_Txt *buscaTxt(listaText *Lista, char *cadena)
 {
 	nodo_Txt *apu;
 	
@@ -233,13 +231,13 @@ int buscaTxt(listaText *Lista, char *cadena)
 		// Si se encuentra la cadena:
 		if(strncmp(cadena, apu->cadena, 16) == 0)
 		{
-			return 0;
+			return apu;
 		}
 		apu = apu->sig;
 	}
 
 	// Si la cadena no se encuentra:
-	return 1;
+	//return NULL;
 }
 
 //int borraNodoTxt(listaText *Lista, nodo_Txt *nd);
