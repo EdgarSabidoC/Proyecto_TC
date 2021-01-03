@@ -414,10 +414,6 @@ char *tokenCadena(char *cadena)
 }
 
 
-/* Imprime los tokens en el archivo .sim */
-void impTokSim(FILE *archivo);
-
-
 /* Guarda en una lista el token y lo imprime en el archivo .lex */
 void impTokLex(char ident, char *token, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
@@ -734,6 +730,43 @@ void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[linea
 }
 
 
+/* Se imprimen las listas en el archivo .sim */
+void impSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
+{
+    // Se imprimen las listas en el archivo .sim:
+
+    // Se imprime la lista de variables:
+    fprintf(archivo_sim,"IDS\n");
+
+    nodo_VarNum *cont = lista_vars->raiz;
+    while(cont)
+    {
+        fprintf(archivo_sim, "%s, ID%02u\n", cont->nombre, cont->ID);
+        cont = cont->sig;
+    }
+    
+    // Se imprime la lista de cadenas de texto:    
+    fprintf(archivo_sim, "\nTXT\n");
+
+    nodo_Txt *cont2 = lista_cadenas->raiz;
+    while(cont2)
+    {
+        fprintf(archivo_sim,"%s, TX%02u\n", cont2->cadena, cont2->ID);
+        cont2 = cont2->sig;
+    }
+
+    // Se imprime la lista de valores:
+    fprintf(archivo_sim, "\nVAL\n");
+
+    nodo_Val *cont3 = lista_valores->raiz;
+    while(cont3)
+    {
+        fprintf(archivo_sim, "%d, %ld\n", cont3->valor_octal, cont3->valor_decimal);
+        cont3 = cont3->sig;
+    }
+
+}
+
 /* Función principal */
 int main(int argc, char **argv)
 {   
@@ -819,23 +852,8 @@ int main(int argc, char **argv)
     printf("\n\n\nSe verifican los tokens:\n");
     anaLex(lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
 
-    // Se imprimen las listas:
-    nodo_VarNum *cont = lista_var.raiz;
-    printf("\n\nLista de variables:\n\n");
-    while(cont)
-    {
-        printf("%s, ID%02u\n", cont->nombre, cont->ID);
-        cont = cont->sig;
-    }
-
-    nodo_Txt *cont2 = lista_txt.raiz;
-        
-    printf("\n\nLista de cadenas de texto:\n\n");
-    while(cont2)
-    {
-        printf("%s, TX%02u\n", cont2->cadena, cont2->ID);
-        cont2 = cont2->sig;
-    }
+    // Se imprimen las listas en el archivo .sim:
+    impSim(sim, &lista_var, &lista_txt, &lista_val);
 
     // Se libera la memoria ocupada por las listas:
     liberaListaVarNum(&lista_var);

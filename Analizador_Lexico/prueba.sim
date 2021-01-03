@@ -1,0 +1,22 @@
+IDS
+Hello, ID01
+WOrld, ID02
+factorial, ID03
+VarX, ID04
+VarY, ID05
+Num, ID06
+FINPRO, ID07
+
+TXT
+"\"HOlA MUNDO\"", TX01
+", TX02
+"Factorial de ", TX03
+" es ", TX04
+
+VAL
+1, 1
+0, 0
+1, 1
+1, 1
+2, 2
+3, 3
