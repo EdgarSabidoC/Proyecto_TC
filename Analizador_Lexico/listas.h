@@ -45,9 +45,28 @@ struct
 
 } listaText;
 
+typedef
+struct __nodoVal
+{
+	int valor_octal;
+	long long valor_decimal;
+
+	struct __nodoVal *sig;
+} nodo_Val;
+
+
+// Estructura de la lista de valores:
+typedef
+struct
+{
+	nodo_Val *raiz;
+	unsigned int tam;
+
+} listaVal;
+
+
 //--------------------------FUNCIONES PARA LISTA DE VARIABLES NUMÉRICAS--------------------------
 
-extern nodo_VarNum *basura_num;
 
 nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id);
 
@@ -61,14 +80,9 @@ void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo);
 
 nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre);
 
-//int borraNodoVarNum(listaVarNum *Lista, nodo_VarNum *nodo);
-
-void imprimeListaVarNum(FILE *archivo, listaVarNum *Lista);
-
 
 //--------------------------FUNCIONES PARA LISTA DE CADENAS DE TEXTO--------------------------
 
-extern nodo_Txt *basura_txt;
 
 nodo_Txt *creaNodoText(char *cadena, unsigned int id);
 
@@ -80,10 +94,17 @@ void liberaListaTxt(listaText*Lista);
 
 void pushBackTxt(listaText *Lista, nodo_Txt *nodo);
 
-nodo_Txt *buscaTxt(listaText *Lista, char *cadena);
 
-//int borraNodoTxt(listaText *Lista, nodo_Txt *nodo);
+//--------------------------FUNCIONES PARA LISTA DE VALORES--------------------------
 
-void imprimeListaTxt(FILE *archivo, listaText *Lista);
+nodo_Val *creaNodoVal(int numero_octal, long long numero_decimal);
+
+int liberaNodoVal(nodo_Val *nodo);
+
+void iniListaVal(listaVal *Lista);
+
+void liberaListaVal(listaVal *Lista);
+
+void pushBackVal(listaVal *Lista, nodo_Val *nodo);
 
 #endif

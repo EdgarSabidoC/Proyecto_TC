@@ -1,40 +1,67 @@
 #include "lexer.h" // Funciones del analizador léxico.
- // Funciones de las listas.
+#include <math.h>
 
-// VARIABLES
+/*  
 
-/* TOKENS ACEPTADOS QUE SON PARTE DEL LENGUAJE MIO */
+TOKENS ACEPTADOS QUE SON PARTE DEL LENGUAJE MIO
 
-// operadores relacionales: ">", "<", "=="
+ operadores relacionales: ">", "<", "=="
 
-// operadores aritméticos: '+', '-', '*', '/'
+ operadores aritméticos: '+', '-', '*', '/'
 
-// asignacion: '='
+ asignacion: '='
 
+*/
+
+// Contadores globales:
+
+/* Contador de variables numéricas */
 unsigned int cont_var = 0;
+
+/* Contador de variables de texto */
 unsigned int cont_txt = 0;
+
 
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 
-/* Genera un archivo .lex e imprime una cadena en él */
-void generarLexer(char *cadena, char *nombre_programa)
-{
 
-    FILE *lexer = fopen("Programa.lex", "a+");
-
-    // Se imprime la cadena en el archivo .lex:
-    fprintf(lexer, "%s", cadena);
-
-    fclose(lexer);
-}
-
-/* Genera el archivo .sim e imprime en él */
-void generarLex(char *cadena, char *nombre_programa)
+/* Genera un archivo ,Lex con el nombre del programa .mio */
+void generarSim(char *cadena, char *nombre_programa)
 {
     
 }
 
 
+/* Calcula el valor decimal de un número octal dada una cadena que sea un número */
+long long OctADec(char *numero)
+{
+    // La cadena se convierte en número:
+    int octal = atoi(numero);
+    
+    int decimal = 0;
+  
+    // Se inicializa el valor de la base de 1 que es 8^0:
+    int base = 1; 
+    
+    // Variable temporal:
+    int temp = octal; 
+    
+    while (temp) 
+    { 
+        // Se extrae el último dígito:
+        int ultimo_digito = temp % 10; 
+        temp = temp / 10; 
+
+        // Se multiplica el último dígito con el valor
+        // de la base correcto y se añade al valor decimal
+        decimal += ultimo_digito * base; 
+  
+        base = base * 8; 
+    } 
+
+    // Se retorna el decimal:
+    return decimal;
+}
 
 
 /* La función halla la cantidad de líneas de un texto */
@@ -60,7 +87,8 @@ int __contarLineasArchivo(FILE *archivo)
 }
 
 
-/* La función almacena las líneas del archivo dentro de un vector 
+/* 
+    La función almacena las líneas del archivo dentro de un vector 
     Retorna la cantidad de espacios en blanco que hay al principio de la línea.
 */
 void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, char cadena[lineas][caracteres])
@@ -87,7 +115,7 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, ch
 
 
 /* Valida si la cadena es una palabra reservada */
-bool __esReservada(char *cadena)
+int __esReservada(char *cadena)
 {
     unsigned int i = 0;
     char *palabras_reservadas[11] = {"PROGRAMA", "FINPROG", "SI", "ENTONCES", "SINO", "FINSI", "REPITE", "VECES", "FINREP", "IMPRIME", "LEE"};
@@ -98,47 +126,47 @@ bool __esReservada(char *cadena)
         // Si es una palabra reservada:
         if(strncmp(cadena, palabras_reservadas[i], sizeof(palabras_reservadas[i])) == 0)
         {   
-            return (true);
+            return (0);
         }
         i++;
     }
 
     // Si no es una palabra reservada:
-    return (false);
+    return (1);
 }
 
 
 /* Valida si la cadena es una ASIGNACIÓN */
-bool __esAsig(char *cadena)
+int __esAsig(char *cadena)
 {
     // '=' == 61 en ASCII.
 
     // Se verifica si es una asignación:
     if (*cadena == 61)
-        return (true);
+        return (0);
     
     // Si no es asignación:
-    return (false);
+    return (1);
 }
 
 
 /* Valida si la cadena es un SÍMBOLO */
-bool __esSimbol(char *token)
+int __esSimbol(char *token)
 {
     // Se verifica si el char es una letra o un número:
     if(isalpha(*token) != 0 || isdigit(*token) != 0)
     {
-        return (false);
+        return (1);
     }
 
     // Si es un símbolo:
-    return (true);
+    return (0);
 
 }
 
 
 /* Valida si la cadena es un OPERADOR ARITMÉTICO. */
-bool __esOpAr(char *cadena) 
+int __esOpAr(char *cadena) 
 { 
     unsigned int i = 0;
     char *op_ar[4] = {"+","-","*","/"};
@@ -149,18 +177,18 @@ bool __esOpAr(char *cadena)
         // Si es un operador aritmético:
         if(strncmp(cadena, op_ar[i], sizeof(op_ar[i])) == 0)
         {       
-            return (true); 
+            return (0); 
         }
         i++;
     }
     
     // Si no es un operador aritmético:
-    return (false);
+    return (1);
 }
 
 
 /* Valida si la cadena es un NÚMERO */
-bool __esNum(char *token)
+int __esNum(char *token)
 {
     // Si el primer char es un número:
     if(isdigit(*token) != 0)
@@ -176,17 +204,17 @@ bool __esNum(char *token)
         // Si es un número:
         if(*tmp == '\0')
         {
-            return (true);
+            return (0);
         }
 
         // Si no es un número
-        return (false);
+        return (1);
     }
 }
 
 
 /* Valida si la cadena es un OPERADOR RELACIONAL */
-bool __esOpRel(char *cadena)
+int __esOpRel(char *cadena)
 {
     unsigned int i = 0;
     char *op_rel[3] = {"<", ">", "=="};
@@ -196,66 +224,66 @@ bool __esOpRel(char *cadena)
     {
         if(strncmp(cadena, op_rel[i], sizeof(op_rel[i])) == 0)
         {       
-            return (true); 
+            return (0); 
         }
         i++;
     } // Fin while
 
     // Si no es un operador relacional:
-    return (false);      
+    return (1);      
 }
 
 
 /* Verifica si el caracter es un '#' COMENTARIO */
-bool __esComentario(char *cadena)
+int __esComentario(char *cadena)
 {
     // '#' == 35 en ASCII.
 
     // Si es comentario:
     if(*cadena == 35)
-        return (true);
+        return (0);
 
     // Si no es comentario:
-    return (false);
+    return (1);
 }
 
 
 /* Valida si el caracter es una COMILLA */
-bool __esComilla(char *cadena)
+int __esComilla(char *cadena)
 {
     // '\"' == 34 en ASCII,
 
     // Si es una comilla:
     if(*cadena == 34)
-        return (true);
+        return (0);
 
     // Si no es una comilla:
-    return (false);
+    return (1);
 }
 
 
 /* Valida si la cadena es un string */
-bool __esTexto(char *token, unsigned int num_linea)
+int __esTexto(char *token, unsigned int num_linea)
 {
     // Se verifica si es una palabra reservada:
 
     // Si es una cadena de text0:
     if(*token == '\"')
     {
-        return (true);    
+        return (0);    
     }
     
     // No es una cadena de texto:
-    return (false);
+    return (1);
 }
 
 
 /* Valida si la cadena es una variable válida */
-bool __esVarValid(char *token)
+int __esVarValid(char *token)
 {
     // Se verifica que no se trate de una palabra reservada:
-    if(__esReservada(token) == true)
-        return (false);
+    if(__esReservada(token) == 0)
+        return (1);
 
     // Si el token comienza con una letra:
     if (isalpha(*token) != 0)
@@ -275,29 +303,29 @@ bool __esVarValid(char *token)
         if(*tmp == '\0' || *tmp == ' ')
         {   
             // Es una variable válida:
-            return (true); 
+            return (0); 
         }
         
         // Si el char al que apunta tmp es un símbolo:
-        return (false);
+        return (1);
     }
 
     // Si no es una variable válida:
-    return (false);
+    return (1);
 }
 
 
 /* Valida si la cadena se trata de una variable */
-bool __esVariable(char *token)
+int __esVariable(char *token)
 {
-    if(__esReservada(token) == true)
-        return (false);
+    if(__esReservada(token) == 0)
+        return (1);
     
-    else if(__esVarValid(token) == true)
-        return (true);
+    else if(__esVarValid(token) == 0)
+        return (0);
     
     else
-        return (false);
+        return (1);
     
 }
 
@@ -307,11 +335,11 @@ char __Identifica(char *token, unsigned int num_linea)
 {
     if(isalpha(*token) != 0)
     {
-        if(__esReservada(token) == true)
+        if(__esReservada(token) == 0)
             return 'R';
         else
         {
-            if(__esVarValid(token) == true)
+            if(__esVarValid(token) == 0)
                 return 'V';
             else
                 return 'v'; // Es variable, pero no válida. Pues tiene algún símbolo raro dentro de la variable.
@@ -322,27 +350,27 @@ char __Identifica(char *token, unsigned int num_linea)
     {
         if(isdigit(*token) != 0)
         {
-            if(__esNum(token) == true)
+            if(__esNum(token) == 0)
                 return 'N';
             else
                 return 'n'; // Es una variable que comienza con un número. Error.
         }
         
-        else if(__esSimbol(token) == true)
+        else if(__esSimbol(token) == 0)
         {
-            if(__esComentario(token) == true)
+            if(__esComentario(token) == 0)
                 return '#'; // Es comentario.
 
-            else if(__esOpRel(token) == true)
+            else if(__esOpRel(token) == 0)
                 return 'r'; // Es operador relacional.
             
-            else if(__esOpAr(token) == true)
+            else if(__esOpAr(token) == 0)
                 return 'a';
             
-            else if(__esAsig(token) == true)
+            else if(__esAsig(token) == 0)
                 return 'A'; // Es asignación.
             
-            else if(__esComilla(token) == true)
+            else if(__esComilla(token) == 0)
                 return 'C'; // Es comilla.
             
             else if(strlen(token) > 2)
@@ -386,8 +414,82 @@ char *tokenCadena(char *cadena)
 }
 
 
-/* Retorna un token */
-char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas)
+/* Imprime los tokens en el archivo .sim */
+void impTokSim(FILE *archivo);
+
+
+/* Guarda en una lista el token y lo imprime en el archivo .lex */
+void impTokLex(char ident, char *token, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
+{
+    // Si es una variable:
+    if(ident == 'V')
+    { 
+        // Puntero a un nodo de variable;
+        nodo_VarNum *nodo;
+
+        // Se busca el nodo en la lista:
+        nodo = buscaVarNum(lista_vars, token);
+
+        // Si el nodo ya existe:
+        if (nodo)
+        {
+            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        }
+
+        // Si el nodo no existe:
+        else
+        {   
+            // Se aumenta el contador de variables numéricas:
+            cont_var++;
+
+            // Se crea el nodo y se ingresa a la lista:
+            nodo = creaNodoVarNum(token, cont_var);
+            pushBackVarNum(lista_vars, nodo);
+
+            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        }
+        
+    }
+
+    // Si es cadena de texto:
+    else if (ident == 'C')
+    {
+        // Aumenta el contador de cadenas de texto:
+        cont_txt++;
+        
+        // Puntero a un nodo de cadena de texto;
+        nodo_Txt *nodo;
+
+        // Se crea el nodo y se ingresa en la lista:
+        nodo = creaNodoText(token, cont_txt);
+        pushBackTxt(lista_cadenas, nodo);
+
+        // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+    }
+
+    // Si es un valor numérico
+    else if (ident == 'N')
+    {
+        // Puntero a un nodo de variable;
+        nodo_Val *nodo;
+
+        // Se obtiene el valor decimal del número:
+        long long token_decimal = OctADec(token);
+
+        // Se obtiene el valor octal del token:
+        int token_octal = atoi(token);
+            
+        // Se crea el nodo y se ingresa en la lista:
+        nodo = creaNodoVal(token_octal, token_decimal);
+        pushBackVal(lista_valores, nodo);
+
+        // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+    }
+}
+
+
+/* Retorna un token obtenido en la línea */
+char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     if(!cadena)
         return 0;
@@ -509,61 +611,8 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
 
     printf("[%s]\n", token);
 
-    // Si es una variable:
-    if(ident == 'V')
-    { 
-        // Puntero a un nodo de variable;
-        nodo_VarNum *nodo;
-        nodo = buscaVarNum(lista_vars, token);
-
-        if (nodo)
-        {
-            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
-        }
-
-        // Si el nodo no existe:
-        else
-        {   
-            // Se aumenta el contador:
-            cont_var++;
-
-            // Se crea el nodo y se ingresa a la lista:
-            nodo = creaNodoVarNum(token, cont_var);
-            pushBackVarNum(lista_vars, nodo);
-
-            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
-        }
-        
-    }
-
-    // Si es cadena de texto:
-    else if (ident == 'C')
-    {
-        // Puntero a un nodo de variable;
-        nodo_Txt *nodo;
-        nodo = buscaTxt(lista_cadenas, token);
-
-        // Si existe el nodo:
-        if(nodo)
-        {
-            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
-        }
-
-        // Si el nodo no existe:
-        else
-        {
-            nodo = NULL;
-
-            // Aumenta el contado:
-            cont_txt++;
-            
-            // Se crea el nodo y se ingresa en la lista:
-            nodo = creaNodoText(token, cont_txt);
-            pushBackTxt(lista_cadenas, nodo);
-
-            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
-        } 
-    }
+    // Se imprime el token de la lista correspondiente en el archivo .lex:
+    impTokLex(ident, token, lista_vars, lista_cadenas, lista_valores);
 
     // Se apunta el puntero de lexema a NULL:
     lexema = NULL;
@@ -580,7 +629,7 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
 
 
 /* Analizador léxico, aquí se generan los tokens del programa y se imprimen en los archivos .lex y .sim */
-void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_cadenas)
+void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_strs, listaVal *lista_vals)
 {
     unsigned int i; 
 
@@ -588,7 +637,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
     for(i = 0; i < lineas; i++)
     {
         // Se ignora la línea es un comentario:
-        if(__esComentario(cadena[i]) == true)
+        if(__esComentario(cadena[i]) == 0)
         {
             // Se pasa a la siguiente línea:
             continue;
@@ -614,7 +663,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
 
         // Se genera el primer token:
         char *token;
-        token = genTok(copia, i+1, lista_vars, lista_cadenas);
+        token = genTok(copia, i+1, lista_vars, lista_strs, lista_vals);
 
         // Si sólo hay un token en la línea:
         if(strlen(token) == strlen(cadena[i]))
@@ -648,7 +697,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
             {   
                 
                 // Se genera el siguiente token de la línea:
-                token = genTok(ptr, i+1, lista_vars, lista_cadenas);
+                token = genTok(ptr, i+1, lista_vars, lista_strs, lista_vals);
 
                 // Se genera el último o único token en la línea:
                 if(strlen(token) == strlen(ptr))
@@ -688,90 +737,115 @@ void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[linea
 /* Función principal */
 int main(int argc, char **argv)
 {   
-    if (argc>1)
+    // Si el programa no tiene la cantidad de argumentos correctos:
+    if (argc <= 1 || argc > 2)
+    // Falló al correr el programa:
+        return 1;
+    
+    // Se verifica que el archivo sea extensión .mio:
+    char *punto = strchr(argv[1], '.');
+    char *mio = ".mio";
+
+    // Se verifica que la extensión sea .mio
+    if(strncmp(punto, mio, sizeof(".mio")))
     {
-        char *punto = strchr(argv[1], '.');
-        char *mio = ".mio";
-
-        // Se verifica que la extensión sea .mio
-        if(strncmp(punto, mio, sizeof(".mio")))
-        {
-            printf("ERROR, no se encontró archivo .mio\n\n");
-            return -1;
-        }
-
-        // Puntero al nombre del programa:
-        char *nombre_programa = argv[1];
-        
-        printf("%s\n", nombre_programa);
-
-        //generarLex(NULL, nombre_programa);
-
-        // Puntero al archivo:
-        FILE *archivo = fopen(argv[1], "r");
-        
-        // Se inicializan las listas para almacenar la tabla de símbolos.
-        listaVarNum lista_var;
-        listaText lista_txt;
-
-        iniListaVarNum(&lista_var);
-        iniListaTxt(&lista_txt);
-
-        // Se cuenta la cantidad de líneas del archivo:
-        unsigned int lineas;
-        lineas = __contarLineasArchivo(archivo);
-        fclose(archivo); // Se cierra el archivo
-
-        // Cantidad de caracteres máximos de cada archivo:
-        unsigned int caracteres = 10000;
-
-        // Arreglo que almacenará cada línea del archivo:
-        char array[lineas][caracteres];
-
-        // Puntero al archivo:
-        FILE *parchivo = fopen(argv[1], "r");
-        
-        // Se guarda cada línea del archivo:
-        __guardarLineas(parchivo, lineas, caracteres, array);
-        fclose(parchivo); // Se cierra el archivo
-
-        // Se imprime cada línea del archivo:
-        printf("\n\n\nSe imprime lo del documento.\n");
-        __imprimeLineas(lineas, caracteres, array);
-        printf("\n\n\n");
-
-        // Se generan los tokens:
-        printf("\n\n\nSe verifican los tokens:\n");
-        anaLex(lineas, caracteres, array, &lista_var, &lista_txt);
-
-        // Se genera el archivo .lex:
-        //generarLexer(lineas, array);
-
-        // Se imprime la última línea del archivo:
-        //printf("\nEl numero de caracteres de la ultima linea es: %d", strlen(array[lineas-1]));
-        
-
-        // Se imprimen las listas:
-        nodo_VarNum *cont = lista_var.raiz;
-        printf("\n\nLista de variables:\n\n");
-        while(cont)
-        {
-            printf("%s, ID%02u\n", cont->nombre, cont->ID);
-            cont = cont->sig;
-        }
-
-        nodo_Txt *cont2 = lista_txt.raiz;
-        
-        printf("\n\nLista de cadenas de texto:\n\n");
-        while(cont2)
-        {
-            printf("%s, TX%02u\n", cont2->cadena, cont2->ID);
-            cont2 = cont2->sig;
-        }
-
-        // Se libera la memoria ocupada por las listas:
-        liberaListaVarNum(&lista_var);
-        liberaListaTxt(&lista_txt);
+        printf("ERROR, no se encontró archivo .mio\n\n");
+        return 1;
     }
+
+    // Puntero al nombre del programa:
+    char *nombre_programa = argv[1];
+        
+    printf("%s\n", nombre_programa);
+
+    // Archivo .lex:
+        
+    // Nombre del archivo .lex:
+    char nombre_lex[strlen(argv[1])+1];
+    strncpy(nombre_lex, argv[1], strlen(argv[1])-3);
+    strcat(nombre_lex, "lex");
+
+    printf("%s\n", nombre_lex);
+
+    // Se crea el archivo .lex:
+    FILE *lexer = fopen(nombre_lex, "a+");
+        
+    // Archivo .sim:
+        
+    // Nombre del archivo .sim:
+    char nombre_sim[strlen(argv[1])+1];
+    strncpy(nombre_sim, argv[1], strlen(argv[1])-3);
+    strcat(nombre_sim, "sim");
+
+    printf("%s\n", nombre_sim);
+
+    // Se crea el archivo .sim:
+    FILE *sim = fopen(nombre_sim, "a+");
+
+    // Se inicializan las listas para almacenar la tabla de símbolos.
+    listaVarNum lista_var;
+    listaText lista_txt;
+    listaVal lista_val;
+
+    iniListaVarNum(&lista_var);
+    iniListaTxt(&lista_txt);
+    iniListaVal(&lista_val);
+
+    // Se cuenta la cantidad de líneas del archivo .mio:
+    FILE *archivo = fopen(argv[1], "r");
+    unsigned int lineas;
+    lineas = __contarLineasArchivo(archivo);
+    fclose(archivo); // Se cierra el archivo
+
+    // Cantidad de caracteres máximos de cada archivo:
+    unsigned int caracteres = 10000;
+
+    // Arreglo que almacenará cada línea del archivo:
+    char array[lineas][caracteres];
+
+    // Puntero al archivo:
+    FILE *parchivo = fopen(argv[1], "r");
+        
+    // Se guarda cada línea del archivo:
+    __guardarLineas(parchivo, lineas, caracteres, array);
+    fclose(parchivo); // Se cierra el archivo
+
+    // Se imprime cada línea del archivo:
+    printf("\n\n\nSe imprime lo del documento.\n");
+    __imprimeLineas(lineas, caracteres, array);
+    printf("\n\n\n");
+
+    // Se generan los tokens:
+    printf("\n\n\nSe verifican los tokens:\n");
+    anaLex(lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
+
+    // Se imprimen las listas:
+    nodo_VarNum *cont = lista_var.raiz;
+    printf("\n\nLista de variables:\n\n");
+    while(cont)
+    {
+        printf("%s, ID%02u\n", cont->nombre, cont->ID);
+        cont = cont->sig;
+    }
+
+    nodo_Txt *cont2 = lista_txt.raiz;
+        
+    printf("\n\nLista de cadenas de texto:\n\n");
+    while(cont2)
+    {
+        printf("%s, TX%02u\n", cont2->cadena, cont2->ID);
+        cont2 = cont2->sig;
+    }
+
+    // Se libera la memoria ocupada por las listas:
+    liberaListaVarNum(&lista_var);
+    liberaListaTxt(&lista_txt);
+    liberaListaVal(&lista_val);
+
+    // Se cierra el archivo .lex y el archivo .sim:
+    fclose(lexer);
+    fclose(sim);
+
+    // Programa exitoso:
     return 0;
 }

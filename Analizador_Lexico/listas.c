@@ -2,20 +2,13 @@
 
 //--------------------------FUNCIONES PARA LISTA DE VARIABLES NUMÉRICAS--------------------------
 
-// Lista de nodos eliminados:
-nodo_VarNum *basura_num = NULL;
 
+/* Crea un nodo_VarNum */
 nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id)
 {
 	nodo_VarNum *apu;
 	
-	if (basura_num == NULL) // Equivalente a if (!basura)
-		apu = (nodo_VarNum *)malloc(sizeof(nodo_VarNum)); // Creamos un espacio de memoria del tamaño de la struct nodo_VarNum
-	else
-	{
-		apu = basura_num; // Al nodo "apu" le asignamos el nodo "basura".
-		basura_num = basura_num->sig; // El nodo "basura" apunta al nodo siguiente.
-	}
+	apu = (nodo_VarNum *)malloc(sizeof(nodo_VarNum)); // Se crea un espacio de memoria del tamaño de la struct nodo_VarNum
 
 	if (apu) //Equivalente a apu != NULL
 	{
@@ -25,29 +18,35 @@ nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id)
 		apu->sig = NULL; // El apuntador del nodo "apu" apunta a NULL.
 	}
 
-	return apu; // Retornamos el nodo "apu".
+	return apu; // Se retorna el nodo "apu".
 }
 
+
+/* LIbera la memoria ocupada por un nodo_VarNum */
 int liberaNodoVarNum(nodo_VarNum *nodo)
 {
 	if(nodo) //Equivalente a nodo != NULL
 	{
-		nodo->sig = basura_num; // el nodo siguiente pasa a ser el nodo basura.
-		basura_num = nodo; // basura pasa a convertirse en el nodo
-		
-		//free (nodo->sig);
-		
+		free(nodo); // Se libera la memoria del nodo_VarNum.
+	
+		// Si la operación es exitosa:	
 		return 0;
 	}
+
+	// Si no se pudo libera la memoria del nodo:
 	return -1;
 }
 
+
+/* Inicializa una lista de variables numéricas */
 void iniListaVarNum(listaVarNum *Lista)
 {
 	Lista->raiz = NULL; // El nodo raíz de la lista apunta a NULL
 	Lista->tam = 0; // La lista está vacía, entonces el tamaño es 0.
 }
 
+
+/* Libera el espacio de memoria ocupada por la lista de variables numéricas */
 void liberaListaVarNum(listaVarNum *Lista)
 {
 	nodo_VarNum *aux; // Apuntador auxiliar
@@ -62,6 +61,8 @@ void liberaListaVarNum(listaVarNum *Lista)
 	Lista->tam = 0; // Se deja el tamaño en 0, pues la lista está vacía
 }
 
+
+/* Ingresa un nodo_VarNum al final de la lista */
 void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo)
 {
 	if (nodo) //Equivalente a nd != NULL
@@ -86,6 +87,8 @@ void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo)
 	}
 }
 
+
+/* Busca el nodo de una variable numérica dentro de la lista */
 nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre)
 {	
 	nodo_VarNum *apu;
@@ -96,7 +99,7 @@ nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre)
 	while (apu != NULL)
 	{
 		// Si se encuentra la cadena:
-		if(strncmp(nombre, apu->nombre, 17) == 0)
+		if(strncmp(nombre, apu->nombre, 17) == 0) // Compara las cadenas.
 		{
 			return apu;
 		}
@@ -107,36 +110,11 @@ nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre)
 	return NULL;	
 }
 
-//int borraNodoVarNum(listaVarNum *Lista, nodo_VarNum *nd);
-
-void imprimeListaVarNum(FILE *archivo, listaVarNum *Lista)
-{
-	if(archivo) // Equivalente a archivo != NULL
-	{
-		if(!Lista->tam) // Si la lista esta vacia.
-			fprintf(archivo, "[]");
-		else
-		{
-			nodo_VarNum *aux = Lista->raiz; // Nodo auxiliar
-	
-      		fprintf(archivo, "[");
-	  		
-			while(aux->sig) //Equivalente a aux != NULL
-      		{
-    			fprintf (archivo, "%s, ID%u", aux->nombre, aux->ID);
-        		aux = aux->sig;
-    		}
-			fprintf (archivo, "%s, ID%u", aux->nombre, aux->ID); // Se imprime el último nodo.
-		}
-	}
-}
-
 
 //--------------------------FUNCIONES PARA LISTA DE CADENAS DE TEXTO--------------------------
 
-// Lista de nodos eliminados:
-nodo_Txt *basura_txt = NULL;
 
+/* Crea un nodo_Txt */
 nodo_Txt *creaNodoText(char *cadena, unsigned int id)
 {
 	nodo_Txt *apu;
@@ -157,25 +135,34 @@ nodo_Txt *creaNodoText(char *cadena, unsigned int id)
 	return apu; // Se retorna el nodo "apu".
 }
 
+
+/* Libera la memoria ocupada por un nodo_Txt */
 int liberaNodoTxt(nodo_Txt *nodo)
 {
 	if(nodo) //Equivalente a nodo != NULL
 	{
+		// Se libera la memoria ocupada por el nodo:
 		free(nodo->cadena); // Se libera la memoria del string del nodo.
-		//nodo->sig = basura_txt; // el nodo siguiente pasa a ser el nodo basura.
-		//basura_txt = nodo; // basura pasa a convertirse en el nodo
-		
+		free(nodo); // Se libera la memoria del nodo.
+
+		// Si la operación fue exitosa:
 		return 0;
 	}
+
+	// Si no se pudo liberar la memoria del nodo:
 	return -1;
 }
 
+
+/* Inicializa una lista de cadenas de texto */
 void iniListaTxt(listaText *Lista)
 {
 	Lista->raiz = NULL; // El nodo raíz de la lista apunta a NULL
 	Lista->tam = 0; // La lista está vacía, entonces el tamaño es 0.
 }
 
+
+/* Libera el espacio de memoria ocpada por la lista de cadenas de texto */
 void liberaListaTxt(listaText*Lista)
 {
 	nodo_Txt *aux; // Apuntador auxiliar
@@ -184,12 +171,15 @@ void liberaListaTxt(listaText*Lista)
 	{
 		aux = Lista->raiz; // El nodo "aux" adquiere lo que está en el nodo "raíz" de la lista.
 		Lista->raiz = Lista->raiz->sig; // La raíz de la lista apunta al valor del nodo siguiente del que era el nodo raíz.
+		
 		liberaNodoTxt(aux); // Se libera el nodo "aux"
 	}
 
 	Lista->tam = 0; // Se deja el tamaño en 0, pues la lista está vacía
 }
 
+
+/* Ingresa un nodo_Txt al final de la lista */
 void pushBackTxt(listaText *Lista, nodo_Txt *nodo)
 {
 	if (nodo) //Equivalente a nd != NULL
@@ -214,47 +204,91 @@ void pushBackTxt(listaText *Lista, nodo_Txt *nodo)
 	}
 }
 
-nodo_Txt *buscaTxt(listaText *Lista, char *cadena)
-{
-	nodo_Txt *apu;
-	
-	// Se recorre la lista buscando la cadena:
-	apu = Lista->raiz;
 
-	while (apu != NULL)
+//--------------------------FUNCIONES PARA LISTA DE VALORES--------------------------
+
+
+/* Crea un nodo_Val */
+nodo_Val *creaNodoVal(int numero_octal, long long numero_decimal)
+{
+	nodo_Val *apu;
+	
+	apu = (nodo_Val *)malloc(sizeof(nodo_Val)); // Creamos un espacio de memoria del tamaño de la struct nodo_Val
+
+	if (apu) //Equivalente a apu != NULL
 	{
-		// Si se encuentra la cadena:
-		if(strncmp(cadena, apu->cadena, 16) == 0)
-		{
-			return apu;
-		}
-		apu = apu->sig;
+		apu->valor_octal =  numero_octal; // Se asigna el valor octal.
+		apu->valor_decimal = numero_decimal; // Se asigna el valor decimal.
+		
+		apu->sig = NULL; // El apuntador del nodo "apu" apunta a NULL.
 	}
 
-	// Si la cadena no se encuentra:
-	return NULL;
+	return apu; // Retornamos el nodo "apu".
 }
 
-//int borraNodoTxt(listaText *Lista, nodo_Txt *nd);
 
-void imprimeListaTxt(FILE *archivo, listaText *Lista)
+/* Libera la memoria ocupada por un nodo_Val */
+int liberaNodoVal(nodo_Val *nodo)
 {
-	if(archivo) // Equivalente a archivo != NULL
+	if(nodo) //Equivalente a nodo != NULL
 	{
-		if(!Lista->tam) // Si la lista esta vacia.
-			fprintf(archivo, "[]");
+		// Se libera el nodo:
+		free(nodo);
+
+		// Si resulta existosa la operación:
+		return 0;
+	}
+
+	// Si no se pudo liberar el nodo:
+	return 1;
+}
+
+
+/* Inicializa una lista de valores */
+void iniListaVal(listaVal *Lista)
+{
+	Lista->raiz = NULL; // El nodo raíz de la lista apunta a NULL
+	Lista->tam = 0; // La lista está vacía, entonces el tamaño es 0.
+}
+
+
+/* Libera el espacio de memoria ocupado por la lista de valores */
+void liberaListaVal(listaVal *Lista)
+{
+	nodo_Val *aux; // Apuntador auxiliar
+	
+	while (Lista->raiz) // Mientras la raíz sea diferente de NULL
+	{
+		aux = Lista->raiz; // El nodo "aux" adquiere lo que está en el nodo "raíz" de la lista.
+		Lista->raiz = Lista->raiz->sig; // La raíz de la lista apunta al nodo siguiente del que era el nodo raíz.
+		liberaNodoVal(aux); // Se libera el nodo "aux"
+	}
+
+	Lista->tam = 0; // Se deja el tamaño en 0, pues la lista está vacía
+}
+
+
+/* Ingresa un nodo_Val al final de la lista */
+void pushBackVal(listaVal *Lista, nodo_Val *nodo)
+{
+	if (nodo) //Equivalente a nd != NULL
+	{
+		if (!Lista->raiz)
+		   Lista->raiz = nodo;
 		else
 		{
-			nodo_Txt *aux = Lista->raiz; // Nodo auxiliar
-	
-      		fprintf(archivo, "[");
-	  		
-			while(aux->sig) //Equivalente a aux != NULL
-      		{
-    			fprintf (archivo, "%s, ID%u", aux->cadena, aux->ID);
-        		aux = aux->sig;
-    		}
-			fprintf (archivo, "%s, ID%u", aux->cadena, aux->ID); // Se imprime el último nodo.
-		}
+			nodo_Val *apu;
+
+			// Se recorre toda la lista hasta que
+			// apu apunte al último nodo.
+			apu = Lista->raiz;
+			while (apu->sig)
+				apu = apu->sig;
+				
+			// Se inserta nodo despues de apu;	
+			apu->sig = nodo;
+			nodo = NULL;
+		}	
+		Lista->tam++;
 	}
 }
