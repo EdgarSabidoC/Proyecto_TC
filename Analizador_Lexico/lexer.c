@@ -103,9 +103,8 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, ch
             // Se cambia el caracter \n por \0;
             if(cadena[i][strlen(cadena[i])-1] == '\n')
                 cadena[i][strlen(cadena[i])-1] = '\0';
-
-            printf("%s\n", cadena[i]);
-            i++;
+                
+            i++; // Se pasa a la línea siguiente.
         }
 
         // Si se llega al final del archivo:
@@ -416,7 +415,7 @@ char *tokenCadena(char *cadena)
 
 
 /* Guarda en una lista el token y lo imprime en el archivo .lex */
-void impTokLex(char ident, char *token, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
+void impTokLex(FILE *archivo_lex, char ident, char *token, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     // Si es una variable:
     if(ident == 'V')
@@ -430,7 +429,8 @@ void impTokLex(char ident, char *token, listaVarNum *lista_vars, listaText *list
         // Si el nodo ya existe:
         if (nodo)
         {
-            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+            // Se imprime en el archivo .lex:
+            fprintf(archivo_lex, "[id] ID%02u\n", nodo->ID);
         }
 
         // Si el nodo no existe:
@@ -443,7 +443,8 @@ void impTokLex(char ident, char *token, listaVarNum *lista_vars, listaText *list
             nodo = creaNodoVarNum(token, cont_var);
             pushBackVarNum(lista_vars, nodo);
 
-            // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+            // Se imprime en el archivo .lex:
+            fprintf(archivo_lex, "[id] ID%02u\n", nodo->ID);
         }
         
     }
@@ -461,7 +462,8 @@ void impTokLex(char ident, char *token, listaVarNum *lista_vars, listaText *list
         nodo = creaNodoText(token, cont_txt);
         pushBackTxt(lista_cadenas, nodo);
 
-        // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        // Se imprime en el archivo .lex:
+        fprintf(archivo_lex, "[txt] TX%02u\n", nodo->ID);
     }
 
     // Si es un valor numérico
@@ -480,13 +482,14 @@ void impTokLex(char ident, char *token, listaVarNum *lista_vars, listaText *list
         nodo = creaNodoVal(token_octal, token_decimal);
         pushBackVal(lista_valores, nodo);
 
-        // SE TIENE QUE IMPRIMIR EN EL ARCHIVO .LEX
+        // Se imprime en el archivo .lex:
+        fprintf(archivo_lex, "[val]\n");
     }
 }
 
 
 /* Retorna un token obtenido en la línea */
-char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
+char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     if(!cadena)
         return 0;
@@ -509,7 +512,6 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
     
     // Se genera el puntero del lexema:
     lexema = strtok_r(copia_lex, " \t", &aux);
-    printf("Lexema: [%s]\n", lexema);
     
     // Se identifica el tipo de unidad léxica:
     char ident = __Identifica(lexema, num_linea);
@@ -524,80 +526,73 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
     {
         // Es reservada:
         case 'R':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t\0", &aux);
-        printf("Es reservada: ");
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t\0", &aux);
         break;
 
         // Es variable válida:
         case 'V':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("Es Variable: ");
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
         break;
 
         // Es variable que contiene símbolos:
         case 'v':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("ERROR en línea: [%u] --La variable contiene caracteres no válidos: ", num_linea);
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
+            fprintf(stdout, "ERROR en línea: [%u] --La variable contiene caracteres no válidos: %s\n", num_linea, ptr_strok);
         break;
 
         // Es variable que comienza con un número:
         case 'n':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("ERROR en línea: [%u] --La variable comienza con un número: ", num_linea);
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
+            fprintf(stdout, "ERROR en línea: [%u] --La variable comienza con un número: %s\n", num_linea, ptr_strok);
         break;
 
         // Es variable  que comienza con un símbolo:
         case 's':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("ERROR en línea: [%u] --La variable comienza con un caracter no válido: ", num_linea);
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
+            fprintf(stdout,"ERROR en línea: [%u] --La variable comienza con un caracter no válido: %s", num_linea, ptr_strok);
         break;
 
         // Es un número
         case 'N':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("Es número: ");
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
         break;
 
         // Es un operador aritmético:
         case 'a':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("Es un operador aritmético: ");
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
+            fprintf(archivo_lex, "[op_ar]\n"); // Se imprime en el archivo .lex
         break;
 
         // Es un operador relacional:
         case 'r':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("Es un operador relacional: ");
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
+            fprintf(archivo_lex, "[op_rel]\n"); // Se imprime en el archivo .lex
         break;
 
         // Es asginació:
         case 'A':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("Es asignación: ");
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
         break;
 
         // Es cadena:
         case 'C':
-        // Se genera token con la copia:
-        //ptr_strok = strtok_r(copia, "\n\0", &aux);
-        ptr_strok = tokenCadena(copia);
-        printf("Es cadena: ");
+            // Se genera token con la copia:
+            ptr_strok = tokenCadena(copia);
         break;
 
         // Es símbolo:
         case 'S':
-        // Se genera token con la copia:
-        ptr_strok = strtok_r(copia, " \n\t", &aux);
-        printf("Es símbolo: ");
+            // Se genera token con la copia:
+            ptr_strok = strtok_r(copia, " \n\t", &aux);
         break;
     }
 
@@ -607,10 +602,12 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
     // Se genera una copia dinámica de la cadena:
     strncpy(token, ptr_strok, strlen(ptr_strok)+1);    
 
-    printf("[%s]\n", token);
+    // Se imprime la palabra reservada o la asignación en el archivo ,lex:
+    if(ident == 'R' || ident == 'A')
+         fprintf(archivo_lex, "%s\n", ptr_strok); // Se imprime en el archivo .lex
 
     // Se imprime el token de la lista correspondiente en el archivo .lex:
-    impTokLex(ident, token, lista_vars, lista_cadenas, lista_valores);
+    impTokLex(archivo_lex, ident, token, lista_vars, lista_cadenas, lista_valores);
 
     // Se apunta el puntero de lexema a NULL:
     lexema = NULL;
@@ -627,7 +624,7 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
 
 
 /* Analizador léxico, aquí se generan los tokens del programa y se imprimen en los archivos .lex y .sim */
-void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_strs, listaVal *lista_vals)
+void anaLex(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_strs, listaVal *lista_vals)
 {
     unsigned int i; 
 
@@ -661,7 +658,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
 
         // Se genera el primer token:
         char *token;
-        token = genTok(copia, i+1, lista_vars, lista_strs, lista_vals);
+        token = genTok(archivo_lex, copia, i+1, lista_vars, lista_strs, lista_vals);
 
         // Si sólo hay un token en la línea:
         if(strlen(token) == strlen(cadena[i]))
@@ -695,7 +692,7 @@ void anaLex(unsigned int lineas, unsigned int chars, char cadena[lineas][chars],
             {   
                 
                 // Se genera el siguiente token de la línea:
-                token = genTok(ptr, i+1, lista_vars, lista_strs, lista_vals);
+                token = genTok(archivo_lex, ptr, i+1, lista_vars, lista_strs, lista_vals);
 
                 // Se genera el último o único token en la línea:
                 if(strlen(token) == strlen(ptr))
@@ -733,7 +730,7 @@ void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[linea
 
 
 /* Se imprimen las listas en el archivo .sim */
-void impSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
+void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     // Se imprimen las listas en el archivo .sim:
 
@@ -767,105 +764,4 @@ void impSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cadenas
         cont3 = cont3->sig;
     }
 
-}
-
-/* Función principal */
-int main(int argc, char **argv)
-{   
-    // Si el programa no tiene la cantidad de argumentos correctos:
-    if (argc <= 1 || argc > 2)
-    // Falló al correr el programa:
-        return 1;
-    
-    // Se verifica que el archivo sea extensión .mio:
-    char *punto = strchr(argv[1], '.');
-    char *mio = ".mio";
-
-    // Se verifica que la extensión sea .mio
-    if(strncmp(punto, mio, sizeof(".mio")))
-    {
-        printf("ERROR, no se encontró archivo .mio\n\n");
-        return 1;
-    }
-
-    // Puntero al nombre del programa:
-    char *nombre_programa = argv[1];
-        
-    printf("%s\n", nombre_programa);
-
-    // Archivo .lex:
-        
-    // Nombre del archivo .lex:
-    char nombre_lex[strlen(argv[1])+1];
-    strncpy(nombre_lex, argv[1], strlen(argv[1])-3);
-    strcat(nombre_lex, "lex");
-
-    printf("%s\n", nombre_lex);
-
-    // Se crea el archivo .lex:
-    FILE *lexer = fopen(nombre_lex, "a+");
-        
-    // Archivo .sim:
-        
-    // Nombre del archivo .sim:
-    char nombre_sim[strlen(argv[1])+1];
-    strncpy(nombre_sim, argv[1], strlen(argv[1])-3);
-    strcat(nombre_sim, "sim");
-
-    printf("%s\n", nombre_sim);
-
-    // Se crea el archivo .sim:
-    FILE *sim = fopen(nombre_sim, "a+");
-
-    // Se inicializan las listas para almacenar la tabla de símbolos.
-    listaVarNum lista_var;
-    listaText lista_txt;
-    listaVal lista_val;
-
-    iniListaVarNum(&lista_var);
-    iniListaTxt(&lista_txt);
-    iniListaVal(&lista_val);
-
-    // Se cuenta la cantidad de líneas del archivo .mio:
-    FILE *archivo = fopen(argv[1], "r");
-    unsigned int lineas;
-    lineas = __contarLineasArchivo(archivo);
-    fclose(archivo); // Se cierra el archivo
-
-    // Cantidad de caracteres máximos de cada archivo:
-    unsigned int caracteres = 10000;
-
-    // Arreglo que almacenará cada línea del archivo:
-    char array[lineas][caracteres];
-
-    // Puntero al archivo:
-    FILE *parchivo = fopen(argv[1], "r");
-        
-    // Se guarda cada línea del archivo:
-    __guardarLineas(parchivo, lineas, caracteres, array);
-    fclose(parchivo); // Se cierra el archivo
-
-    // Se imprime cada línea del archivo:
-    printf("\n\n\nSe imprime lo del documento.\n");
-    __imprimeLineas(lineas, caracteres, array);
-    printf("\n\n\n");
-
-    // Se generan los tokens:
-    printf("\n\n\nSe verifican los tokens:\n");
-    anaLex(lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
-
-    // Se imprimen las listas en el archivo .sim:
-    impSim(sim, &lista_var, &lista_txt, &lista_val);
-
-    // Se libera la memoria ocupada por las listas:
-    liberaListaVarNum(&lista_var);
-    liberaListaTxt(&lista_txt);
-    liberaListaVal(&lista_val);
-
-    // Se cierra el archivo .lex y el archivo .sim:
-    fclose(lexer);
-    fclose(sim);
-
-    // Programa exitoso:
-    return 0;
 }
