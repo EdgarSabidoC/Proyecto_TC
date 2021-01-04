@@ -101,7 +101,8 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, ch
         if(fgets(cadena[i], sizeof(cadena[i]), archivo) != NULL)
         {
             // Se cambia el caracter \n por \0;
-            cadena[i][strlen(cadena[i])-1] = '\0';
+            if(cadena[i][strlen(cadena[i])-1] == '\n')
+                cadena[i][strlen(cadena[i])-1] = '\0';
 
             printf("%s\n", cadena[i]);
             i++;
@@ -507,7 +508,8 @@ char *genTok(char *cadena, unsigned int num_linea, listaVarNum *lista_vars, list
     char *lexema; // Puntero al token que pasará por la función __Identifica.
     
     // Se genera el puntero del lexema:
-    lexema = strtok_r(copia_lex, " \n\t\0", &aux);
+    lexema = strtok_r(copia_lex, " \t", &aux);
+    printf("Lexema: [%s]\n", lexema);
     
     // Se identifica el tipo de unidad léxica:
     char ident = __Identifica(lexema, num_linea);
