@@ -2,12 +2,17 @@
 
 #include "sintax.c"
 
-int main(int argc, char **argv)
+/*int main(int argc, char **argv)
 {
-    //if()
-    //    return 1;
+    // Se declara e inicializa la lista:
+    listaTok *lista;
+    iniListaTok(&lista);
 
-    //analSin();    
+    // Se guardan los tokens del archivo dentro de la lista:
+    guardarTokens(&lista);
+    
+    // Se pasa la lista por el analizador de sintaxis:
+    analSintax(&lista);    
 
     return 0;
-}
+}*/

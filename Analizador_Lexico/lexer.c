@@ -669,6 +669,8 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
             continue;
         }
 
+        // Se imprime el primer número de línea en el archivo:
+        fprintf(archivo_lex,"~%u\n", i+1);
         
         unsigned int espacios = 0; // Contador de los espacios en blanco.
         char *tmp = cadena[i]; // Puntero para recorrer la cadena.

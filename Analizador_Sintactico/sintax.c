@@ -1,7 +1,44 @@
 #include "sintax.h"
 
 /* Crea una lista de los tokens de una línea */
-listaTok *crearListaToks();
+void guardarTokens(FILE *archivo_lex, listaTok *lista)
+{
+    unsigned int num_linea = 0;
+
+    // Se crea un arreglo dinámico temporal para guardar el token:
+    char *token = malloc(11 * sizeof(char));
+
+    // Se recorre el archivo:
+    while(fgets(token, sizeof(token), archivo_lex) != NULL)
+    {
+        // Si es el indicador del número de línea:
+        if(*token == '~')
+        {
+            // El número de línea se almacena:
+            num_linea = atoi(token+1);
+
+            free(token); // Se libera el espacio de memoria del token.
+
+            token = malloc(11 * sizeof(char)); // Se reserva nuevo espacio de memoria.
+
+            continue; // Continúa en el siguiente token.
+        }
+
+        // Si es un token:
+        nodo_Tok *nodo = creaNodoTok(token, num_linea);
+        
+        // Se verifica que el nodo no sea NULL:
+        if(nodo)
+            pushBackTok(lista, nodo); // Se inserta el nodo a la lista.
+
+        free(token); // Se libera el espacio de memoria del token.
+
+        token = malloc(11 * sizeof(char)); // Se reserva nuevo espacio de memoria.
+    }
+    
+    free(token); // Se libera el espacio de memoria del token.
+    token = NULL; // Se apunta el puntero de token a NULL.
+}
 
 
 /* Valida si la cadena es una palabra reservada */
@@ -184,115 +221,6 @@ int __esImprime(char *token, unsigned int num_linea)
 }
 
 
-/* Identifica si la sentencia es de repite */
-int __esRepite(nodo_Tok *nodo, unsigned int num_linea)
-{
-    if(__esElem(nodo->token) == 0)
-    {
-        // Se pasa al token siguiente:
-        nodo = nodo->sig;
-
-        if(strncmp(nodo->token,"VECES", strlen(nodo->token)+1) == 0)
-        {
-            // Se pasa al token siguiente:
-            nodo = nodo->sig;
-
-            if(__esSents(nodo) == 0)
-            {
-                // Se pasa al token siguiente:
-                nodo = nodo->sig;
-
-                if(strncmp(nodo->token,"FINREP", strlen(nodo->token)+1) == 0)
-                    return 0; // No hubo errores.
-
-                // Hubo error, falta FINREP:
-                printf("ERROR de sintaxis en línea [%u] --Falta FINREP.\n", num_linea);
-                return 1;
-            } // Fin if
-
-            // Hubo error, sentencia no válida:
-            printf("ERROR de sintaxis en línea [%u] --Sentencia no válida.\n", num_linea);
-            return 1;  
-        } // Fin if
-
-        // Hubo error, falta VECES:
-        printf("ERROR de sintaxis en línea [%u] --Falta VECES.\n", num_linea);
-        return 1;
-    } // Fin if
-
-    // Hubo errores:
-    printf("ERROR de sintaxis en línea [%u] --No es un elemento válido.\n", num_linea);
-    return 1;
-}
-
-
-/* Identifica si la sentencia es de Si-Entonces o un Si-Entonces-Sino */
-int __esSiEnt(nodo_Tok *nodo, unsigned int num_linea)
-{
-    if(__esCompara(nodo, num_linea) == 0)
-    {
-        nodo = nodo->sig; // Se pasa al nodo siguiente.
-
-        if(strncmp(nodo->token, "ENTONCES", strlen(nodo->token)+1) == 0)
-        {
-            nodo = nodo->sig; // Se pasa al nodo siguiente.
-
-            if(nodo = __esSents(nodo) == 0)
-            {
-                nodo = nodo->sig; // Se pasa al nodo siguiente.
-                
-                // Finaliza en FINSI:
-                if(strncmp(nodo->token, "FINSI", strlen(nodo->token)+1) == 0)
-                    return 0; // No hubo errores.
-
-                // Es un SI-ENTONCES-SINO:
-                else if(strncmp(nodo->token, "SINO", strlen(nodo->token)+1) == 0)
-                {
-                    nodo = nodo->sig; // Se pasa al nodo siguiente.
-
-                    if(nodo = __esSents(nodo))
-                    {
-                        nodo = nodo->sig; // Se pasa al nodo siguiente.
-
-                        if(strncmp(nodo->token, "FINSI", strlen(nodo->token)+1) == 0)
-                            return 0; // No hubo errores.
-                        
-                        // Hubo error, falta FINSI:
-                        printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (FINSI).\n", num_linea);
-                        return 1;
-                    
-                    } // Fin if
-
-                    // Hubo error, sentencia no válida:
-                    printf("ERROR de sintaxis en línea [%u] --Sentencia no válida.\n", num_linea);
-                    return 1;
-
-                } // Fin else if
-
-                // Hubo error, falta FINSI:
-                printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (FINSI).\n", num_linea);
-                return 1;
-
-            } // Fin if
-
-            // Hubo error, sentencia no válida:
-            printf("ERROR de sintaxis en línea [%u] --Sentencia no válida.\n", num_linea);
-            return 1;
-
-        } // Fin if
-
-        // Hubo error, sentencia no válida:
-        printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (ENTONCES).\n", num_linea);
-        return 1;
-
-    } // Fin if
-
-    // Hubo error, sentencia no válida:
-    printf("ERROR de sintaxis en línea [%u] --No es una comparación.\n", num_linea);
-    return 1;
-}
-
-
 /* Identifica si es una asginación */
 int __esAsig(nodo_Tok *nodo, unsigned int num_linea)
 {
@@ -337,74 +265,160 @@ int __esOperArit(nodo_Tok *nodo, unsigned int num_linea)
 
 
 /* Identifica si se trata de una sentencia válida */
-int __esSent(listaTok *lista, unsigned int num_linea)
+int __esSent(nodo_Tok *nodo, unsigned int num_linea)
 {
-    nodo_Tok *aux = lista->raiz;
+    //nodo_Tok *aux = lista->raiz;
     
     unsigned int error = 0;
 
-    if(__esReservada(aux->token) == 0)
+    if(__esReservada(nodo->token) == 0)
     {   
         // Si empieza con LEE:
-        if(strncmp(aux->token,"LEE", strlen(aux->token)+1) == 0)
+        if(strncmp(nodo->token,"LEE", strlen(nodo->token)+1) == 0)
         {   
             // Se pasa al token siguiente:
-            aux = aux->sig;
+            nodo = nodo->sig;
             
-            error = __esLee(aux->token, num_linea);
+            error = __esLee(nodo->token, num_linea);
 
             return error; // Se retorna el valor de error.
         }
 
         // Si empieza con IMPRIME:
-        else if(strncmp(aux->token, "IMPRIME", strlen(aux->token)+1) == 0)
+        else if(strncmp(nodo->token, "IMPRIME", strlen(nodo->token)+1) == 0)
         {
             // Se pasa al token siguiente:
-            aux = aux->sig;
+            nodo = nodo->sig;
 
-            error = __esImprime(aux->token, num_linea);
+            error = __esImprime(nodo->token, num_linea);
 
             return error; // Se retorna el valor de error.
         }
 
         // Si es repite:
-        else if(strncmp(aux->token, "REPITE", strlen(aux->token)+1) == 0)
+        else if(strncmp(nodo->token, "REPITE", strlen(nodo->token)+1) == 0)
         {   
             // Se pasa al token siguiente:
-            aux = aux->sig;
-            
-            error = __esRepite(aux, num_linea);
+            nodo = nodo->sig;
 
-            return error; // Se retorna el valor de error.
+            if(__esElem(nodo->token) == 0)
+            {
+                // Se pasa al token siguiente:
+                nodo = nodo->sig;
+
+                if(strncmp(nodo->token,"VECES", strlen(nodo->token)+1) == 0)
+                {
+                    nodo = nodo->sig; // Se pasa al token siguiente.
+
+                    if(__esSent(nodo, nodo->num_linea) == 0)
+                    {
+                        nodo = nodo->sig; // Se pasa al token siguiente.
+
+                        if(strncmp(nodo->token,"FINREP", strlen(nodo->token)+1) == 0)
+                            return 0; // No hubo errores.
+
+                        while(__esSent(nodo, nodo->num_linea) == 0)
+                        {
+                            nodo = nodo->sig; // Se pasa al token siguiente.
+
+                            if(strncmp(nodo->token,"FINREP", strlen(nodo->token)+1) == 0)
+                                return 0; // No hubo errores.
+                        }
+
+                        // Hubo error, falta FINREP:
+                        printf("ERROR de sintaxis en línea [%u] --Falta FINREP.\n", num_linea);
+                        return 1;
+
+                    } // Fin if
+
+                    // Hubo error, sentencia no válida:
+                    printf("ERROR de sintaxis en línea [%u] --Sentencia no válida.\n", num_linea);
+                    return 1;  
+
+                } // Fin if
+
+                // Hubo error, falta VECES:
+                printf("ERROR de sintaxis en línea [%u] --Falta VECES.\n", num_linea);
+                return 1;
+
+            } // Fin if
+
+            // Hubo error:
+            printf("ERROR de sintaxis en línea [%u] --No es un elemento válido.\n", num_linea);
+            return 1;
 
         } // Fin de else if de repite
 
         // Si es condicional si-entonces o si-entonces-sino:
-        else if(strncmp(aux->token, "SI", strlen(aux->token)+1) == 0)
+        else if(strncmp(nodo->token, "SI", strlen(nodo->token)+1) == 0)
         {
-            // Se pasa al token siguiente:
-            aux = aux->sig;  
+            nodo = nodo->sig;  // Se pasa al token siguiente.
 
-            error = __esSiEnt(aux, num_linea); 
+            if(__esCompara(nodo, nodo->num_linea) == 0)
+            {
+                nodo = nodo->sig;  // Se pasa al token siguiente.
 
-            return error; // Se retorna el valor de error.
+                if(strncmp(nodo->token, "ENTONCES", strlen(nodo->token)+1) == 0)
+                {
+                    nodo = nodo->sig;  // Se pasa al token siguiente.
+
+                    if(__esSent(nodo, nodo->num_linea) == 0)
+                    {
+                        nodo = nodo->sig;  // Se pasa al token siguiente.
+                    
+                        if(strncmp(nodo->token, "FINSI", strlen(nodo->token)+1) == 0)
+                            return 0; // No hubo errores.
+
+                        while(__esSent(nodo, nodo->num_linea) == 0)
+                        {
+                            nodo = nodo->sig; // Se pasa al nodo siguiente.
+
+                            if(strncmp(nodo->token,"FINSI", strlen(nodo->token)+1) == 0)
+                                return 0; // No hubo errores.
+                        }
+
+                        // Hubo error:
+                        printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (FINSI).\n", nodo->num_linea);
+                        return 1;
+
+                    } // Fin if __esSent
+
+                    // Hubo error:
+                    printf("ERROR de sintaxis en línea [%u] --Sentencia no válida.\n", nodo->num_linea);
+                    return 1;
+
+                } // Fin if ENTONCES
+
+                // Hubo error:
+                printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (ENTONCES).\n", nodo->num_linea);
+                return 1;
+
+            } // Fin if __esCompara
+
+            // Hubo error:
+            printf("ERROR de sintaxis en línea [%u] --No es una comparación.\n", nodo->num_linea);
+            return 1;
 
         } // Fin else if de condicional 
+        
+        // Hubo error:
+        printf("ERROR de sintaxis en línea [%u] --Sentencia no válida.\n", nodo->num_linea);
+        return 1;
 
-    } // Fin if
+    } // Fin if __esReservada
 
 
     // Si es una asignación:
-    else if((error = __esVariable(aux->token)) == 0)
+    else if((error = __esVariable(nodo->token)) == 0)
     {
-        aux = aux->sig; // Se pasa al token siguiente.
+        nodo = nodo->sig; // Se pasa al token siguiente.
 
-        if ((error = __esAsig(aux, num_linea)) == 0)
+        if ((error = __esAsig(nodo, num_linea)) == 0)
         {
-            aux = aux->sig;
+            nodo = nodo->sig;
 
-            if(aux) // Si hay otro nodo después:
-                error = __esOperArit(aux, num_linea);
+            if(nodo) // Si hay otro nodo después:
+                error = __esOperArit(nodo, num_linea);
         
         } // Fin if
 
@@ -413,7 +427,7 @@ int __esSent(listaTok *lista, unsigned int num_linea)
     } // Fin else if de asignación
 
     // Hubo errores
-    printf("ERROR de sintaxis en línea [%u] --No es una sentencia válida.\n", num_linea);
+    printf("[ERROR de sintaxis en línea [%u] --No es una sentencia válida].\n", num_linea);
     error = 1;
 
     // Se retorna el resultado del error, 0 si no hubo, 1 si hubo:
@@ -421,17 +435,52 @@ int __esSent(listaTok *lista, unsigned int num_linea)
 }
 
 
-/* Identifica si es SENTS */
-int __esSents(nodo_List *lista)
+/* Inicia el analizador sintáctico */
+int analSintax(listaTok *lista) 
 {
-    nodo_List *aux = lista->raiz_lista_tok;
+    nodo_Tok *aux = lista->raiz;
 
-    if(__esSent(lista->raiz_lista_tok, lista->num_linea) == 0)
+    if(strncmp(aux->token, "PROGRAMA", strlen(aux->token)+1) == 0)
     {
-        aux = aux->sig_lista; // Se pasa al siguiente nodo (sublista).
+        aux = aux->sig; // Se pasa al nodo siguiente.
 
-        if(aux) // Si la sublista no está vacía.
-            if(__esSents(aux->sig_lista) == 0)
-                printf("Hola MUndo");
-    }
+        if(__esVariable(aux->token) == 0)
+        {
+            aux = aux->sig; // Se pasa al nodo siguiente.
+
+            if(__esSent(aux, aux->num_linea) == 0)
+            {
+                aux = aux->sig; // Se pasa al nodo siguiente.
+
+                if(strncmp(aux->token,"FINPROG", strlen(aux->token)+1) == 0)
+                    return 0; // No hubo errores.
+
+                while(__esSent(aux, aux->num_linea) == 0)
+                {
+                    aux = aux->sig; // Se pasa al nodo siguiente.
+
+                    if(strncmp(aux->token,"FINPROG", strlen(aux->token)+1) == 0)
+                        return 0; // No hubo errores.
+
+                }
+
+                // Hubo error:
+                printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (FINPROG).\n", aux->num_linea);
+                return 1;
+
+            } // Fin if
+
+            // Hubo error:
+            printf("ERROR de sintaxis en línea [%u] --No es una sentencia válida.\n", aux->num_linea);
+            return 1;
+
+        } // Fin if __esVariable
+
+        printf("ERROR de sintaxis en línea [%u] --Falta identificador.\n", aux->num_linea);
+        return 1;
+
+    } // Fin if PROGRAMA
+
+    printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (PROGRAMA).\n", aux->num_linea);
+    return 1;
 }
