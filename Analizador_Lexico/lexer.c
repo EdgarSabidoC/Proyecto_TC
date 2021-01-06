@@ -25,13 +25,6 @@ unsigned int cont_txt = 0;
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 
 
-/* Genera un archivo ,Lex con el nombre del programa .mio */
-void generarSim(char *cadena, char *nombre_programa)
-{
-    
-}
-
-
 /* Calcula el valor decimal de un número octal dada una cadena que sea un número */
 long long OctADec(char *numero)
 {
@@ -330,7 +323,7 @@ int __esVariable(char *token)
 }
 
 
-/* Identifica el tipo de unidad léxica (inicia el análsis de la unidad léxica) */
+/* Identifica el tipo de componente léxico (inicia el análsis del componente léxico) */
 char __identifica(char *token, unsigned int num_linea)
 {
     if(isalpha(*token) != 0)
@@ -526,7 +519,7 @@ void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cad
 }
 
 
-/* Obtiene un token de una cadena según el tipo de unidad léxica identificada por __identifica y lo retorna (obtiene la unidad léxica) */
+/* Obtiene un token de una cadena según el tipo de componente léxico identificado por __identifica y lo retorna (obtiene un componente léxico) */
 char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     if(!cadena)

@@ -65,7 +65,7 @@ void liberaListaVarNum(listaVarNum *Lista)
 /* Ingresa un nodo_VarNum al final de la lista */
 void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo)
 {
-	if (nodo) //Equivalente a nd != NULL
+	if (nodo) //Equivalente a nodo != NULL
 	{
 		if (!Lista->raiz)
 		   Lista->raiz = nodo;
