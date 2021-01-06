@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
 
     // Se generan los tokens:
-    anaLex(lexer, lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
+    analizador(lexer, lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
 
 
 

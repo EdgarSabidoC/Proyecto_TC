@@ -330,8 +330,8 @@ int __esVariable(char *token)
 }
 
 
-/* Identifica el tipo de unidad léxica */
-char __Identifica(char *token, unsigned int num_linea)
+/* Identifica el tipo de unidad léxica (inicia el análsis de la unidad léxica) */
+char __identifica(char *token, unsigned int num_linea)
 {
     if(isalpha(*token) != 0)
     {
@@ -385,7 +385,7 @@ char __Identifica(char *token, unsigned int num_linea)
 }
 
 
-/* Genera el token para cadenas */
+/* Obtiene el token de tipo cadena de una línea */
 char *tokenCadena(char *cadena)
 {
     char *token, *tmp;
@@ -414,7 +414,7 @@ char *tokenCadena(char *cadena)
 }
 
 
-/* Guarda en una lista el token y lo imprime en el archivo .lex */
+/* Guarda en una lista un token de variable, cadena o valor, se imprime en el archivo .lex su respectiva representación */
 void impTokLex(FILE *archivo_lex, char ident, char *token, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     // Si es una variable:
@@ -488,7 +488,45 @@ void impTokLex(FILE *archivo_lex, char ident, char *token, listaVarNum *lista_va
 }
 
 
-/* Retorna un token obtenido en la línea */
+/* Se imprimen las listas en el archivo .sim */
+void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
+{
+    // Se imprimen las listas en el archivo .sim:
+
+    // Se imprime la lista de variables:
+    fprintf(archivo_sim,"IDS\n");
+
+    nodo_VarNum *cont = lista_vars->raiz;
+    while(cont)
+    {
+        fprintf(archivo_sim, "%s, ID%02u\n", cont->nombre, cont->ID);
+        cont = cont->sig;
+    }
+    
+    // Se imprime la lista de cadenas de texto:    
+    fprintf(archivo_sim, "\nTXT\n");
+
+    nodo_Txt *cont2 = lista_cadenas->raiz;
+    while(cont2)
+    {
+        fprintf(archivo_sim,"%s, TX%02u\n", cont2->cadena, cont2->ID);
+        cont2 = cont2->sig;
+    }
+
+    // Se imprime la lista de valores:
+    fprintf(archivo_sim, "\nVAL\n");
+
+    nodo_Val *cont3 = lista_valores->raiz;
+    while(cont3)
+    {
+        fprintf(archivo_sim, "%d, %ld\n", cont3->valor_octal, cont3->valor_decimal);
+        cont3 = cont3->sig;
+    }
+
+}
+
+
+/* Obtiene un token de una cadena según el tipo de unidad léxica identificada por __identifica y lo retorna (obtiene la unidad léxica) */
 char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     if(!cadena)
@@ -514,7 +552,7 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
     lexema = strtok_r(copia_lex, " \t", &aux);
     
     // Se identifica el tipo de unidad léxica:
-    char ident = __Identifica(lexema, num_linea);
+    char ident = __identifica(lexema, num_linea);
     
     // Se apunta el aux a NULL para ser reutilizado:
     aux = NULL;
@@ -623,15 +661,15 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
 }
 
 
-/* Analizador léxico, aquí se generan los tokens del programa y se imprimen en los archivos .lex y .sim */
-void anaLex(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_strs, listaVal *lista_vals)
+/* Crea las cadenas para obtener los tokens a través de genTok e inicia el proceso de análisis por línea (identifica si hay una o más unidades léxicas en la línea) */
+void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_strs, listaVal *lista_vals)
 {
     unsigned int i; 
 
     // Se recorre cada línea:
     for(i = 0; i < lineas; i++)
     {
-        // Se ignora la línea es un comentario:
+        // Se ignora la línea si es un comentario:
         if(__esComentario(cadena[i]) == 0)
         {
             // Se pasa a la siguiente línea:
@@ -703,7 +741,7 @@ void anaLex(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char cad
                     free(token);
                     token = NULL;
 
-                    break;
+                    break; // Se rompe el ciclo.
                 }
 
                 // Se apunta a la siguiente unidad léxica de la cadena
@@ -714,54 +752,7 @@ void anaLex(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char cad
                 free(token);
                 token = NULL;
             } // Fin while
-        }
+        } // Fin else
     } // Fin for
 }
 
-
-/* La función imprime un arreglo con las líneas del archivo */
-void __imprimeLineas(unsigned int lineas, unsigned int chars, char arreglo[lineas][chars])
-{
-    unsigned int i;
-
-    for(i = 0; i < lineas; i++)
-        printf("%s\n", arreglo[i]);
-}
-
-
-/* Se imprimen las listas en el archivo .sim */
-void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
-{
-    // Se imprimen las listas en el archivo .sim:
-
-    // Se imprime la lista de variables:
-    fprintf(archivo_sim,"IDS\n");
-
-    nodo_VarNum *cont = lista_vars->raiz;
-    while(cont)
-    {
-        fprintf(archivo_sim, "%s, ID%02u\n", cont->nombre, cont->ID);
-        cont = cont->sig;
-    }
-    
-    // Se imprime la lista de cadenas de texto:    
-    fprintf(archivo_sim, "\nTXT\n");
-
-    nodo_Txt *cont2 = lista_cadenas->raiz;
-    while(cont2)
-    {
-        fprintf(archivo_sim,"%s, TX%02u\n", cont2->cadena, cont2->ID);
-        cont2 = cont2->sig;
-    }
-
-    // Se imprime la lista de valores:
-    fprintf(archivo_sim, "\nVAL\n");
-
-    nodo_Val *cont3 = lista_valores->raiz;
-    while(cont3)
-    {
-        fprintf(archivo_sim, "%d, %ld\n", cont3->valor_octal, cont3->valor_decimal);
-        cont3 = cont3->sig;
-    }
-
-}
