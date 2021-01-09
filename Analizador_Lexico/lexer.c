@@ -1,5 +1,4 @@
 #include "lexer.h" // Funciones del analizador léxico.
-#include <math.h>
 
 /*  
 
@@ -84,7 +83,7 @@ int __contarLineasArchivo(FILE *archivo)
     La función almacena las líneas del archivo dentro de un vector 
     Retorna la cantidad de espacios en blanco que hay al principio de la línea.
 */
-void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned caracteres, char cadena[lineas][caracteres])
+void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres, char cadena[lineas][caracteres])
 {
     unsigned int i = 0;
 
@@ -671,7 +670,7 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
 
         // Se imprime el primer número de línea en el archivo:
         fprintf(archivo_lex,"~%u\n", i+1);
-        
+
         unsigned int espacios = 0; // Contador de los espacios en blanco.
         char *tmp = cadena[i]; // Puntero para recorrer la cadena.
         
