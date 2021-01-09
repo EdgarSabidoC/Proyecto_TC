@@ -9,20 +9,15 @@ nodo_Tok *creaNodoTok(char *token, unsigned int num_linea)
 {
     nodo_Tok *apu;
 
-	apu = (nodo_Tok *)malloc(sizeof(nodo_Tok)); // Creamos un espacio de memoria del tamaño de la struct nodo_Tok
+	apu = malloc(sizeof(nodo_Tok)); // Creamos un espacio de memoria del tamaño de la struct nodo_Tok
 
 	if (apu) //Equivalente a apu != NULL
 	{
-		// Se crea un arreglo dinámico del tamaño del token:
-		apu->token = (char *)malloc(strlen(token)+1 * sizeof(char));
-
-		strncpy(apu->token, token, strlen(token)+1); // Se copia el token en el nodo.	
+		memcpy(apu->token, token, strlen(token)+1); // Se copia el token en el nodo.	
 		apu->num_linea = num_linea; // Se guarda el número de línea del token.
 
 		apu->sig = NULL; // El apuntador del nodo "apu" apunta a NULL.
 	}
-
-	free(token); // Se libera la memoria del token.
 
 	return apu; // Se retorna el nodo "apu".
 }

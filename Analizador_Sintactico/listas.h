@@ -1,15 +1,15 @@
 #ifndef __LISTA_SIMPLE__
 #define __LISTA_SIMPLE__
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 // Lista de tokens:
 typedef 
 struct _nodoToken // Nodo de token
 {
-	char *token;
+	char token[12];
 	unsigned int num_linea;
 
 	struct _nodoToken *sig;

@@ -1,4 +1,4 @@
-#ifndef __SINTAX__
+/*#ifndef __SINTAX__
 #define __SINTAX__
 
 #include "listas.c"
@@ -7,4 +7,4 @@
 
 int __esSents(nodo_List *lista);*/
 
-#endif
+//#endif
