@@ -218,10 +218,10 @@ int __esTexto(char *token)
 // Valida si la cadena se trata de una variable 
 int __esVariable(char *token)
 {
-    if(strstr(token,"[id]"))
+    if(strncmp(token,"[id]", 4) == 0)
         return 0; // Si es variable.
     
-    // Si no es una variable:
+    // No es una variable:
     return 1;
     
 }
@@ -280,7 +280,7 @@ int __esCompara(nodo_Tok *nodo)
 int __esLee(char *token)
 {
     if(strncmp(token, "LEE", strlen(token)+1) == 0)
-            return 0; // Es LEE.
+        return 0; // Es LEE.
     
     // No es LEE:
     return 1;  
@@ -300,7 +300,7 @@ int __esImprime(char *token)
 
 
 // Identifica si es una igualación:
-int __esAsig(nodo_Tok *token)
+int __esAsig(char *token)
 {
     if(strncmp(token, "=", strlen(token)+1) == 0)
         return 0; // Es un signo de igual.
@@ -407,15 +407,14 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         // Si empieza con LEE:
         if(__esLee(nodo->token) == 0)
         {   
-            // Se pasa al token siguiente:
-            nodo = nodo->sig;
+            nodo = nodo->sig; // Se pasa al nodo siguiente.
             
             // Se verifica que el token siguiente
             // sea un identificador, si no, hay error:
-            if(__esVariable(nodo->token) != 0);
+            if(__esVariable(nodo->token));
             {    
                 // Hubo error:
-                printf("ERROR de sintaxis en línea [%u] --No es un identificador válido", nodo->num_linea);
+                printf("ERROR de sintaxis en línea [%u] --No es un identificador válido.\n", nodo->num_linea);
                 num_errores++;   
             }
         }
@@ -663,7 +662,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     }
 
     // Se retorna el puntero al nodo siguiente
-    return nodo;
+    return nodo->sig;
 }
 
 
@@ -681,7 +680,8 @@ int iniAnalSin(listaTok *lista)
     // las sentencias de la lista sean válidas:
     while(aux)
     {
-        aux = __esSent(aux);
+        printf("[%s] --{%u}--\n", aux->token, aux->num_linea);
+        aux = __esSent(aux); // Nodo siguiente.
     }
     
     // Retorna copia del contador global num_errores:

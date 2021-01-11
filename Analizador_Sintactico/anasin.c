@@ -23,10 +23,11 @@ int main(int argc, char **argv)
     // Se imprime el contenido de la lista:
     while(nodo)
     {
-        printf("Cadena: %s -- Num_linea[%u]\n", nodo->token, nodo->num_linea);
+        printf("Cadena: [%s] -- Num_linea[%u]\n", nodo->token, nodo->num_linea);
         nodo = nodo->sig;
-    }  
-    
+    }
+    printf("\n\n");
+
     // Se inicia el analizador sintáctico con la lista:
     unsigned int errores; // Número de errores.
     errores = iniAnalSin(&lista);
