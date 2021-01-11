@@ -27,6 +27,18 @@ int main(int argc, char **argv)
         nodo = nodo->sig;
     }  
     
+    // Se inicia el analizador sintáctico con la lista:
+    unsigned int errores; // Número de errores.
+    errores = iniAnalSin(&lista);
+
+    if(errores != 0)
+    {
+        printf("Compilación no exitosa:\n");
+        printf("Se encontraron %u errores.\n", errores);
+        return EXIT_FAILURE;
+    }
+    
     // Finalización exitosa del programa:
+    printf("¡COMPILACIÓN EXITOSA!\n");
     return EXIT_SUCCESS;
 }

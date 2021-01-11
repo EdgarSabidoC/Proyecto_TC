@@ -299,54 +299,18 @@ int __esImprime(char *token)
 }
 
 
-// Identifica si es una asginación 
-int __esAsig(nodo_Tok *nodo)
+// Identifica si es una igualación:
+int __esAsig(nodo_Tok *token)
 {
-    if(strncmp(nodo->token, "=", strlen(nodo->token)+1) == 0)
-    {
-        nodo = nodo->sig; // Se pasa al siguiente nodo.
-
-        if(__esElem(nodo->token) == 0)
-            return 0; // No hubo errores.
-
-        // Hubo error, no es un elemento válido:
-        printf("ERROR de sintaxis en línea [%u] --No es un elemento válido.\n", nodo->num_linea);
-        num_errores++;
-        return 1;
-
-    } // Fin if
-
-    // Hubo error, no es una asignación:
-    printf("ERROR de sintaxis en línea [%u] --No es un operador de asginación válido.\n", nodo->num_linea);
-    num_errores++;
+    if(strncmp(token, "=", strlen(token)+1) == 0)
+        return 0; // Es un signo de igual.
+    
+    // No es un signo de igual :
     return 1;
 }
 
 
-// Identifica si la cadena es una operación aritmética 
-int __esOperArit(char *token)
-{
-    if(__esOpAr(token) == 0)
-    {
-        nodo = nodo->sig; // Se pasa al nodo siguiente.
-
-        if(__esElem(nodo->token) == 0)
-            return 0; // No hubo errores.
-
-        // Hubo error, no es un elemento válid:
-        printf("ERROR de sintaxis en línea [%u] --No es un elemento válido.\n", nodo->num_linea);
-        num_errores++;
-        return 1;
-
-    } // Fin if
-             
-    printf("ERROR de sintaxis en línea [%u] --No es un operador aritmético válido.\n", nodo->num_linea);
-    num_errores++;
-    return 1;
-}
-
-
-
+// Identifica si el token es un REPTE:
 int __esRepite(char *token)
 {
     // Se verifica que el token sea un REPITE:
@@ -358,7 +322,7 @@ int __esRepite(char *token)
 }
 
 
-
+// Identifica si el token es un VECES:
 int __esVeces(char *token)
 {   
     // Se verifica si el token es VECES:
@@ -370,7 +334,7 @@ int __esVeces(char *token)
 }
 
 
-
+// Identifica si el token es un FINREP:
 int __esFinRep(char *token)
 {   
     // Se verifica si el token es FINREP:
@@ -382,7 +346,7 @@ int __esFinRep(char *token)
 }
 
 
-
+// Identifica si el token es un SI:
 int __esSi(char *token)
 {   
     // Se verifica si el token es SI:
@@ -394,7 +358,7 @@ int __esSi(char *token)
 }
 
 
-
+// Identifica si el token es un SINO:
 int __esSiNo(char *token)
 {   
     // Se verifica si el token es SINO:
@@ -406,7 +370,7 @@ int __esSiNo(char *token)
 }
 
 
-
+// identifica si el token es un FINSI:
 int __esFinSi(char *token)
 {   
     // Se verifica si el token es FINSI:
@@ -418,7 +382,7 @@ int __esFinSi(char *token)
 }
 
 
-
+// Identifica si el token es un ENTONCES:
 int __esEntonces(char *token)
 {   
     // Se verifica si el token es ENTONCES:
@@ -434,7 +398,9 @@ int __esEntonces(char *token)
 // Identifica si se trata de una sentencia válida 
 nodo_Tok *__esSent(nodo_Tok *nodo)
 {   
-    unsigned int error = 0;
+    // Si el nodo es nulo:
+    if(!nodo)
+        return nodo;
 
     if(__esReservada(nodo->token) == 0)
     {   
@@ -485,7 +451,8 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                 {
                     nodo = nodo->sig; // Se pasa al nodo siguiente.
 
-                    if(__esSent(nodo) == 0)
+                    // Se verifica que el token sea una sentencia válida:
+                    if(__esSent(nodo))
                     {
                         nodo = nodo->sig; // Se pasa al nodo siguiente.
 
@@ -494,7 +461,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                         {   
                             // Se verifica que sea un nodo diferente de NULL y 
                             // que lo que siga sean sentencias válidas:
-                            while(nodo && __esSent(nodo) == 0)
+                            while(nodo && __esSent(nodo))
                             {
                                 nodo = nodo->sig; // Se pasa al nodo siguiente.
 
@@ -550,7 +517,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                 {
                     nodo = nodo->sig;  // Se pasa al nodo siguiente.
 
-                    if(__esSent(nodo) == 0)
+                    if(__esSent(nodo))
                     {
                         nodo = nodo->sig;  // Se pasa al nodo siguiente.
                     
@@ -558,7 +525,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                         {    
                             // Se verifica que sea un nodo diferente de NULL y 
                             // que lo que siga sean sentencias válidas:
-                            while(nodo && __esSent(nodo) == 0)
+                            while(nodo && __esSent(nodo))
                             {
                                 nodo = nodo->sig; // Se pasa al nodo siguiente.
 
@@ -579,7 +546,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                             // entonces se verifica si es un SINO:
                             else if(__esSiNo(nodo->token) == 0)
                             {
-                                if(__esSent(nodo) == 0)
+                                if(__esSent(nodo))
                                 {
                                     nodo = nodo->sig;  // Se pasa al nodo siguiente.
                     
@@ -587,7 +554,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                     {    
                                         // Se verifica que sea un nodo diferente de NULL y 
                                         // que lo que siga sean sentencias válidas:
-                                        while(nodo && __esSent(nodo) == 0)
+                                        while(nodo && __esSent(nodo))
                                         {
                                             nodo = nodo->sig; // Se pasa al nodo siguiente.
 
@@ -649,27 +616,44 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         }
     } // Fin if __esReservada
 
-    // Si es una asignación:
-    else if((__esVariable(nodo->token)) == 0)
+    // Se verifica si es una sentencia de asignación:
+    else if(__esVariable(nodo->token) == 0)
     {
         nodo = nodo->sig; // Se pasa al nodo siguiente.
 
-        if((__esAsig(nodo)) == 0)
+        // Se verifica que sea un signo de '=':
+        if(__esAsig(nodo->token) == 0)
         {
-            nodo = nodo->sig;
+            nodo = nodo->sig; // Se pasa al nodo siguiente.
 
-            if(nodo) // Si hay otro nodo después:
-                if(__esOperArit(nodo) != 0)
+            // Se verifica si el token es un ELEM:
+            if(__esElem(nodo->token) == 0)
+            {      
+                nodo = nodo->sig; // Se pasa al nodo siguiente.
+
+                // Se verifica si el token siguiente es un operador aritmético:
+                if(__esOpAr(nodo->token) == 0)
                 {
-                    printf("ERROR de sintaxis en línea [%u] --No es un operador aritmético válido.\n", nodo->num_linea);
-                    num_errores++;
-                }
-        
-        } // Fin if
+                    nodo = nodo->sig; // Se pasa al nodo siguiente.
 
-        return nodo; // Se retorna el valor de nodo.
+                    // Se verifica si el token no es un ELEM:
+                    if(__esElem(nodo->token) != 0)
+                    {
+                        printf("ERROR de sintaxis en línea [%u] --Elemento no encontrado.\n", nodo->num_linea);
+                        num_errores++;
+                    }
 
-    } // Fin else if de asignación
+                    // Si es un elemento, se verifica que lo que siga no sea
+                    // un signo de '=', en caso de ser un identificador (variable):
+                    else if(__esAsig(nodo->sig->token) == 0)
+                    {
+                        printf("ERROR de sintaxis en línea [%u] --No es posible operar una asignación.\n");
+                        num_errores++;
+                    }
+                } // Fin if __esOpAr.
+            } // Fin if __esElem.
+        } // Fin if __esAsig.
+    } // Fin else if de __esVar de asignación.
 
     // Hubo error de sentencia:
     else
@@ -679,62 +663,28 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     }
 
     // Se retorna el puntero al nodo siguiente
-    // si el nodo no es nulo:
-    if(nodo)    
-        return nodo;
-    return NULL;
+    return nodo;
 }
 
 
-// Inicia el analizador sintáctico 
-int analSintax(listaTok *lista) 
+// Inicia el analizador sintáctico: 
+int iniAnalSin(listaTok *lista) 
 {
+    // Si la lista es NULL:
+    if(!lista)
+        return num_errores++;
+
+    // Nodo auxiliar para recorrer la lista:
     nodo_Tok *aux = lista->raiz;
 
-    if(strncmp(aux->token, "PROGRAMA", strlen(aux->token)+1) == 0)
+    // Se llama a __esSent para verificar que todas
+    // las sentencias de la lista sean válidas:
+    while(aux)
     {
-        aux = aux->sig; // Se pasa al nodo siguiente.
-
-        if(__esVariable(aux->token) == 0)
-        {
-            aux = aux->sig; // Se pasa al nodo siguiente.
-
-            if(__esSent(aux) == 0)
-            {
-                aux = aux->sig; // Se pasa al nodo siguiente.
-
-                if(strncmp(aux->token,"FINPROG", strlen(aux->token)+1) == 0)
-                    return 0; // No hubo errores.
-
-                while(__esSent(aux) == 0)
-                {
-                    aux = aux->sig; // Se pasa al nodo siguiente.
-
-                    if(strncmp(aux->token,"FINPROG", strlen(aux->token)+1) == 0)
-                        return 0; // No hubo errores.
-
-                }
-
-                // Hubo error:
-                printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (FINPROG).\n", aux->num_linea);
-                num_errores++;
-
-            } // Fin if
-
-            // Hubo error:
-            printf("ERROR de sintaxis en línea [%u] --No es una sentencia válida.\n", aux->num_linea);
-            num_errores++;
-
-        } // Fin if __esVariable
-
-        printf("ERROR de sintaxis en línea [%u] --Falta identificador.\n", aux->num_linea);
-        num_errores++;
-
-    } // Fin if PROGRAMA
-
-    printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (PROGRAMA).\n", aux->num_linea);
-    num_errores++;
-
+        aux = __esSent(aux);
+    }
+    
+    // Retorna copia del contador global num_errores:
     return num_errores;
 }
 
