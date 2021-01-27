@@ -109,7 +109,7 @@ void guardarTokens(FILE *arch_lex_1, FILE *arch_lex_2, listaTok *lista)
 		// Si no se encuentra FINPROG:
 		else if(num_linea_lex == 46 && strncmp(linea, "FINPROG", strlen(linea)) != 0)
 		{
-        	printf("ERROR de sintaxis en línea [%u] --FINPROG no encontrado.\n");
+        	printf("ERROR de sintaxis en línea [%u] --FINPROG no encontrado.\n", num_linea_mio);
             num_errores++;
         }    
 		
@@ -161,8 +161,8 @@ int __esOpAr(char *cadena)
 int __esVal(char *token)
 {
     // Se verifica si es un número:
-    if(strstr(token, "[val]"))
-    {       
+    if(strncmp(token, "[val]", strlen(token)) == 0)
+    {   
         return 0; // Si es un número.
     }
 
@@ -230,10 +230,10 @@ int __esVariable(char *token)
 // Identifica si el token es un elemento 
 int __esElem(char *token)
 {
-    if(__esVariable(token))
+    if(__esVariable(token) == 0)
         return 0; // Es un elemento, es una variable.
     
-    else if(__esVal(token))
+    else if(__esVal(token) == 0)
         return 0; // Es un elemento, es un valor.
     
     // No es un elemento:
@@ -279,7 +279,7 @@ int __esCompara(nodo_Tok *nodo)
 // Identifica si la sentencia es de lectura 
 int __esLee(char *token)
 {
-    if(strncmp(token, "LEE", strlen(token)+1) == 0)
+    if(strncmp(token, "LEE", strlen(token)) == 0)
         return 0; // Es LEE.
     
     // No es LEE:
@@ -299,10 +299,11 @@ int __esImprime(char *token)
 }
 
 
-// Identifica si es una igualación:
+// Identifica si es una asignación:
 int __esAsig(char *token)
 {
-    if(strncmp(token, "=", strlen(token)+1) == 0)
+    // '=' = 61 en ASCII:
+    if(*token == 61)
         return 0; // Es un signo de igual.
     
     // No es un signo de igual :
@@ -398,6 +399,9 @@ int __esEntonces(char *token)
 // Identifica si se trata de una sentencia válida 
 nodo_Tok *__esSent(nodo_Tok *nodo)
 {   
+    // Bandera que identifica un error de sentencia.
+    int err_sent = 0;
+
     // Si el nodo es nulo:
     if(!nodo)
         return nodo;
@@ -407,30 +411,58 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         // Si empieza con LEE:
         if(__esLee(nodo->token) == 0)
         {   
-            nodo = nodo->sig; // Se pasa al nodo siguiente.
-            
-            // Se verifica que el token siguiente
-            // sea un identificador, si no, hay error:
-            if(__esVariable(nodo->token));
-            {    
-                // Hubo error:
-                printf("ERROR de sintaxis en línea [%u] --No es un identificador válido.\n", nodo->num_linea);
-                num_errores++;   
+            if(nodo->sig)
+            {
+                nodo = nodo->sig; // Se pasa al nodo siguiente.
+
+                // Se verifica que el token siguiente
+                // sea un identificador, si no, hay error:
+                if(__esVariable(nodo->token) != 0)
+                {
+                    // Hubo error:
+                    printf("ERROR de sintaxis en línea [%u] --No es un identificador válido.\n", nodo->num_linea);
+                    num_errores++;
+                    err_sent++; // Hay un error de sentencia.
+                }
+                
+                // Si es una variable:
+                else if(nodo->sig)
+                    nodo = nodo->sig; // Se pasa al token sig.
+                
+
             }
+
+            // Si es el final:
+            else
+                err_sent++; // Hay un error de sentencia.
         }
 
         // Si empieza con IMPRIME:
         else if(__esImprime(nodo->token) == 0)
         {    
-            // Se pasa al token siguiente:
-            nodo = nodo->sig;
+            if(nodo->sig) 
+            {    
+                nodo = nodo->sig; // Se pasa al token siguiente.
 
-            // Se verifica que el token siguiente sea 
-            // un elemento o una cadena, si no, hay error:
-            if(__esElem(nodo->token) != 0 && __esTexto(nodo->token) != 0)
+                // Se verifica que el token siguiente sea 
+                // un elemento o una cadena, si no, hay un error:
+                if(__esElem(nodo->token) != 0 && __esTexto(nodo->token) != 0)
+                {
+                    printf("ERROR de sintaxis en línea [%u] --No hay identificador, número o cadena.\n", nodo->num_linea);
+                    num_errores++;
+                }
+
+                if(nodo->sig)
+                    nodo = nodo->sig; // Se pasa al token siguiente.       
+                else
+                    return NULL; // Si es el final.
+            }
+
+            // Si es el final:
+            else
             {
-                printf("ERROR de sintaxis en línea [%u] --No hay identificador, número o cadena.\n", nodo->num_linea);
-                num_errores++;
+                err_sent++; // Hay un error de sentencia.
+                return NULL;
             }
         }
 
@@ -619,27 +651,29 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     else if(__esVariable(nodo->token) == 0)
     {
         nodo = nodo->sig; // Se pasa al nodo siguiente.
-
+        printf("__esVariable(%s)\n", nodo->token);
         // Se verifica que sea un signo de '=':
         if(__esAsig(nodo->token) == 0)
         {
             nodo = nodo->sig; // Se pasa al nodo siguiente.
-
+            printf("__esAsig(%s)\n", nodo->token);
             // Se verifica si el token es un ELEM:
             if(__esElem(nodo->token) == 0)
             {      
                 nodo = nodo->sig; // Se pasa al nodo siguiente.
+                printf("__esElem(%s)\n", nodo->token);
 
                 // Se verifica si el token siguiente es un operador aritmético:
                 if(__esOpAr(nodo->token) == 0)
                 {
                     nodo = nodo->sig; // Se pasa al nodo siguiente.
-
+                    printf("__esOpAr(%s)\n", nodo->token);
                     // Se verifica si el token no es un ELEM:
                     if(__esElem(nodo->token) != 0)
                     {
                         printf("ERROR de sintaxis en línea [%u] --Elemento no encontrado.\n", nodo->num_linea);
                         num_errores++;
+                        err_sent++; // Hay un error de sentencia.
                     }
 
                     // Si es un elemento, se verifica que lo que siga no sea
@@ -648,6 +682,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                     {
                         printf("ERROR de sintaxis en línea [%u] --No es posible operar una asignación.\n");
                         num_errores++;
+                        err_sent++; // Hay un error de sentencia
                     }
                 } // Fin if __esOpAr.
             } // Fin if __esElem.
@@ -655,7 +690,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     } // Fin else if de __esVar de asignación.
 
     // Hubo error de sentencia:
-    else
+    if(err_sent != 0)
     {    
         printf("ERROR de sintaxis en línea [%u] --No es una sentencia válida.\n", nodo->num_linea);
         num_errores++;
