@@ -10,9 +10,9 @@ unsigned int num_errores = 0;
    Retorna: el número (int) de líneas que hay en el archivo.
    En caso de no encontrar el archivo, retorna -1.
 */
-int __contarLineasArchivo(FILE *archivo)
+/*int __contarLineasArchivo(FILE *archivo)
 {
-    int numero_lineas = 0; // Contador del número de líneas del archivo.
+    unsigned int numero_lineas = 0; // Contador del número de líneas del archivo.
     char c; // Almacena el caracter leído del archivo.
 
     // Si el archivo no existe o no se encuentra:
@@ -29,7 +29,7 @@ int __contarLineasArchivo(FILE *archivo)
 
     //printf("La cantidad de lineas es: %d\n", numero_lineas+1);
     return numero_lineas+1; // Se retorna la cantidad de líneas del archivo.
-}
+} */
 
 
 /* Crea una lista de los tokens del archivo .lex 
@@ -50,14 +50,6 @@ void guardarTokens(FILE *arch_lex_1, FILE *arch_lex_2, listaTok *lista)
     // Contadores del número de líneas de los archivos .mio y .lex:
     unsigned int num_linea_mio = 0; // Número de línea del archivo .mio
     unsigned int num_linea_lex = 0; // Número de línea del archivo .lex
-	unsigned int num_linea_fin_lex = 0; // Número de línea final del archivo .lex
-	
-
-    // Se cuenta la cantidad de líneas del archivo .lex:
-	num_linea_fin_lex = __contarLineasArchivo(arch_lex_1);
-	fclose(arch_lex_1); // Se cierra el primer archivo.
-    arch_lex_1 = NULL; // Se apunta a nulo el puntero del primer archivo.
-
 
 	// Guarda la línea del archivo .lex temporalmente:
 	char linea[12];
@@ -65,10 +57,10 @@ void guardarTokens(FILE *arch_lex_1, FILE *arch_lex_2, listaTok *lista)
 	// Se recorre el archivo .lex para ir obteniendo cada línea:
     while(fgets(linea, sizeof(linea), arch_lex_2))
     {
-		// Se aumenta el número de línea del archivo .lex:
+        // Se aumenta el número de línea del archivo .lex:
 		num_linea_lex++;
 
-		// Si es el indicador de número de línea se lo salta:
+        // Si es el indicador de número de línea se lo salta:
 		if(linea[0] == '~')
         {
 			// Se aumenta el número de línea del archivo .mio:
@@ -76,47 +68,22 @@ void guardarTokens(FILE *arch_lex_1, FILE *arch_lex_2, listaTok *lista)
             continue;
         }
 
+        // Si es una línea en blanco:
+        if(linea[0] == '\n')
+            continue;
+
 		// Se cambia el salto de línea por el caracter nulo.
 		// 10 == '\n' en ASCII
 		// 0 == '\0' en ASCII
         if(linea[strlen(linea)-1] == 10)
             linea[strlen(linea)-1] = 0;
 
-        // Se verifica que no hayan errores en la estructura principal del programa:
-        if((num_linea_lex == 2) && strncmp(linea,"PROGRAMA", strlen(linea)) == 0)
-			continue; // Si se encuentra no se agrega en la lista.
-		
-		// Si no se encuentra PROGRAMA:
-		else if((num_linea_lex == 2) && strncmp(linea,"PROGRAMA", strlen(linea)) != 0)
-		{	
-            printf("ERROR de sintaxis en línea [%u] --PROGRAMA no encontrado.\n", num_linea_mio);
-            num_errores++;
-        }
-
-        if((num_linea_lex == 3) && strncmp(linea, "[id] ID01", strlen(linea)) == 0)
-            continue; // Si se encuentra, no se agrega en la lista.
-        
-		// Si no se encuentra el nombre del programa:
-		else if((num_linea_lex == 3) && strncmp(linea, "[id] ID01", strlen(linea)) != 0)
-		{
-        	printf("ERROR de sintaxis en línea [%u] --Nombre de programa no encontrado.\n", num_linea_mio);
-            num_errores++;
-        }
-
-        if(num_linea_lex == 46 && strncmp(linea, "FINPROG", strlen(linea)) == 0)
-            continue; // Si se encuentra, no se agrega en la lista.
-        
-		// Si no se encuentra FINPROG:
-		else if(num_linea_lex == 46 && strncmp(linea, "FINPROG", strlen(linea)) != 0)
-		{
-        	printf("ERROR de sintaxis en línea [%u] --FINPROG no encontrado.\n", num_linea_mio);
-            num_errores++;
-        }    
-		
 		// Se crea y agrega el nodo a la lista:
         nodo_Tok *nodo = creaNodoTok(linea, num_linea_mio);
         pushBackTok(lista, nodo);
     }
+    fclose(arch_lex_1); // Se cierra el primer archivo.
+    arch_lex_1 = NULL; // Se apunta a nulo el puntero del primer archivo.
     fclose(arch_lex_2); // Se cierra el segundo archivo.
     arch_lex_2 = NULL; // Se apunta a nulo el puntero del segundo archivo.
 }
@@ -419,7 +386,8 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                 // sea un identificador:
                 if(__esVariable(nodo->token) == 0)
                 {
-                    nodo = nodo->sig;
+                    if(nodo->sig)
+                        nodo = nodo->sig;
                 }
 
                 // Hay error:
@@ -445,8 +413,9 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                 // Se verifica que el token siguiente sea 
                 // un elemento o una cadena
                 if(__esElem(nodo->token) == 0 || __esTexto(nodo->token) == 0)
-                {    
-                    nodo = nodo->sig; // Se pasa al siguiente nodo.
+                {   
+                    if(nodo->sig)
+                        nodo = nodo->sig; // Se pasa al siguiente nodo.
                 }    
                 // Si hay un error:
                 else
@@ -471,7 +440,6 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                 // Se verifica que el token sea un elemento:
                 if(__esElem(nodo->token) == 0)
                 {
-                    printf("Es ELEMENTO: %s\n", nodo->token);
                     if(nodo->sig)
                     {    
                         nodo = nodo->sig; // Se pasa al nodo siguiente.
@@ -479,8 +447,6 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                         // Se verifica que el token sea VECES:
                         if(__esVeces(nodo->token) == 0)
                         {
-                            printf("Es VECES: %s\n", nodo->token);
-
                             // Se verifica que el token sea una sentencia válida:
                             if(nodo->sig)
                             {
@@ -489,11 +455,11 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                 // Se verifica que lo que sigue 
                                 // sea una sentencia válida:
                                 nodo = __esSent(nodo);
-
+                                
                                 // Se verifican los tokens siguientes:
                                 if(nodo)
                                 {
-                                    // Se verifica si el token no es FINREP:
+                                    // Se verifica que el token no sea FINREP:
                                     if(__esFinRep(nodo->token) != 0)
                                     {   
                                         // Se verifica que sea un nodo diferente de NULL y 
@@ -504,8 +470,9 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                             
                                             // Si es FINREP:
                                             if(__esFinRep(nodo->token) == 0)
-                                            {
-                                                nodo = nodo->sig; // Se pasa al siguiente nodo.
+                                            {   
+                                                if(nodo->sig)
+                                                    nodo = nodo->sig; // Se pasa al siguiente nodo.
                                                 break; // No hubo errores.
                                             }
                                         }
@@ -518,6 +485,8 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                             num_errores++;
                                         }
                                     } // Fin if __esFinRep
+                                    else if(nodo->sig)
+                                        nodo = nodo->sig; // Se pasa al siguiente nodo.
                                 } // Fin if nodo  
                                 else
                                 {
@@ -525,7 +494,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                     num_errores++;
                                 }
                                 
-                            } // Fin if __esSent.
+                            } // Fin if.
 
                             else
                             {
@@ -580,9 +549,11 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                 // sea una sentencia válida:
                                 nodo = __esSent(nodo);
                                 
-                                // Se verifican los tokens siguientes
+                                // Se verifican los tokens siguientes:
                                 if(nodo)
-                                {
+                                {   
+                                    // Se verifica si ya se llegó al FINSI
+                                    // o si hay más sentencias válidas:
                                     if(__esFinSi(nodo->token) != 0)
                                     {    
                                         // Se verifica que sea un nodo diferente de NULL y 
@@ -608,14 +579,17 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                         // entonces se verifica si es un SINO:
                                         else if(__esSiNo(nodo->token) == 0)
                                         {
+                                            nodo = nodo->sig;  // Se pasa al nodo siguiente.
+
+                                            // Se verifica que lo que sigue 
+                                            // sea una sentencia válida:
+                                            nodo = __esSent(nodo);
+
+                                            // Se verifican los siguientes tokens:
                                             if(nodo)
                                             {  
-                                                nodo = nodo->sig;  // Se pasa al nodo siguiente.
-
-                                                // Se verifica que lo que sigue 
-                                                // sea una sentencia válida:
-                                                nodo = __esSent(nodo);
-
+                                                // Se verifica si ya se llegó al FINSI
+                                                // o si hay más sentencias válidas:
                                                 if(__esFinSi(nodo->token) != 0)
                                                 {    
                                                     // Se verifica que sea un nodo diferente de NULL y 
@@ -627,7 +601,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                                         // Si es FINSI:
                                                         if(__esFinSi(nodo->token) == 0)
                                                         {
-                                                            nodo = nodo->sig;
+                                                            nodo = nodo->sig; // Se pasa al siguiente token.
                                                             break; // No hubo errores.   
                                                         }
                                                     }
@@ -640,7 +614,12 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                                         num_errores++;
                                                     }
                                                 } // Fin if __esFinSi.    
-                                            } // FIn if __esSent.
+                                            } // Fin if nodo.
+                                            else
+                                            {
+                                                printf("ERROR de sintaxis en línea [%u] --Falta (FINSI).\n", nodo->num_linea);
+                                                num_errores++;
+                                            }    
                                         } // Fin else if __esSiNo.
                                     } // Fin if __esFinSi.
 
@@ -689,7 +668,6 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     // Se verifica si es una sentencia de asignación:
     else if(__esVariable(nodo->token) == 0)
     {
-        printf("__esVariable(%s)\n", nodo->token);
         if(nodo->sig)
         {    
             nodo = nodo->sig; // Se pasa al nodo siguiente.
@@ -780,14 +758,42 @@ int iniAnalSin(listaTok *lista)
     // Nodo auxiliar para recorrer la lista:
     nodo_Tok *aux = lista->raiz;
 
-    // Se llama a __esSent para verificar que todas
-    // las sentencias de la lista sean válidas:
-    while(aux)
+    // Se analiza la estructura principal del programa:
+    if(strncmp(aux->token, "PROGRAMA", strlen(aux->token)+1) == 0)
+         aux = aux->sig;
+    
+    // Si PROGRAMA no se encuentra:
+    else
     {
-        printf("[%s] --{%u}--\n", aux->token, aux->num_linea);
-        aux = __esSent(aux); // Nodo siguiente.
+        printf("ERROR de sintaxis en línea [%u] --No se encuentra palabra reservada: PROGRAMA.\n", aux->num_linea);
+        num_errores++;
+    }
+
+    if(strncmp(aux->token, "[id] ID01", strlen(aux->token)+1) == 0)
+        aux = aux->sig;
+    
+    // Si el nombre del programa no se encuentra:
+    else
+    {
+        printf("ERROR de sintaxis en línea [%u] --No se encuentra: Nombre del programa.\n", aux->num_linea);
+        num_errores++;
     }
     
+
+    // Se llama a __esSent para verificar que todas
+    // las sentencias de la lista sean válidas:
+    while(aux->sig)
+    {
+        //printf("[%s] --{%u}--\n", aux->token, aux->num_linea);
+        aux = __esSent(aux); // Se continúa el ciclo con el siguiente nodo.
+    }
+    
+    if(strncmp(aux->token, "FINPROG", strlen(aux->token)+1) != 0)
+    {
+        printf("ERROR de sintaxis en línea [%u] --No se encuentra palabra reservada: FINPROG.\n", aux->num_linea);
+        num_errores++;
+    }
+
     // Retorna copia del contador global num_errores:
     return num_errores;
 }

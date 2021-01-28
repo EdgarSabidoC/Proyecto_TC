@@ -32,10 +32,16 @@ int main(int argc, char **argv)
     unsigned int errores; // Número de errores.
     errores = iniAnalSin(&lista);
 
-    if(errores != 0)
+    if(errores > 1)
     {
         printf("Compilación no exitosa:\n");
         printf("Se encontraron %u errores.\n", errores);
+        return EXIT_FAILURE;
+    }
+    else if(errores == 1)
+    {
+        printf("Compilación no exitosa:\n");
+        printf("Se encontró %u error.\n", errores);
         return EXIT_FAILURE;
     }
     
