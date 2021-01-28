@@ -338,10 +338,8 @@ int __esVeces(char *token)
 // Identifica si el token es un FINREP:
 int __esFinRep(char *token)
 {
-    printf("El tam de FINREP es: %u\n", strlen("FINREP")+1);
-
     // Se verifica si el token es FINREP:
-    if(strcmp(token,"FINREP") == 0)
+    if(strncmp(token,"FINREP", strlen(token)+1) == 0)
         return 0; // Es FINREP.
 
     // No es FINREP:
@@ -448,7 +446,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                 // Se verifica que el token siguiente sea 
                 // un elemento o una cadena
                 if(__esElem(nodo->token) == 0 || __esTexto(nodo->token) == 0)
-                    if(nodo->sig)
+                    //if(nodo->sig)
                         nodo = nodo->sig; // Se pasa al siguiente nodo.
 
                 // Si hay un error:
@@ -505,11 +503,14 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                                         while(nodo)
                                         {
                                             nodo = __esSent(nodo);
-                                            printf("El nodo del while es: {%s}\n", nodo->token);
-                                            printf("El tam del token es: _%u_\n", strlen(nodo->token)+1);
+                                            
                                             // Si es FINREP:
                                             if(__esFinRep(nodo->token) == 0)
+                                            {
+                                                if(nodo->sig)
+                                                    nodo = nodo->sig;
                                                 break; // No hubo errores.
+                                            }
                                         }
                             
                                         // Se verifica si se llegó al final de la lista:
