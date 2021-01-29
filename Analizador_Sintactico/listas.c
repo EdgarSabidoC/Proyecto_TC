@@ -4,7 +4,19 @@
 //-------------------------FUNCIONES DE LA LISTA DE TOKENS--------------------------
 
 
-
+/* 
+ * DESCRIPCIÓN:
+ * Esta función aparta un bloque de memoria
+ * en la memoria dinámica y crea un nodo 
+ * de tipo nood_Tok (a partir del token y de su 
+ * número de línea) para una lista de tipo listaTok,
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token
+ * 			y un entero sin signo (número de línea del token)
+ * 
+ * SALIDA: Puntero al nodo.
+ * 
+ */
 nodo_Tok *creaNodoTok(char *token, unsigned int num_linea)
 {
     nodo_Tok *apu;
@@ -22,8 +34,18 @@ nodo_Tok *creaNodoTok(char *token, unsigned int num_linea)
 	return apu; // Se retorna el nodo "apu".
 }
 
-
-
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por un nodo en una lista
+ * de tipo listaTok.
+ * 
+ * ENTRADA: Un puntero de tipo nodo_Tok (nodo).
+ * 
+ * SALIDA: 0 si la operación fue exitosa, 
+ *         1 si la operación no fue exitosa.
+ * 
+ */
 int liberaNodoTok(nodo_Tok *nodo)
 {
     if(nodo) //Equivalente a nodo != NULL
@@ -31,6 +53,7 @@ int liberaNodoTok(nodo_Tok *nodo)
 		// Se libera la memoria ocupada por el nodo:
 		free(nodo->token); // Se libera la memoria del string del nodo.
 		free(nodo); // Se libera la memoria del nodo.
+		nodo = NULL;
 
 		// Si la operación fue exitosa:
 		return 0;
@@ -41,7 +64,17 @@ int liberaNodoTok(nodo_Tok *nodo)
 }
 
 
-
+/* 
+ * DESCRIPCIÓN:
+ * Esta función inicializa una lista de tipo
+ * listaTok apuntando su raíz a NULL y
+ * asignando un tamaño de 0.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaTok.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void iniListaTok(listaTok *Lista)
 {
     Lista->raiz = NULL; // El nodo raíz de la lista apunta a NULL
@@ -49,7 +82,17 @@ void iniListaTok(listaTok *Lista)
 }
 
 
-
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por una lista de tipo
+ * listaTok.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaTok.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void liberaListaTok(listaTok *lista)
 {
 
@@ -63,11 +106,24 @@ void liberaListaTok(listaTok *lista)
 		liberaNodoTok(aux); // Se libera el nodo "aux"
     }
 
+	lista->raiz = NULL;
 	lista->tam = 0; // Se deja el tamaño en 0, pues la lista está vacía
 }
 
 
-
+/* 
+ * DESCRIPCIÓN:
+ * Esta función ingresa un nodo de tipo
+ * nodo_Tok al final de una lista de tipo 
+ * listaTok con una operación pushBack.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaTok
+ * 			y un puntero a un nodo de tipo 
+ * 			nodo_Tok (nodo).
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void pushBackTok(listaTok *Lista, nodo_Tok *nodo)
 {
     if (nodo) //Equivalente a nodo != NULL
@@ -93,7 +149,19 @@ void pushBackTok(listaTok *Lista, nodo_Tok *nodo)
 }
 
 
-
+/* 
+ * DESCRIPCIÓN:
+ * Esta función busca un nodo de tipo nood_Tok
+ * dentro de una lista de tipo listaTok y
+ * lo retorna si lo encuentra.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaTok
+ * 			y un puntero de tipo char (cadena)
+ * 			del token.
+ * 
+ * SALIDA: Puntero a un nodo de tipo nodo_Tok.
+ * 
+ */
 nodo_Tok *buscaTok(listaTok *Lista, char *token)
 {
     nodo_Tok *apu;

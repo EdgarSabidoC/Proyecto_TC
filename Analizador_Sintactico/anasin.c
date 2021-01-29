@@ -7,11 +7,11 @@
  * del analizador sintáctico y se inicializa
  * la lista donde se guardarán los tokens.
  * 
- * ENTRADA: String con el nombre del archivo .lex
+ * ENTRADA: Cadena (string) con el nombre del archivo .lex
  * 
  * SALIDA: Resultado de la compilación:
- *  EXIT_SUCCES - Compilación exitosa.
- *  EXIT_FAILURE - Fallo en la compilación.
+ *          EXIT_SUCCES - Compilación exitosa.
+ *          EXIT_FAILURE - Fallo en la compilación.
  * 
  */
 int main(int argc, char **argv)
