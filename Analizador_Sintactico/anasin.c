@@ -34,13 +34,13 @@ int main(int argc, char **argv)
 
     if(errores > 1)
     {
-        printf("ERROR DURANTE LA COMPILACIÓN:\n");
+        printf("\n\nERROR DURANTE LA COMPILACIÓN:\n");
         printf("Se encontraron %u errores.\n", errores);
         return EXIT_FAILURE;
     }
     else if(errores == 1)
     {
-        printf("ERROR DURANTE LA COMPILACIÓN:\n");
+        printf("\n\nERROR DURANTE LA COMPILACIÓN:\n");
         printf("Se encontró %u error.\n", errores);
         return EXIT_FAILURE;
     }
