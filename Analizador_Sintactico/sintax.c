@@ -401,9 +401,9 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         {    
             // Se verifica que el token siguiente sea 
             // un elemento o una cadena:
-            if((nodo->sig) && (__esElem(nodo->token) == 0 || __esTexto(nodo->token) == 0)) 
+            if((nodo->sig) && (__esElem(nodo->sig->token) == 0 || __esTexto(nodo->sig->token) == 0)) 
                 nodo = nodo->sig; // Se pasa al nodo.
-                
+
             // Hay un error de indetificador, número o cadena:
             else
             {
