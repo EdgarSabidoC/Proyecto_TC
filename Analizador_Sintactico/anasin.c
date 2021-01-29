@@ -1,10 +1,35 @@
 #include "sintax.c"
 
+/*
+ * DESCRIPCIÓN: 
+ * Función principal que controla al analizador.
+ * Aquí se realizan los llamados a las funciones
+ * del analizador sintáctico y se inicializa
+ * la lista donde se guardarán los tokens.
+ * 
+ * ENTRADA: String con el nombre del archivo .lex
+ * 
+ * SALIDA: Resultado de la compilación:
+ *  EXIT_SUCCES - Compilación exitosa.
+ *  EXIT_FAILURE - Fallo en la compilación.
+ * 
+ */
 int main(int argc, char **argv)
 {
-    // Falla el programa:
+    // Falla el programa si no se le pasa
+    // el nombre del archivo .lex:
     if (argc <= 1)
         return EXIT_FAILURE;
+
+    // Se verifica que el archivo sea extensión .lex:
+    char *punto = strchr(argv[1], '.');
+    char *lex = ".lex";
+
+    if(strncmp(punto, lex, sizeof(".lex")))
+    {
+        printf("ERROR, no se encontró archivo .lex\n\n");
+        return EXIT_FAILURE;
+    }
 
     // Se declara e inicializa la lista:
     listaTok lista;
@@ -21,11 +46,7 @@ int main(int argc, char **argv)
 
     // Se imprime el contenido de la lista:
     while(nodo)
-    {
-        //printf("Cadena: [%s] -- Num_linea[%u]\n", nodo->token, nodo->num_linea);
         nodo = nodo->sig;
-    }
-    printf("\n\n");
 
     // Se inicia el analizador sintáctico con la lista:
     unsigned int errores; // Número de errores.

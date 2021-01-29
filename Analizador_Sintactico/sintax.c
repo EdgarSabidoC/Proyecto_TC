@@ -1,4 +1,5 @@
-#include "listas.c"
+// Biblioteca que incluye las funciones necesarias para el uso de listas de tipo listaTok:
+#include "listas.c" 
 
 // Contador global de errores del programa:
 unsigned int num_errores = 0;
@@ -12,11 +13,13 @@ unsigned int num_errores = 0;
  * línea de la sentencia (denotados por "~"), así
  * como las líneas en blanco.
  * 
- * NOTA 1: La función modifica el caracter final de 
+ * NOTA 1: 
+ * La función modifica el caracter final de 
  * la línea, cambiando los saltos de línea '\n' 
  * por el caracter nulo '\0'.
  * 
- * NOTA 2: LA función cierra el archivo que se le 
+ * NOTA 2: 
+ * La función cierra el archivo que se le 
  * pasa como argumento.
  *
  * ENTRADA: Un puntero al archivo .lex y un
@@ -67,7 +70,23 @@ void guardarTokens(FILE *arch_lex, listaTok *lista)
 }
 
 
-// Valida si la cadena es una palabra reservada 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * se trata de una palabra reservada del
+ * lenguaje MIO.
+ * 
+ * NOTA: 
+ * Las palabras reservadas aceptadas son:
+ * PROGRAMA, FINPROG, SI, ENTONCES, SINO, 
+ * FINSI, REPITE, VECES, FINREP, IMPRIME
+ * y LEE.
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esReservada(char *token)
 {
     unsigned int i = 0;
@@ -89,7 +108,16 @@ int __esReservada(char *token)
 }
 
 
-// Valida si la cadena es un OPERADOR ARITMÉTICO. 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * se trata de un operador aritmético: [op_ar] 
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esOpAr(char *cadena) 
 { 
     // Se verifica si es un operador aritmético:
@@ -102,7 +130,16 @@ int __esOpAr(char *cadena)
 }
 
 
-// Valida si la cadena es un NÚMERO 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * se trata de un número: [val] 
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esVal(char *token)
 {
     // Se verifica si es un número:
@@ -116,7 +153,16 @@ int __esVal(char *token)
 }
 
 
-// Valida si la cadena es un OPERADOR RELACIONAL 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * se trata de un operador relacional: [op_rel] 
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esOpRel(char *cadena)
 {
     // Se verifica si es un operador relacional:
@@ -130,21 +176,16 @@ int __esOpRel(char *cadena)
 }
 
 
-// Valida si el caracter es una COMILLA 
-int __esComilla(char *cadena)
-{
-    // '\"' == 34 en ASCII,
-
-    // Si es una comilla:
-    if(*cadena == 34)
-        return 0;
-
-    // Si no es una comilla:
-    return 1;
-}
-
-
-// Valida si la cadena es un string 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * se trata de texto: [txt]
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esTexto(char *token)
 {
     // Se verifica si es una palabra reservada:
@@ -160,7 +201,17 @@ int __esTexto(char *token)
 }
 
 
-// Valida si la cadena se trata de una variable 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * se trata del identificador de una 
+ * variable: [id]
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esVariable(char *token)
 {
     if(strstr(token,"[id]") != NULL)
@@ -172,7 +223,18 @@ int __esVariable(char *token)
 }
 
 
-// Identifica si el token es un elemento 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * se trata de un elemento, es decir, si se 
+ * trata del identificador de una variable o 
+ * un valor numérico: [id] o [val]
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esElem(char *token)
 {
     if(__esVariable(token) == 0)
@@ -185,8 +247,17 @@ int __esElem(char *token)
     return 1;
 }
 
-
-// Identifica si es una comparación 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (sentencia)
+ * a partir del token que se le pase como argumento
+ * se trata del una comparación.
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esCompara(nodo_Tok *nodo)
 {
     // Se verifica si el token es un identificador:
@@ -203,25 +274,34 @@ int __esCompara(nodo_Tok *nodo)
                 return 0; // No hubo errores.
             
             // Hubo errores:
-            printf("ERROR de sintaxis en línea [%u] --No es un elemento válido.\n", nodo->num_linea);
+            printf("ERROR de sintaxis en línea [%u] --No es un elemento válido --> %s.\n", nodo->num_linea, nodo->token);
             num_errores++;
             return 1;
         } // Fin if
 
         // Hubo errores:
-        printf("ERROR de sintaxis en línea [%u] --No es un operador relacional.\n", nodo->num_linea);
+        printf("ERROR de sintaxis en línea [%u] --No es un operador relacional --> %s.\n", nodo->num_linea, nodo->token);
         num_errores++;
         return 1;
     } // Fin if
 
     // Hubo errores:
-    printf("ERROR de sintaxis en línea [%u] --No es un identificador.\n", nodo->num_linea);
+    printf("ERROR de sintaxis en línea [%u] --No es un identificador --> %s.\n", nodo->num_linea, nodo->token);
     num_errores++;
     return 1;
 }
 
-
-// Identifica si la sentencia es de lectura 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada para la lectura: LEE
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esLee(char *token)
 {
     if(strncmp(token, "LEE", strlen(token)) == 0)
@@ -231,8 +311,17 @@ int __esLee(char *token)
     return 1;  
 }
 
-
-// Identifica si la sentencia es de impresión 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada para impresión: IMPRIME
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esImprime(char *token)
 {
     // Se verifica si el token es IMPRIME:
@@ -244,7 +333,17 @@ int __esImprime(char *token)
 }
 
 
-// Identifica si es una asignación:
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es el símbolo
+ * de asignación: =
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esAsig(char *token)
 {
     // '=' = 61 en ASCII:
@@ -255,8 +354,17 @@ int __esAsig(char *token)
     return 1;
 }
 
-
-// Identifica si el token es un REPTE:
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada para el ciclo de repetirción: REPITE
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esRepite(char *token)
 {
     // Se verifica que el token sea un REPITE:
@@ -268,7 +376,17 @@ int __esRepite(char *token)
 }
 
 
-// Identifica si el token es un VECES:
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada: VECES
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esVeces(char *token)
 {   
     // Se verifica si el token es VECES:
@@ -280,7 +398,18 @@ int __esVeces(char *token)
 }
 
 
-// Identifica si el token es un FINREP:
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada del delimitador del ciclo de
+ * repetición: FINREP
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esFinRep(char *token)
 {
     // Se verifica si el token es FINREP:
@@ -292,7 +421,17 @@ int __esFinRep(char *token)
 }
 
 
-// Identifica si el token es un SI:
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada para las sentencias condicionales: SI
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esSi(char *token)
 {   
     // Se verifica si el token es SI:
@@ -304,7 +443,17 @@ int __esSi(char *token)
 }
 
 
-// Identifica si el token es un SINO:
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada para la sentencia condicional: SINO
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esSiNo(char *token)
 {   
     // Se verifica si el token es SINO:
@@ -316,19 +465,18 @@ int __esSiNo(char *token)
 }
 
 
-// identifica si el token es un FINSI:
-int __esFinSi(char *token)
-{   
-    // Se verifica si el token es FINSI:
-    if(strncmp(token,"FINSI", strlen(token)+1) == 0)
-        return 0; // Es FINSI.
-
-    // No es FINSI:
-    return 1; 
-}
-
-
-// Identifica si el token es un ENTONCES:
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la 
+ * palabra reservada para las sentencias 
+ * condicionales: ENTONCES
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esEntonces(char *token)
 {   
     // Se verifica si el token es ENTONCES:
@@ -339,6 +487,28 @@ int __esEntonces(char *token)
     return 1; 
 }
 
+
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada del delimitador de las sentencias
+ * condicionales: FINSI
+ * 
+ * ENTRADA: Puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
+int __esFinSi(char *token)
+{   
+    // Se verifica si el token es FINSI:
+    if(strncmp(token,"FINSI", strlen(token)+1) == 0)
+        return 0; // Es FINSI.
+
+    // No es FINSI:
+    return 1; 
+}
 
 
 /* 
