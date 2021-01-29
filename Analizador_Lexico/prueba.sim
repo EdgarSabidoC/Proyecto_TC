@@ -5,7 +5,7 @@ VarY, ID03
 Num, ID04
 
 TXT
-"Factorial de ", TX01
+"Factorial de", TX01
 " es ", TX02
 
 VAL

@@ -9,8 +9,6 @@ int main(int argc, char **argv)
     if (argc <= 1 || argc > 2)
     // Falló al correr el programa:
         return 1;
-    
-
 
     // Se verifica que el archivo sea extensión .mio:
     char *punto = strchr(argv[1], '.');
@@ -38,7 +36,7 @@ int main(int argc, char **argv)
     strcat(nombre_lex, "lex");
 
     // Se crea el archivo .lex:
-    FILE *lexer = fopen(nombre_lex, "a+");
+    FILE *lexer = fopen(nombre_lex, "w+");
         
 
 
@@ -50,7 +48,7 @@ int main(int argc, char **argv)
     strcat(nombre_sim, "sim");
 
     // Se crea el archivo .sim:
-    FILE *sim = fopen(nombre_sim, "a+");
+    FILE *sim = fopen(nombre_sim, "w+");
 
 
 

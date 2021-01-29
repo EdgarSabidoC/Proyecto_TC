@@ -257,13 +257,13 @@ int __esComilla(char *cadena)
 /* Valida si la cadena es un string */
 int __esTexto(char *token, unsigned int num_linea)
 {
-    // Se verifica si es una palabra reservada:
-
     // Si es una cadena de text0:
-    if(*token == '\"')
-    {
-        return (0);    
-    }
+    if(*token == 34 && *(token+strlen(token)-1) == 34)
+        return (0);
+    
+    // Se verifica que tanto al inicio como al final de la cadena de texto hayan comillas "...":
+    else if(*token == 34 && *(token+strlen(token)-1) != 34)
+        fprintf(stdout,"ERROR en línea: [%u] --Se esperaba caracter terminal --> \" en %s\n", num_linea, token);
     
     // No es una cadena de texto:
     return (1);
@@ -364,7 +364,7 @@ char __identifica(char *token, unsigned int num_linea)
             
             else if(__esComilla(token) == 0)
                 return 'C'; // Es comilla.
-            
+
             else if(strlen(token) > 2)
                 return 's'; // Es variable que comienza con un símbolo.
             
@@ -389,7 +389,7 @@ char *tokenCadena(char *cadena)
     // espacio == 32 en ASCII.
 
     // Se recorre la cadena:
-     while(*tmp != '\0' || *tmp != '\n')
+    while(*tmp != '\0' || *tmp != '\n')
     {
         if(strstr(tmp, "\"") || strstr(tmp, "\"\0"))
         { 
@@ -584,7 +584,7 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
         case 's':
             // Se genera token con la copia:
             ptr_strok = strtok_r(copia, " \n\t", &aux);
-            fprintf(stdout,"ERROR en línea: [%u] --La variable comienza con un caracter no válido: %s", num_linea, ptr_strok);
+            fprintf(stdout,"ERROR en línea: [%u] --La variable comienza con un caracter no válido: %s\n", num_linea, ptr_strok);
         break;
 
         // Es un número
@@ -607,7 +607,7 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
             fprintf(archivo_lex, "[op_rel]\n"); // Se imprime en el archivo .lex
         break;
 
-        // Es asginació:
+        // Es asginación:
         case 'A':
             // Se genera token con la copia:
             ptr_strok = strtok_r(copia, " \n\t", &aux);
@@ -617,6 +617,9 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
         case 'C':
             // Se genera token con la copia:
             ptr_strok = tokenCadena(copia);
+
+            // Se valida que la cadena sea un token válido:
+            __esTexto(ptr_strok, num_linea);
         break;
 
         // Es símbolo:
@@ -632,7 +635,7 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
     // Se genera una copia dinámica de la cadena:
     strncpy(token, ptr_strok, strlen(ptr_strok)+1);    
 
-    // Se imprime la palabra reservada o la asignación en el archivo ,lex:
+    // Se imprime la palabra reservada o la asignación en el archivo .lex:
     if(ident == 'R' || ident == 'A')
          fprintf(archivo_lex, "%s\n", ptr_strok); // Se imprime en el archivo .lex
 
