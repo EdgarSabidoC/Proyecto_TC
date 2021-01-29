@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     // Se imprime el contenido de la lista:
     while(nodo)
     {
-        printf("Cadena: [%s] -- Num_linea[%u]\n", nodo->token, nodo->num_linea);
+        //printf("Cadena: [%s] -- Num_linea[%u]\n", nodo->token, nodo->num_linea);
         nodo = nodo->sig;
     }
     printf("\n\n");
@@ -34,13 +34,13 @@ int main(int argc, char **argv)
 
     if(errores > 1)
     {
-        printf("Compilación no exitosa:\n");
+        printf("ERROR DURANTE LA COMPILACIÓN:\n");
         printf("Se encontraron %u errores.\n", errores);
         return EXIT_FAILURE;
     }
     else if(errores == 1)
     {
-        printf("Compilación no exitosa:\n");
+        printf("ERROR DURANTE LA COMPILACIÓN:\n");
         printf("Se encontró %u error.\n", errores);
         return EXIT_FAILURE;
     }
