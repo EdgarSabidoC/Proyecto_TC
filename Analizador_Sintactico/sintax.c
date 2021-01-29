@@ -3,49 +3,29 @@
 // Contador global de errores del programa:
 unsigned int num_errores = 0;
 
-/* Cuenta la cantidad de líneas que hay en un archivo.
-   
-   Parámetros: Puntero a un archivo.
-   
-   Retorna: el número (int) de líneas que hay en el archivo.
-   En caso de no encontrar el archivo, retorna -1.
-*/
-/*int __contarLineasArchivo(FILE *archivo)
-{
-    unsigned int numero_lineas = 0; // Contador del número de líneas del archivo.
-    char c; // Almacena el caracter leído del archivo.
-
-    // Si el archivo no existe o no se encuentra:
-    if (!archivo)
-    {
-        printf("ERROR: No se pudo abrir el archivo.\n");
-        return -1;
-    }
-
-    // Se extra el primer caracter de cada línea y se guarda en c:
-    for(c = getc(archivo); c != EOF; c = getc(archivo))
-        if(c == '\n') // Si hay un salto de línea se incrementa el contador.
-            numero_lineas++;
-
-    //printf("La cantidad de lineas es: %d\n", numero_lineas+1);
-    return numero_lineas+1; // Se retorna la cantidad de líneas del archivo.
-} */
-
-
-/* Crea una lista de los tokens del archivo .lex 
-   en la lista no se guardan los toknes:
-   "PROGRAMA", "[id] ID01" y "FINPROG" que
-   son parte de la estructura principal del
-   programa.
-
-    Cierra los archivos que se le pasen como 
-    argumento.
-
-   También verifica que no falten los tokens
-   principales de la estrucutra del programa:
-   "PROGRAMA", "[id] ID01" y "FINPROG".
+/* 
+ * DESCRIPCIÓN:
+ * Esta función crea una lista con los tokens del 
+ * archivo .lex.
+ *
+ * La función ignora las indicadores de número de
+ * línea de la sentencia (denotados por "~"), así
+ * como las líneas en blanco.
+ * 
+ * NOTA 1: La función modifica el caracter final de 
+ * la línea, cambiando los saltos de línea '\n' 
+ * por el caracter nulo '\0'.
+ * 
+ * NOTA 2: LA función cierra el archivo que se le 
+ * pasa como argumento.
+ *
+ * ENTRADA: Un puntero al archivo .lex y un
+ * puntero a una lista de tipo listaTok.
+ * 
+ * SALIDA: N/A.
+ * 
  */
-void guardarTokens(FILE *arch_lex_1, FILE *arch_lex_2, listaTok *lista)
+void guardarTokens(FILE *arch_lex, listaTok *lista)
 {
     // Contadores del número de líneas de los archivos .mio y .lex:
     unsigned int num_linea_mio = 0; // Número de línea del archivo .mio
@@ -55,7 +35,7 @@ void guardarTokens(FILE *arch_lex_1, FILE *arch_lex_2, listaTok *lista)
 	char linea[12];
 
 	// Se recorre el archivo .lex para ir obteniendo cada línea:
-    while(fgets(linea, sizeof(linea), arch_lex_2))
+    while(fgets(linea, sizeof(linea), arch_lex))
     {
         // Se aumenta el número de línea del archivo .lex:
 		num_linea_lex++;
@@ -82,10 +62,8 @@ void guardarTokens(FILE *arch_lex_1, FILE *arch_lex_2, listaTok *lista)
         nodo_Tok *nodo = creaNodoTok(linea, num_linea_mio);
         pushBackTok(lista, nodo);
     }
-    fclose(arch_lex_1); // Se cierra el primer archivo.
-    arch_lex_1 = NULL; // Se apunta a nulo el puntero del primer archivo.
-    fclose(arch_lex_2); // Se cierra el segundo archivo.
-    arch_lex_2 = NULL; // Se apunta a nulo el puntero del segundo archivo.
+    fclose(arch_lex); // Se cierra el archivo.
+    arch_lex = NULL; // Se apunta a NULL el puntero del archivo.
 }
 
 
@@ -363,7 +341,23 @@ int __esEntonces(char *token)
 
 
 
-// Identifica si se trata de una sentencia válida 
+/* 
+ * DESCRIPCIÓN:
+ * Esta función identifica si se trata de una sentencia válida 
+ * del lenguaje MIO. Para ello va recorriendo los nodos de la 
+ * lista partiendo del nodo de la lista que se le pase 
+ * y utilizando previsión para identificar los tokens
+ * en la secuencia correcta por sentencia.
+ * 
+ * NOTA: Para recorrer correctamente la lista es necesario el uso
+ * de un ciclo y un puntero auxiliar, pues el análisis es por
+ * sentencia.
+ * 
+ * ENTRADA: Un puntero a un nodo_Tok para iniciar el análisis.
+ * 
+ * SALIDA: Un puntero a un nodo_Tok donde finalizó el análisis.
+ * 
+ */
 nodo_Tok *__esSent(nodo_Tok *nodo)
 {   
     unsigned int err_sent = 0; // Bandera que identifica un error de sentencia.
@@ -716,6 +710,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
 
 
 /* 
+ * DESCRIPCIÓN:
  * Esta función inicia el analizador sintáctico,
  * primero hace una análisis de la estructura
  * principal del programa analizando si posee
