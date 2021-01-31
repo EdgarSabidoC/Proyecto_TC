@@ -251,7 +251,7 @@ int __esElem(char *token)
  * DESCRIPCIÓN:
  * Esta función valida si la cadena (sentencia)
  * a partir del token que se le pase como argumento
- * se trata del una comparación.
+ * se trata de una comparación.
  * 
  * ENTRADA: Un puntero de tipo char (cadena) del token.
  * 
@@ -260,19 +260,17 @@ int __esElem(char *token)
  */
 int __esCompara(nodo_Tok *nodo)
 {
-    // Se verifica si el token es un identificador:
-    if(__esVariable(nodo->token) == 0)
+    // Se verifica si el token es una variable (identificador):
+    if(nodo && __esVariable(nodo->token) == 0)
     {
-        nodo = nodo->sig; // Se pasa al siguiente nodo.
-
         // Se verifica si el token es un operador relacional:
-        if(__esOpRel(nodo->token) == 0)
+        if((nodo->sig) && __esOpRel(nodo->sig->token) == 0)
         {
             nodo = nodo->sig; // Se pasa al siguiente nodo.
 
-            if(__esElem(nodo->token) == 0)
+            if((nodo->sig) && __esElem(nodo->sig->token) == 0)
                 return 0; // No hubo errores.
-            
+
             // Hubo errores:
             printf("ERROR de sintaxis en línea [%u] --No es un elemento válido --> %s.\n", nodo->num_linea, nodo->token);
             num_errores++;
@@ -532,6 +530,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
 {   
     unsigned int err_sent = 0; // Bandera que identifica un error de sentencia.
     unsigned int err_var = 0; // Bandera que identifica un error de variable sin utilizar.
+    static unsigned int en_rep = 1; // Bandera que indica si se entró a la sentencia REPITE.
 
     // Si el nodo es nulo:
     if(!nodo)
@@ -561,7 +560,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
 
 
         // Si empieza con IMPRIME:
-        else if(__esImprime(nodo->token) == 0)
+        if(__esImprime(nodo->token) == 0)
         {    
             // Se verifica que el token siguiente sea 
             // un elemento o una cadena:
@@ -582,8 +581,10 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         } // Fin else if __esImprime
 
         // Si es repite:
-        else if(__esRepite(nodo->token) == 0)
+        if(__esRepite(nodo->token) == 0)
         { 
+            en_rep = 0; // Se cambia la bandera del repite.
+
             // Guarda el número de línea de REPITE:
             unsigned int num_lin_rep = nodo->num_linea;
 
@@ -592,208 +593,192 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
             {
                 nodo = nodo->sig; // Se pasa al nodo.
 
-                    // Se verifica que el token sea VECES:
-                    if((nodo->sig) && __esVeces(nodo->sig->token) == 0)
-                    {    
-                        nodo = nodo->sig; // Se pasa al nodo.
+                // Se verifica que el token sea VECES:
+                if((nodo->sig) && __esVeces(nodo->sig->token) == 0)
+                {   
+                    nodo = nodo->sig; // Se pasa al nodo que contiene VECES.
 
-                        // Se verifica que haya un nodo siguiente:
-                        if(nodo->sig)
-                        {
-                            nodo = nodo->sig; // Se pasa al nodo.
-                            
-                            // Se verifica que
-                            // haya un nodo siguiente:
-                            if(nodo->sig)
-                            { 
-                                // Mientras hayan sentencias válidas
-                                // se recorren hasta hallar FINREP
-                                // o hallar FINPROG
-                                while(nodo = __esSent(nodo))
-                                {
-                                    // Si es FINREP o se llega al final del programa:
-                                    if(__esFinRep(nodo->token) == 0 || !nodo->sig)
-                                    {   
-                                        if(nodo->sig)
-                                            nodo = nodo->sig; // Se pasa al siguiente nodo.
-                                        break; // No hubo errores.
-                                    }
-                                }
-                           
-                                // Se verifica si se llegó al final de la lista:
-                                // Si se llegó al final, hubo error, pues falta FINREP:
-                                if(!(nodo->sig))
-                                {
-                                    printf("ERROR de sintaxis en línea [%u] --En declaración REPITE se esperaba --> FINREP.\n", num_lin_rep);
-                                    num_errores++;
-
+                    // Se verifica que haya
+                    // un nodo siguiente:
+                    if(nodo->sig && __esFinRep(nodo->sig->token) != 0)
+                    { 
+                        nodo = nodo->sig; // Se pasa al nodo siguiente.
+                        
+                        // Etiqueta para continuar el flujo del REPITE
+                        // al encontrar un error de declaración:
+                        repite:
+                            // Se recorren los nodos hasta hallar FINREP
+                            // o hallar FINPROG:
+                        
+                            while(nodo = __esSent(nodo))
+                            {
+                                // Si es FINREP o se llega al final del programa:
+                                if(__esFinRep(nodo->token) == 0 || !nodo->sig)
+                                {   
+                                    // Si el siguiente nodo no es NULL:
                                     if(nodo->sig)
                                         nodo = nodo->sig; // Se pasa al siguiente nodo.
+                                    break;
                                 }
-                            } // Fin if nodo = __esSent  
-                            else
-                                err_sent++; // Hubo un error de sentencia o declaración.
-                        } // Fin if nodo->sig.
-                        else
-                            err_sent++; // Hubo un error de sentencia o declaración.
-                          
-                    } // Fin if __esVeces.
+                            }
+                        
+                            // Se verifica si se llegó al final de la lista:
+                            // Si se llegó al final, hubo error, pues falta FINREP:
+                            if(!(nodo->sig))
+                            {
+                                printf("ERROR de sintaxis en línea [%u] --En declaración REPITE se esperaba --> FINREP.\n", num_lin_rep);
+                                num_errores++;
+                            }
+                    } // Fin if nodo->sig
+
                     else
-                    {                
-                        // Hubo error, falta VECES:
-                        printf("ERROR de sintaxis en línea [%u] --En declaración REPITE se esperaba --> VECES.\n", nodo->num_linea);
+                    {
+                        if(nodo->sig)
+                            nodo = nodo->sig->sig;
+
+                        printf("ERROR de sintaxis en línea [%u] --Sentencia REPITE sin utilizar.\n", num_lin_rep);
+
                         num_errores++;
                     }
+                } // Fin if __esVeces.
+                else
+                {                
+                    // Hubo error, falta VECES:
+                    printf("ERROR de sintaxis en línea [%u] --En declaración REPITE se esperaba --> VECES.\n", nodo->num_linea);
+                    num_errores++;
+                    goto repite; // Se va a la etiqueta repite en línea 606.
+                }
             } // Fin if __esElem
             else
             {
                 // Hubo error, no es un elemento:
-                printf("ERROR de sintaxis en línea [%u] --No es un elemento válido --> %s.\n", nodo->num_linea, nodo->token);
+                printf("ERROR de sintaxis en línea [%u] --Se esperaba un elemento, pero en su lugar se encontró --> %s.\n", nodo->num_linea, nodo->sig->token);
                 num_errores++;
-            }            
+                
+                if(nodo->sig)
+                    nodo = nodo->sig;
+
+                if(__esVeces(nodo->token) == 0)
+                {
+                    nodo = nodo->sig;
+                    goto repite; // Se va a la etiqueta repite en línea 606.
+                }
+            }    
         } // Fin de else if de __esRepite
 
         // Si es condicional si-entonces o si-entonces-sino:
-        else if(__esSi(nodo->token) == 0)
+        if(__esSi(nodo->token) == 0)
         {
-            if(nodo->sig)
-            {
-                nodo = nodo->sig;  // Se pasa al nodo siguiente.
+            // Guarda el número de línea del SI :
+            unsigned int num_lin_si = nodo->num_linea;
 
-                if(__esCompara(nodo) == 0)
+            // Se verifica que lo que siga sea una comparación:
+            if(nodo->sig && __esCompara(nodo->sig) == 0)
+            {
+                // Se pasa al último token (nodo) de la
+                // comparación el cual es un elemento:
+                nodo = nodo->sig->sig;
+                
+                // Se verifica que lo que sigue sea un ENTONCES:
+                if(nodo->sig && __esEntonces(nodo->sig->token) == 0)
                 {   
+                    nodo = nodo->sig;  // Se pasa al nodo del ENTONCES.
+
+                    // Se verifica que haya un nodo después:
                     if(nodo->sig)
-                    {   
+                    {
                         nodo = nodo->sig;  // Se pasa al nodo siguiente.
 
-                        if(__esEntonces(nodo->token) == 0)
+                        // Se verifica que sea un nodo diferente de NULL y 
+                        // que lo que siga sean sentencias válidas:
+                        while(nodo = __esSent(nodo))
                         {
-                            if(nodo->sig)
+                            // Si es FINSI, SINO:
+                            if(__esFinSi(nodo->token) == 0)
                             {
-                                nodo = nodo->sig;  // Se pasa al nodo siguiente.
-                                
-                                // Se verifica que lo que sigue 
-                                // sea una sentencia válida:
-                                nodo = __esSent(nodo);
-                                
-                                // Se verifican los tokens siguientes:
-                                if(nodo)
-                                {   
-                                    // Se verifica si ya se llegó al FINSI
-                                    // o si hay más sentencias válidas:
-                                    if(__esFinSi(nodo->token) != 0)
-                                    {    
-                                        // Se verifica que sea un nodo diferente de NULL y 
-                                        // que lo que siga sean sentencias válidas:
-                                        while(nodo)
-                                        {
-                                            nodo = __esSent(nodo);
+                                nodo->sig;
+                            }
 
-                                            // Si es FINSI o SINO:
-                                            if(__esFinSi(nodo->token) == 0 || __esSiNo(nodo->token) == 0)
-                                                break; // No hubo errores.   
-                                        }
+                            // Se verifica si se llegó al final de la lista,
+                            // si se llegó al final, hubo error, pues falta FINSI:
+                            if(!nodo->sig)
+                            {
+                                printf("ERROR de sintaxis en línea [%u] --En declaración SI no se encuentra --> FINSI.\n", num_lin_si);
+                                num_errores++;
+                                break;
+                            }
+                        }
 
-                                        // Se verifica si se llegó al final de la lista:
-                                        // Si se llegó al final, hubo error, pues falta FINSI:
-                                        if(!nodo)
-                                        {
-                                            printf("ERROR de sintaxis en línea [%u] --No se encuentra --> FINSI.\n", nodo->num_linea);
-                                            num_errores++;
-                                        }
+                        // Si no se llegó al final de la lista,
+                        // se verifica si es un SINO:
+                        if(__esSiNo(nodo->token) == 0)
+                        {
+                            nodo = nodo->sig;  // Se pasa al nodo siguiente.
 
-                                        // Si no se llegó al final de la lista,
-                                        // entonces se verifica si es un SINO:
-                                        else if(__esSiNo(nodo->token) == 0)
-                                        {
-                                            nodo = nodo->sig;  // Se pasa al nodo siguiente.
+                            // Se verifica que lo que sigue 
+                            // sea una sentencia válida:
+                            nodo = __esSent(nodo);
 
-                                            // Se verifica que lo que sigue 
-                                            // sea una sentencia válida:
-                                            nodo = __esSent(nodo);
-
-                                            // Se verifican los siguientes tokens:
-                                            if(nodo)
-                                            {  
-                                                // Se verifica si ya se llegó al FINSI
-                                                // o si hay más sentencias válidas:
-                                                if(__esFinSi(nodo->token) != 0)
-                                                {    
-                                                    // Se verifica que sea un nodo diferente de NULL y 
-                                                    // que lo que siga sean sentencias válidas:
-                                                    while(nodo)
-                                                    {
-                                                        nodo = __esSent(nodo);
-
-                                                        // Si es FINSI:
-                                                        if(__esFinSi(nodo->token) == 0)
-                                                        {
-                                                            nodo = nodo->sig; // Se pasa al siguiente token.
-                                                            break; // No hubo errores.   
-                                                        }
-                                                    }
-
-                                                    // Se verifica si se llegó al final de la lista:
-                                                    // Si se llegó al final, hubo error, pues falta FINSI:
-                                                    if(!nodo)
-                                                    {
-                                                        printf("ERROR de sintaxis en línea [%u] --Falta (FINSI).\n", nodo->num_linea);
-                                                        num_errores++;
-                                                    }
-                                                } // Fin if __esFinSi.    
-                                            } // Fin if nodo.
-                                            else
-                                            {
-                                                printf("ERROR de sintaxis en línea [%u] --Falta (FINSI).\n", nodo->num_linea);
-                                                num_errores++;
-                                            }    
-                                        } // Fin else if __esSiNo.
-                                    } // Fin if __esFinSi.
-
-                                    else
+                            // Se verifican los siguientes tokens:
+                            if(nodo)
+                            {  
+                                // Se verifica si ya se llegó al FINSI
+                                // o si hay más sentencias válidas:
+                                if(__esFinSi(nodo->token) != 0)
+                                {    
+                                    // Se verifica que sea un nodo diferente de NULL y 
+                                    // que lo que siga sean sentencias válidas:
+                                    while(nodo)
                                     {
-                                        // Hubo error, falta un FINSI:
-                                        printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (FINSI).\n", nodo->num_linea);
+                                        nodo = __esSent(nodo);
+
+                                        // Si es FINSI:
+                                        if(__esFinSi(nodo->token) == 0)
+                                        {
+                                            nodo = nodo->sig; // Se pasa al siguiente token.
+                                            break; // No hubo errores.   
+                                        }
+                                    }
+
+                                    // Se verifica si se llegó al final de la lista:
+                                    // Si se llegó al final, hubo error, pues falta FINSI:
+                                    if(!nodo)
+                                    {
+                                        printf("ERROR de sintaxis en línea [%u] --Falta (FINSI).\n", nodo->num_linea);
                                         num_errores++;
                                     }
-                                } // Fin if nodo  
-                                else
-                                {
-                                    // Hubo error, falta un FINSI:
-                                    printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (FINSI).\n", nodo->num_linea);
-                                    num_errores++;
-                                }
-                            } // Fin if
+                                } // Fin if __esFinSi.    
+                            } // Fin if nodo.
                             else
-                                err_sent++; // Hay un error de sentencia.
-                        } // Fin if ENTONCES
-
-                        else
-                        { 
-                            // Hubo error:
-                            printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (ENTONCES).\n", nodo->num_linea);
-                            num_errores++;
-                        }
+                            {
+                                printf("ERROR de sintaxis en línea [%u] --Falta (FINSI).\n", nodo->num_linea);
+                                num_errores++;
+                            }    
+                        } // Fin else if __esSiNo.
                     } // Fin if
                     else
                         err_sent++; // Hay un error de sentencia.
-                } // Fin if __esCompara
-
+                    
+                } // Fin if ENTONCES
                 else
-                {
-                    // Hubo error, no es una COMPARACIÓN:
-                    printf("ERROR de sintaxis en línea [%u] --No es una comparación válida.\n", nodo->num_linea);
+                { 
+                    // Hubo error:
+                    printf("ERROR de sintaxis en línea [%u] --Falta palabra reservada (ENTONCES).\n", nodo->num_linea);
                     num_errores++;
                 }
-            } // Fin if
+            } // Fin if __esCompara
             else
-                err_sent++; // Hay un error de sentencia.
+            {
+                // Hubo error, no es una COMPARACIÓN:
+                printf("ERROR de sintaxis en línea [%u] --No es una comparación válida.\n", nodo->num_linea);
+                num_errores++;
+            }
         } // Fin else if de condicional 
         
     } // Fin if __esReservada
 
     // Se verifica si es una sentencia de asignación:
-    else if(__esVariable(nodo->token) == 0)
+    if(__esVariable(nodo->token) == 0)
     {
         // Se verifica que el token siguiente sea un signo de '=':
         if((nodo->sig) && __esAsig(nodo->sig->token) == 0)
@@ -847,15 +832,22 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     } // Fin if __esVariable.
 
     // Si se encuentra una cadena de texto o una variable sin utilizar:
-    if(__esTexto(nodo->token) == 0 || err_var != 0)
+    if(__esTexto(nodo->token) == 0 || err_var != 0 || __esVal(nodo->token) == 0)
     {
-        printf("ERROR de sintaxis en línea [%u] --Elemento sin utilizar --> %s.\n", nodo->num_linea, nodo->token);
+        printf("ERROR de sintaxis en línea [%u] --Elemento o texto sin utilizar --> %s.\n", nodo->num_linea, nodo->token);
         num_errores++;
         
         // Si hay un nodo después,
         // entonces se pasa a ese nodo:
         if(nodo->sig)
             nodo = nodo->sig;
+    }
+    
+    // Si falta un REPITE:
+    if(nodo->sig && (__esVeces(nodo->token) == 0 || (__esFinRep(nodo->token) == 0 && en_rep != 0)))
+    {
+        printf("ERROR de sintaxis en línea [%u] --En declaración no se encontró --> REPITE.\n", nodo->num_linea);
+        nodo = nodo->sig;
     }
 
     // Si hubo error de sentencia o declaración:
@@ -872,10 +864,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
 
     // Se retorna el puntero al nodo siguiente
     // si no es el final de la lista:
-    if(nodo)
-        return nodo;
-    else
-        return NULL; // Si es el final de la lista
+    return nodo;
 }
 
 
@@ -936,10 +925,30 @@ int iniAnalSin(listaTok *lista)
     {
         printf("%s\n", aux->token);
         aux = __esSent(aux); // Se continúa el ciclo con el siguiente nodo.
+
+        // Se analiza el retorno de la funcion __esSent:
+
+        // Si falta un SI:
+        if(__esSiNo(aux->token) == 0 ||  __esOpRel(aux->token) == 0 || __esEntonces(aux->token) == 0 || __esFinSi(aux->token) == 0)
+        {
+            printf("ERROR de sintaxis en línea [%u] --En declaración no se encontró --> SI.\n", aux->num_linea);
+            
+            if(aux->sig)
+                aux = aux->sig;
+        }
+        
+        // Si la sentencia consta de solamente un número:
+        if(__esVal(aux->token) == 0 )
+        {
+            printf("ERROR de sintaxis en línea [%u] --Sentencia no válida --> %s.\n", aux->num_linea, aux->token);
+
+            if(aux->sig)
+                aux = aux->sig;
+        }
     }    
-    
+
     // Verifica que se halle la palabra reservada FINPROG al final del programa:
-    if(strncmp(aux->token, "FINPROG", strlen(aux->token)+1) != 0)
+    if(aux && strncmp(aux->token, "FINPROG", strlen(aux->token)+1) != 0)
     {
         printf("ERROR de sintaxis en l%cnea [%u] --No se encuentra palabra reservada --> FINPROG.\n", 161, aux->num_linea);
         num_errores++;
