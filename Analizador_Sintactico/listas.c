@@ -11,7 +11,7 @@
  * de tipo nood_Tok (a partir del token y de su 
  * número de línea) para una lista de tipo listaTok,
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token
+ * ENTRADA: Un puntero de a una cadena (token)
  * 			y un entero sin signo (número de línea del token)
  * 
  * SALIDA: Puntero al nodo.
@@ -151,13 +151,12 @@ void pushBackTok(listaTok *Lista, nodo_Tok *nodo)
 
 /* 
  * DESCRIPCIÓN:
- * Esta función busca un nodo de tipo nood_Tok
+ * Esta función busca un nodo de tipo nodo_Tok
  * dentro de una lista de tipo listaTok y
  * lo retorna si lo encuentra.
  * 
  * ENTRADA: Un puntero a una lista de tipo listaTok
- * 			y un puntero de tipo char (cadena)
- * 			del token.
+ * 			y un puntero a una cadena (token).
  * 
  * SALIDA: Puntero a un nodo de tipo nodo_Tok.
  * 

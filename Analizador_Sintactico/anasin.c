@@ -1,3 +1,6 @@
+// Programa principal del analizador sintático.
+
+// Biblioteca con las funciones del analizador sintáctico:
 #include "sintax.c"
 
 /*

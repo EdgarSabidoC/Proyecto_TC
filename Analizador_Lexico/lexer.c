@@ -24,7 +24,18 @@ unsigned int cont_txt = 0;
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 
 
-/* Calcula el valor decimal de un número octal dada una cadena que sea un número */
+/*  
+ * DESCRIPCIÓN:
+ * Esta función calcula el valor decimal de un número 
+ * octal dada una cadena que sea un número.
+ * 
+ * ENTRADA: Un puntero de tipo char a una cadena
+ *          de caracteres (string) que represente 
+ *          un número en base octal.
+ * 
+ * SALIDA: Un long long en base decimal.
+ *  
+ */
 long long OctADec(char *numero)
 {
     // La cadena se convierte en número:
@@ -56,7 +67,16 @@ long long OctADec(char *numero)
 }
 
 
-/* La función halla la cantidad de líneas de un texto */
+/*  
+ * DESCRIPCIÓN:
+ * Esta función halla la cantidad de líneas de un 
+ * texto dentro de un archivo.
+ * 
+ * ENTRADA: Un puntero a un archivo.
+ * 
+ * SALIDA: Un número entero (int).
+ *  
+ */
 int __contarLineasArchivo(FILE *archivo)
 {
     int numero_lineas = 0;
@@ -79,10 +99,19 @@ int __contarLineasArchivo(FILE *archivo)
 }
 
 
-/* 
-    La función almacena las líneas del archivo dentro de un vector 
-    Retorna la cantidad de espacios en blanco que hay al principio de la línea.
-*/
+/*  
+ * DESCRIPCIÓN:
+ * La función almacena las líneas del archivo dentro 
+ * de un vector y retorna la cantidad de espacios en
+ * blanco que hay al principio de la línea.
+ * 
+ * ENTRADA: Un puntero a un archivo, dos unsigned int
+ *          (dimensiones del arrreglo) y un arreglo
+ *          estático de dos dimensiones.
+ * 
+ * SALIDA: N/A.
+ *  
+ */
 void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres, char cadena[lineas][caracteres])
 {
     unsigned int i = 0;
@@ -106,7 +135,22 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres
 }
 
 
-/* Valida si la cadena es una palabra reservada */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es una
+ * palabra reservada.
+ * 
+ * Palabras reservadas: PROGRAMA, FINPROG, SI,
+ *                      ENTONCES, SINO, FINSI,
+ *                      REPITE, VECES FINREP, 
+ *                      IMPRIME, LEE.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esReservada(char *cadena)
 {
     unsigned int i = 0;
@@ -128,7 +172,17 @@ int __esReservada(char *cadena)
 }
 
 
-/* Valida si la cadena es una ASIGNACIÓN */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es un
+ * símbolo de asignación: =.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esAsig(char *cadena)
 {
     // '=' == 61 en ASCII.
@@ -142,7 +196,17 @@ int __esAsig(char *cadena)
 }
 
 
-/* Valida si la cadena es un SÍMBOLO */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es un
+ * símbolo.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esSimbol(char *token)
 {
     // Se verifica si el char es una letra o un número:
@@ -157,7 +221,19 @@ int __esSimbol(char *token)
 }
 
 
-/* Valida si la cadena es un OPERADOR ARITMÉTICO. */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es un
+ * operador aritmético.
+ * 
+ * Operadores aritméticos: +, -, *, /.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esOpAr(char *cadena) 
 { 
     unsigned int i = 0;
@@ -179,13 +255,23 @@ int __esOpAr(char *cadena)
 }
 
 
-/* Valida si la cadena es un NÚMERO */
-int __esNum(char *token)
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es un
+ * número.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
+int __esNum(char *cadena)
 {
     // Si el primer char es un número:
-    if(isdigit(*token) != 0)
+    if(isdigit(*cadena) != 0)
     {
-        char *tmp = token;
+        char *tmp = cadena;
 
         // Se recorre toda la cadena:
         while(isdigit(*tmp) != 0)
@@ -205,7 +291,19 @@ int __esNum(char *token)
 }
 
 
-/* Valida si la cadena es un OPERADOR RELACIONAL */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es un
+ * operador relacional.
+ * 
+ * Operadores relacionales: <, >, ==.
+ *
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esOpRel(char *cadena)
 {
     unsigned int i = 0;
@@ -226,7 +324,17 @@ int __esOpRel(char *cadena)
 }
 
 
-/* Verifica si el caracter es un '#' COMENTARIO */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es el símbolo
+ * de un comentario: #.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esComentario(char *cadena)
 {
     // '#' == 35 en ASCII.
@@ -240,7 +348,17 @@ int __esComentario(char *cadena)
 }
 
 
-/* Valida si el caracter es una COMILLA */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento son unas
+ * comillas dobles: ".
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esComilla(char *cadena)
 {
     // '\"' == 34 en ASCII,
@@ -254,7 +372,19 @@ int __esComilla(char *cadena)
 }
 
 
-/* Valida si la cadena es un string */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es una
+ * una cadena de texto (string) aceptada
+ * por el lenguaje MIO.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token,
+ *          un unsigned int (número de línea de la sentencia).
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
 int __esTexto(char *token, unsigned int num_linea)
 {
     // Si es una cadena de texto:
@@ -273,18 +403,28 @@ int __esTexto(char *token, unsigned int num_linea)
 }
 
 
-/* Valida si la cadena es una variable válida */
-int __esVarValid(char *token)
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es una
+ * variable válida del lenguaje MIO.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
+int __esVarValid(char *cadena)
 {
     // Se verifica que no se trate de una palabra reservada:
-    if(__esReservada(token) == 0)
+    if(__esReservada(cadena) == 0)
         return (1);
 
-    // Si el token comienza con una letra:
-    if (isalpha(*token) != 0)
+    // Si la cadena comienza con una letra:
+    if (isalpha(*cadena) != 0)
     {  
         // Se valida si es un nombre de variable correcto:
-        char *tmp = token;
+        char *tmp = cadena;
         
         // Se verifica que todos los caracteres de la cadena sean válidos:
         while(isalpha(*tmp) != 0 || isdigit(*tmp) != 0)
@@ -310,32 +450,68 @@ int __esVarValid(char *token)
 }
 
 
-/* Valida si la cadena se trata de una variable */
-int __esVariable(char *token)
+/* 
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es una
+ * variable.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ * 
+ */
+int __esVariable(char *cadena)
 {
-    if(__esReservada(token) == 0)
+    if(__esReservada(cadena) == 0)
         return (1);
     
-    else if(__esVarValid(token) == 0)
+    else if(__esVarValid(cadena) == 0)
         return (0);
     
     else
         return (1);
-    
 }
 
 
-/* Identifica el tipo de componente léxico (inicia el análsis del componente léxico) */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función inicia el análisis léxico 
+ * identifica el tipo de componente léxico 
+ * de acuerdo al caracter con el que comienza 
+ * la cadena y retorna un caracter indicando el 
+ * tipo de componente léxico del que se trate.
+ * 
+ * TIpos de componentes léxicos:
+ *      R: palabra reservada.
+ *      V: variable válida.
+ *      v: variable no válida.
+ *      N: número.
+ *      n: variable no válida (inicia con número)
+ *      #: comentario.
+ *      r: operador relacional. 
+ *      a: operador aritmético.
+ *      A: asignación.
+ *      C: comilla.
+ *      s: variable no válida (comienza con símbolo).
+ *      S: símbolo.             
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token,
+ *          un unsigned int (número de línea de la sentencia).
+ * 
+ * SALIDA: Un caracter (char).
+ * 
+ */
 char __identifica(char *token, unsigned int num_linea)
 {
     if(isalpha(*token) != 0)
     {
         if(__esReservada(token) == 0)
-            return 'R';
+            return 'R'; // Palabra reservada.
         else
         {
             if(__esVarValid(token) == 0)
-                return 'V';
+                return 'V'; // Variable válida.
             else
                 return 'v'; // Es variable, pero no válida. Pues tiene algún símbolo raro dentro de la variable.
         }
@@ -346,7 +522,7 @@ char __identifica(char *token, unsigned int num_linea)
         if(isdigit(*token) != 0)
         {
             if(__esNum(token) == 0)
-                return 'N';
+                return 'N'; // Número.
             else
                 return 'n'; // Es una variable que comienza con un número. Error.
         }
@@ -380,7 +556,18 @@ char __identifica(char *token, unsigned int num_linea)
 }
 
 
-/* Obtiene el token de tipo cadena de una línea */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función obtiene el token de tipo
+ * cadena (string) aceptada por el lenguaje
+ * MIO a partir de una cadena de texto y
+ * lo retorna.
+ * 
+ * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * 
+ * SALIDA: Un puntero de tipo char (cadena) al token.
+ * 
+ */
 char *tokenCadena(char *cadena)
 {
     char *token, *tmp;
@@ -409,7 +596,29 @@ char *tokenCadena(char *cadena)
 }
 
 
-/* Guarda en una lista un token de variable, cadena o valor, se imprime en el archivo .lex su respectiva representación */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función guarda en una lista 
+ * (listaVarNum, listaText, listaVal)
+ * el token de una variable, cadena de texto o valor
+ * en su respectivo tipo de lista e imprime en el
+ * archivo .lex la representación del tipo de token.
+ * 
+ * Tipos de representación: 
+ *      [id] IDxx: variable numérica (identificador).
+ *      [txt] TXxx: cadena de texto (string).
+ *      [val]: número (valor). 
+ * 
+ * ENTRADA: Un puntero a un archivo .lex, 
+ *          un char tipo de identificador),
+ *          un puntero a la cadena del token,
+ *          un puntero a una lista tipo listaVarNum,
+ *          un puntero a una lista tipo listaText,
+ *          un puntero a una lista tipo listaVal.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void impTokLex(FILE *archivo_lex, char ident, char *token, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     // Si es una variable:
@@ -483,7 +692,19 @@ void impTokLex(FILE *archivo_lex, char ident, char *token, listaVarNum *lista_va
 }
 
 
-/* Se imprimen las listas en el archivo .sim */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función imprime las 3 listas en el 
+ * archivo .sim
+ * 
+ * ENTRADA: Un puntero a un archivo .sim,
+ *          un puntero a una lista tipo listaVarNum,
+ *          un puntero a una lista tipo listaText,
+ *          un puntero a una lista tipo listaVal.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     // Se imprimen las listas en el archivo .sim:
@@ -521,7 +742,22 @@ void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cad
 }
 
 
-/* Obtiene un token de una cadena según el tipo de componente léxico identificado por __identifica y lo retorna (obtiene un componente léxico) */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función obtiene un token (cadena) según el
+ * tipo de componenete léxico identificado por
+ * la función __identifica y lo retorna.
+ * 
+ * ENTRADA: Un puntero a un archivo .lex,
+ *          un puntero a una cadena,
+ *          un unsigned int (número de línea de la sentencia),
+ *          un puntero a una lista tipo listaVarNum,
+ *          un puntero a una lista tipo listaText,
+ *          un puntero a una lista tipo listaVal.
+ * 
+ * SALIDA: Puntero a una cadena.
+ * 
+ */
 char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
     if(!cadena)
@@ -659,7 +895,24 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
 }
 
 
-/* Crea las cadenas para obtener los tokens a través de genTok e inicia el proceso de análisis por línea (identifica si hay una o más unidades léxicas en la línea) */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función crea las cadenas para obtener los tokens
+ * a través de la función genTok e inicia el proceso
+ * de análisis léxico por línea.
+ * Identifica si hay una o más unidades léxicas en la
+ * línea.
+ * 
+ * ENTRADA: Un puntero a un archivo .lex,
+ *          dos unsigned int (dimensiones del arreglo),
+ *          un arreglo estático de dos dimensiones,
+ *          un puntero a una lista tipo listaVarNum,
+ *          un puntero a una lista tipo listaText,
+ *          un puntero a una lista tipo listaVal.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char cadena[lineas][chars], listaVarNum *lista_vars, listaText *lista_strs, listaVal *lista_vals)
 {
     unsigned int i; 

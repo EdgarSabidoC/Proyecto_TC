@@ -2,8 +2,19 @@
 
 //--------------------------FUNCIONES PARA LISTA DE VARIABLES NUMÉRICAS--------------------------
 
-
-/* Crea un nodo_VarNum */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función aparta un bloque de memoria
+ * en la memoria dinámica y crea un nodo 
+ * de tipo nood_VarNum (a partir del token y de su 
+ * número de identificador) para una lista de tipo listaVarNum,
+ * 
+ * ENTRADA: Un puntero a una cadena (token)
+ * 			y un unsigned int (número de id del token)
+ * 
+ * SALIDA: Puntero al nodo.
+ * 
+ */
 nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id)
 {
 	nodo_VarNum *apu;
@@ -22,13 +33,25 @@ nodo_VarNum *creaNodoVarNum(char *variable, unsigned int id)
 }
 
 
-/* LIbera la memoria ocupada por un nodo_VarNum */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por un nodo en una lista
+ * de tipo listaVarNum.
+ * 
+ * ENTRADA: Un puntero de tipo nodo_VarNum (nodo).
+ * 
+ * SALIDA: 0 si la operación fue exitosa, 
+ *         -1 si la operación no fue exitosa.
+ * 
+ */
 int liberaNodoVarNum(nodo_VarNum *nodo)
 {
-	if(nodo) //Equivalente a nodo != NULL
+	if(nodo)
 	{
 		free(nodo); // Se libera la memoria del nodo_VarNum.
-	
+		nodo = NULL;
+
 		// Si la operación es exitosa:	
 		return 0;
 	}
@@ -38,7 +61,17 @@ int liberaNodoVarNum(nodo_VarNum *nodo)
 }
 
 
-/* Inicializa una lista de variables numéricas */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función inicializa una lista de tipo
+ * listaVarNum apuntando su raíz a NULL y
+ * asignando un tamaño de 0.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaVarNum.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void iniListaVarNum(listaVarNum *Lista)
 {
 	Lista->raiz = NULL; // El nodo raíz de la lista apunta a NULL
@@ -46,10 +79,20 @@ void iniListaVarNum(listaVarNum *Lista)
 }
 
 
-/* Libera el espacio de memoria ocupada por la lista de variables numéricas */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por una lista de tipo
+ * listaVarNum.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaVarNum.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void liberaListaVarNum(listaVarNum *Lista)
 {
-	nodo_VarNum *aux; // Apuntador auxiliar
+	nodo_VarNum *aux; // Nodo auxiliar
 	
 	while (Lista->raiz) // Mientras la raíz sea diferente de NULL
 	{
@@ -58,14 +101,27 @@ void liberaListaVarNum(listaVarNum *Lista)
 		liberaNodoVarNum(aux); // Se libera el nodo "aux"
 	}
 
+	Lista->raiz = NULL;
 	Lista->tam = 0; // Se deja el tamaño en 0, pues la lista está vacía
 }
 
 
-/* Ingresa un nodo_VarNum al final de la lista */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función ingresa un nodo de tipo
+ * nodo_VarNum al final de una lista de tipo 
+ * listaVarNum con una operación pushBack.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaVarNum
+ * 			y un puntero a un nodo de tipo 
+ * 			nodo_VarNum (nodo).
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo)
 {
-	if (nodo) //Equivalente a nodo != NULL
+	if (nodo)
 	{
 		if (!Lista->raiz)
 		   Lista->raiz = nodo;
@@ -79,7 +135,7 @@ void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo)
 			while (apu->sig)
 				apu = apu->sig;
 				
-			// Se inserta nodo despues de apu;	
+			// Se inserta nodo después de apu;	
 			apu->sig = nodo;
 			nodo = NULL;
 		}	
@@ -88,7 +144,19 @@ void pushBackVarNum(listaVarNum *Lista, nodo_VarNum *nodo)
 }
 
 
-/* Busca el nodo de una variable numérica dentro de la lista */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función busca un nodo de tipo nodo_VarNum,
+ * a partir del contenido del nodo (token),
+ * dentro de una lista de tipo listaVarNum y
+ * lo retorna si lo encuentra.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaVarNum
+ * 			y un puntero a una cadena (token).
+ * 
+ * SALIDA: Puntero a un nodo de tipo nodo_VarNum.
+ * 
+ */
 nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre)
 {	
 	nodo_VarNum *apu;
@@ -114,7 +182,19 @@ nodo_VarNum *buscaVarNum(listaVarNum *Lista, char *nombre)
 //--------------------------FUNCIONES PARA LISTA DE CADENAS DE TEXTO--------------------------
 
 
-/* Crea un nodo_Txt */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función aparta un bloque de memoria
+ * en la memoria dinámica y crea un nodo 
+ * de tipo nood_Txt (a partir del token y de su 
+ * número de identificador) para una lista de tipo listaText,
+ * 
+ * ENTRADA: Un puntero a una cadena (token)
+ * 			y un unsigned int (número de id del token)
+ * 
+ * SALIDA: Puntero al nodo.
+ * 
+ */
 nodo_Txt *creaNodoText(char *cadena, unsigned int id)
 {
 	nodo_Txt *apu;
@@ -136,14 +216,26 @@ nodo_Txt *creaNodoText(char *cadena, unsigned int id)
 }
 
 
-/* Libera la memoria ocupada por un nodo_Txt */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por un nodo en una lista
+ * de tipo listaText.
+ * 
+ * ENTRADA: Un puntero de tipo nodo_Txt (nodo).
+ * 
+ * SALIDA: 0 si la operación fue exitosa, 
+ *         -1 si la operación no fue exitosa.
+ * 
+ */
 int liberaNodoTxt(nodo_Txt *nodo)
 {
-	if(nodo) //Equivalente a nodo != NULL
+	if(nodo)
 	{
 		// Se libera la memoria ocupada por el nodo:
 		free(nodo->cadena); // Se libera la memoria del string del nodo.
 		free(nodo); // Se libera la memoria del nodo.
+		nodo = NULL;
 
 		// Si la operación fue exitosa:
 		return 0;
@@ -154,7 +246,17 @@ int liberaNodoTxt(nodo_Txt *nodo)
 }
 
 
-/* Inicializa una lista de cadenas de texto */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función inicializa una lista de tipo
+ * listaText apuntando su raíz a NULL y
+ * asignando un tamaño de 0.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaText.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void iniListaTxt(listaText *Lista)
 {
 	Lista->raiz = NULL; // El nodo raíz de la lista apunta a NULL
@@ -162,10 +264,20 @@ void iniListaTxt(listaText *Lista)
 }
 
 
-/* Libera el espacio de memoria ocpada por la lista de cadenas de texto */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por una lista de tipo
+ * listaText.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaText.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void liberaListaTxt(listaText*Lista)
 {
-	nodo_Txt *aux; // Apuntador auxiliar
+	nodo_Txt *aux; // Nodo auxiliar
 	
 	while (Lista->raiz) // Mientras la raíz sea diferente de NULL
 	{
@@ -175,14 +287,27 @@ void liberaListaTxt(listaText*Lista)
 		liberaNodoTxt(aux); // Se libera el nodo "aux"
 	}
 
+	Lista->raiz = NULL;
 	Lista->tam = 0; // Se deja el tamaño en 0, pues la lista está vacía
 }
 
 
-/* Ingresa un nodo_Txt al final de la lista */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función ingresa un nodo de tipo
+ * nodo_Txt al final de una lista de tipo 
+ * listaText con una operación pushBack.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaText
+ * 			y un puntero a un nodo de tipo 
+ * 			nodo_Txt (nodo).
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void pushBackTxt(listaText *Lista, nodo_Txt *nodo)
 {
-	if (nodo) //Equivalente a nd != NULL
+	if (nodo)
 	{
 		if (!Lista->raiz)
 		   Lista->raiz = nodo;
@@ -196,7 +321,7 @@ void pushBackTxt(listaText *Lista, nodo_Txt *nodo)
 			while (apu->sig)
 				apu = apu->sig;
 				
-			// Se inserta nodo despues de apu;	
+			// Se inserta nodo después de apu;	
 			apu->sig = nodo;
 			nodo = NULL;
 		}	
@@ -208,7 +333,19 @@ void pushBackTxt(listaText *Lista, nodo_Txt *nodo)
 //--------------------------FUNCIONES PARA LISTA DE VALORES--------------------------
 
 
-/* Crea un nodo_Val */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función aparta un bloque de memoria
+ * en la memoria dinámica y crea un nodo 
+ * de tipo nood_Val (a partir del token y de su 
+ * número de identificador) para una lista de tipo listaVal,
+ * 
+ * ENTRADA: Un int (número octal) y 
+ * 			un long long (número decimal).
+ * 
+ * SALIDA: Puntero al nodo.
+ * 
+ */
 nodo_Val *creaNodoVal(int numero_octal, long long numero_decimal)
 {
 	nodo_Val *apu;
@@ -227,15 +364,27 @@ nodo_Val *creaNodoVal(int numero_octal, long long numero_decimal)
 }
 
 
-/* Libera la memoria ocupada por un nodo_Val */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por un nodo en una lista
+ * de tipo listaVal.
+ * 
+ * ENTRADA: Un puntero de tipo nodo_Val (nodo).
+ * 
+ * SALIDA: 0 si la operación fue exitosa, 
+ *         -1 si la operación no fue exitosa.
+ * 
+ */
 int liberaNodoVal(nodo_Val *nodo)
 {
-	if(nodo) //Equivalente a nodo != NULL
+	if(nodo)
 	{
 		// Se libera el nodo:
 		free(nodo);
+		nodo = NULL;
 
-		// Si resulta existosa la operación:
+		// Si resulta exitosa la operación:
 		return 0;
 	}
 
@@ -244,7 +393,17 @@ int liberaNodoVal(nodo_Val *nodo)
 }
 
 
-/* Inicializa una lista de valores */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función inicializa una lista de tipo
+ * listaVal apuntando su raíz a NULL y
+ * asignando un tamaño de 0.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaVal.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void iniListaVal(listaVal *Lista)
 {
 	Lista->raiz = NULL; // El nodo raíz de la lista apunta a NULL
@@ -252,10 +411,20 @@ void iniListaVal(listaVal *Lista)
 }
 
 
-/* Libera el espacio de memoria ocupado por la lista de valores */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función libera de la memoria dinámica
+ * el espacio ocupado por una lista de tipo
+ * listaVal.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaVal.
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void liberaListaVal(listaVal *Lista)
 {
-	nodo_Val *aux; // Apuntador auxiliar
+	nodo_Val *aux; // Nodo auxiliar
 	
 	while (Lista->raiz) // Mientras la raíz sea diferente de NULL
 	{
@@ -264,14 +433,27 @@ void liberaListaVal(listaVal *Lista)
 		liberaNodoVal(aux); // Se libera el nodo "aux"
 	}
 
+	Lista->raiz = NULL;
 	Lista->tam = 0; // Se deja el tamaño en 0, pues la lista está vacía
 }
 
 
-/* Ingresa un nodo_Val al final de la lista */
+/* 
+ * DESCRIPCIÓN:
+ * Esta función ingresa un nodo de tipo
+ * nodo_Val al final de una lista de tipo 
+ * listaVal con una operación pushBack.
+ * 
+ * ENTRADA: Un puntero a una lista de tipo listaVal
+ * 			y un puntero a un nodo de tipo 
+ * 			nodo_Val (nodo).
+ * 
+ * SALIDA: N/A.
+ * 
+ */
 void pushBackVal(listaVal *Lista, nodo_Val *nodo)
 {
-	if (nodo) //Equivalente a nd != NULL
+	if (nodo)
 	{
 		if (!Lista->raiz)
 		   Lista->raiz = nodo;
@@ -285,7 +467,7 @@ void pushBackVal(listaVal *Lista, nodo_Val *nodo)
 			while (apu->sig)
 				apu = apu->sig;
 				
-			// Se inserta nodo despues de apu;	
+			// Se inserta nodo después de apu;	
 			apu->sig = nodo;
 			nodo = NULL;
 		}	

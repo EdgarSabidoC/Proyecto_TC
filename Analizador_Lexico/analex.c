@@ -1,14 +1,28 @@
 // Programa principal del analizador léxico.
 
-#include "lexer.c"
+// Biblioteca con las funciones del analizador léxico:
+#include "lexer.c" 
 
-/* Función principal */
+/*
+ * DESCRIPCIÓN: 
+ * Función principal que controla al analizador.
+ * Aquí se realizan los llamados a las funciones
+ * del analizador léxico y se inicializan
+ * las listas donde se guardarán los tokens.
+ * 
+ * ENTRADA: Cadena (string) con el nombre del archivo .lex
+ * 
+ * SALIDA: Resultado de la compilación:
+ *          EXIT_SUCCES - Compilación exitosa.
+ *          EXIT_FAILURE - Fallo en la compilación.
+ * 
+ */
 int main(int argc, char **argv)
 {   
     // Si el programa no tiene la cantidad de argumentos correctos:
     if (argc <= 1 || argc > 2)
     // Falló al correr el programa:
-        return 1;
+        return EXIT_FAILURE;
 
     // Se verifica que el archivo sea extensión .mio:
     char *punto = strchr(argv[1], '.');
@@ -18,7 +32,7 @@ int main(int argc, char **argv)
     if(strncmp(punto, mio, sizeof(".mio")))
     {
         printf("ERROR, no se encontró archivo .mio\n\n");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Puntero al nombre del programa:
@@ -109,5 +123,5 @@ int main(int argc, char **argv)
     fclose(sim);
 
     // Programa exitoso:
-    return 0;
+    return EXIT_SUCCESS;
 }

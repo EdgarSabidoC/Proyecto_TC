@@ -4,6 +4,10 @@
 // Contador global de errores del programa:
 unsigned int num_errores = 0;
 
+
+//-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
+
+
 /* 
  * DESCRIPCIÓN:
  * Esta función crea una lista con los tokens del 
