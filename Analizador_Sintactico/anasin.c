@@ -13,7 +13,7 @@
  * ENTRADA: Cadena (string) con el nombre del archivo .lex
  * 
  * SALIDA: Resultado de la compilación:
- *          EXIT_SUCCES - Compilación exitosa.
+ *          EXIT_SUCCESS - Compilación exitosa.
  *          EXIT_FAILURE - Fallo en la compilación.
  * 
  */
