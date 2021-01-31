@@ -257,8 +257,11 @@ int __esComilla(char *cadena)
 /* Valida si la cadena es un string */
 int __esTexto(char *token, unsigned int num_linea)
 {
-    // Si es una cadena de text0:
-    if(*token == 34 && *(token+strlen(token)-1) == 34)
+    // Si es una cadena de texto:
+    // EN ASCII:
+    // '"' = 34
+    // '\' = 92
+    if(*token == 34 && *(token+strlen(token)-1) == 34 && *(token+strlen(token)-2) != 92)
         return (0);
     
     // Se verifica que tanto al inicio como al final de la cadena de texto hayan comillas "...":
