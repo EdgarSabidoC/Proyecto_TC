@@ -607,9 +607,9 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                         // Etiqueta para continuar el flujo del REPITE
                         // al encontrar un error de declaración:
                         repite:
+                            
                             // Se recorren los nodos hasta hallar FINREP
                             // o hallar FINPROG:
-                        
                             while(nodo = __esSent(nodo))
                             {
                                 // Si es FINREP o se llega al final del programa:
@@ -637,7 +637,6 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                             nodo = nodo->sig->sig;
 
                         printf("ERROR de sintaxis en línea [%u] --Sentencia REPITE sin utilizar.\n", num_lin_rep);
-
                         num_errores++;
                     }
                 } // Fin if __esVeces.
@@ -646,7 +645,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                     // Hubo error, falta VECES:
                     printf("ERROR de sintaxis en línea [%u] --En declaración REPITE se esperaba --> VECES.\n", nodo->num_linea);
                     num_errores++;
-                    goto repite; // Se va a la etiqueta repite en línea 606.
+                    goto repite; // Se va a la etiqueta repite en línea 609.
                 }
             } // Fin if __esElem
             else
@@ -661,7 +660,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                 if(__esVeces(nodo->token) == 0)
                 {
                     nodo = nodo->sig;
-                    goto repite; // Se va a la etiqueta repite en línea 606.
+                    goto repite; // Se va a la etiqueta repite en línea 609.
                 }
             }    
         } // Fin de else if de __esRepite
@@ -778,7 +777,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     } // Fin if __esReservada
 
     // Se verifica si es una sentencia de asignación:
-    if(__esVariable(nodo->token) == 0)
+    else if(__esVariable(nodo->token) == 0)
     {
         // Se verifica que el token siguiente sea un signo de '=':
         if((nodo->sig) && __esAsig(nodo->sig->token) == 0)
@@ -831,6 +830,10 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
             err_var++;
     } // Fin if __esVariable.
 
+    // Si la sentencia es sólo un símbolo o un token no válido:
+    else
+        err_sent++;
+
     // Si se encuentra una cadena de texto o una variable sin utilizar:
     if(__esTexto(nodo->token) == 0 || err_var != 0 || __esVal(nodo->token) == 0)
     {
@@ -848,6 +851,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     {
         printf("ERROR de sintaxis en línea [%u] --En declaración no se encontró --> REPITE.\n", nodo->num_linea);
         nodo = nodo->sig;
+        num_errores++;
     }
 
     // Si hubo error de sentencia o declaración:
@@ -928,15 +932,6 @@ int iniAnalSin(listaTok *lista)
 
         // Se analiza el retorno de la funcion __esSent:
 
-        // Si falta un SI:
-        if(__esSiNo(aux->token) == 0 ||  __esOpRel(aux->token) == 0 || __esEntonces(aux->token) == 0 || __esFinSi(aux->token) == 0)
-        {
-            printf("ERROR de sintaxis en línea [%u] --En declaración no se encontró --> SI.\n", aux->num_linea);
-            
-            if(aux->sig)
-                aux = aux->sig;
-        }
-        
         // Si la sentencia consta de solamente un número:
         if(__esVal(aux->token) == 0 )
         {
