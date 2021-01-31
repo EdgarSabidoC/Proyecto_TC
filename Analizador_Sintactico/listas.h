@@ -1,6 +1,9 @@
 #ifndef __LISTA_SIMPLE__
 #define __LISTA_SIMPLE__
 
+// NOTA: Para evitar errores inesperados
+// NO MODIFICAR ninguna de las funciones de este archivo.
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

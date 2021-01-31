@@ -1,3 +1,7 @@
+// NOTA: Para evitar errores inesperados
+// NO MODIFICAR ninguna de las funciones de este archivo.
+
+
 #include "lexer.h" // Funciones del analizador léxico.
 
 /*  
@@ -29,8 +33,8 @@ unsigned int cont_txt = 0;
  * Esta función calcula el valor decimal de un número 
  * octal dada una cadena que sea un número.
  * 
- * ENTRADA: Un puntero de tipo char a una cadena
- *          de caracteres (string) que represente 
+ * ENTRADA: Un puntero a una cadena de chars
+ *          (string) que represente 
  *          un número en base octal.
  * 
  * SALIDA: Un long long en base decimal.
@@ -146,7 +150,7 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres
  *                      REPITE, VECES FINREP, 
  *                      IMPRIME, LEE.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -178,7 +182,7 @@ int __esReservada(char *cadena)
  * que se le pasa como argumento es un
  * símbolo de asignación: =.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -202,7 +206,7 @@ int __esAsig(char *cadena)
  * que se le pasa como argumento es un
  * símbolo.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -229,7 +233,7 @@ int __esSimbol(char *token)
  * 
  * Operadores aritméticos: +, -, *, /.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -261,7 +265,7 @@ int __esOpAr(char *cadena)
  * que se le pasa como argumento es un
  * número.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -299,7 +303,7 @@ int __esNum(char *cadena)
  * 
  * Operadores relacionales: <, >, ==.
  *
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -330,7 +334,7 @@ int __esOpRel(char *cadena)
  * que se le pasa como argumento es el símbolo
  * de un comentario: #.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -354,7 +358,7 @@ int __esComentario(char *cadena)
  * que se le pasa como argumento son unas
  * comillas dobles: ".
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -409,7 +413,7 @@ int __esTexto(char *token, unsigned int num_linea)
  * que se le pasa como argumento es una
  * variable válida del lenguaje MIO.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -456,7 +460,7 @@ int __esVarValid(char *cadena)
  * que se le pasa como argumento es una
  * variable.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -563,7 +567,7 @@ char __identifica(char *token, unsigned int num_linea)
  * MIO a partir de una cadena de texto y
  * lo retorna.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars
  * 
  * SALIDA: Un puntero de tipo char (cadena) al token.
  * 

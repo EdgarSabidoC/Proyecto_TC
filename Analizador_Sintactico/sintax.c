@@ -1,3 +1,6 @@
+// NOTA: Para evitar errores inesperados
+// NO MODIFICAR ninguna de las funciones de este archivo.
+
 // Biblioteca que incluye las funciones necesarias para el uso de listas de tipo listaTok:
 #include "listas.c" 
 
@@ -86,7 +89,7 @@ void guardarTokens(FILE *arch_lex, listaTok *lista)
  * FINSI, REPITE, VECES, FINREP, IMPRIME
  * y LEE.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -117,7 +120,7 @@ int __esReservada(char *token)
  * Esta función valida si la cadena (token)
  * se trata de un operador aritmético: [op_ar] 
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars del token.
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -139,7 +142,7 @@ int __esOpAr(char *cadena)
  * Esta función valida si la cadena (token)
  * se trata de un número: [val] 
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -162,7 +165,7 @@ int __esVal(char *token)
  * Esta función valida si la cadena (token)
  * se trata de un operador relacional: [op_rel] 
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -185,7 +188,7 @@ int __esOpRel(char *cadena)
  * Esta función valida si la cadena (token)
  * se trata de texto: [txt]
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -211,7 +214,7 @@ int __esTexto(char *token)
  * se trata del identificador de una 
  * variable: [id]
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -234,7 +237,7 @@ int __esVariable(char *token)
  * trata del identificador de una variable o 
  * un valor numérico: [id] o [val]
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -257,7 +260,7 @@ int __esElem(char *token)
  * a partir del token que se le pase como argumento
  * se trata de una comparación.
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -299,7 +302,7 @@ int __esCompara(nodo_Tok *nodo)
  * que se le pasa como argumento es la palabra
  * reservada para la lectura: LEE
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -319,7 +322,7 @@ int __esLee(char *token)
  * que se le pasa como argumento es la palabra
  * reservada para impresión: IMPRIME
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -341,7 +344,7 @@ int __esImprime(char *token)
  * que se le pasa como argumento es el símbolo
  * de asignación: =
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -362,7 +365,7 @@ int __esAsig(char *token)
  * que se le pasa como argumento es la palabra
  * reservada para el ciclo de repetirción: REPITE
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -384,7 +387,7 @@ int __esRepite(char *token)
  * que se le pasa como argumento es la palabra
  * reservada: VECES
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -407,7 +410,7 @@ int __esVeces(char *token)
  * reservada del delimitador del ciclo de
  * repetición: FINREP
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -429,7 +432,7 @@ int __esFinRep(char *token)
  * que se le pasa como argumento es la palabra
  * reservada para las sentencias condicionales: SI
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -451,7 +454,7 @@ int __esSi(char *token)
  * que se le pasa como argumento es la palabra
  * reservada para la sentencia condicional: SINO
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -474,7 +477,7 @@ int __esSiNo(char *token)
  * palabra reservada para las sentencias 
  * condicionales: ENTONCES
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 
@@ -497,7 +500,7 @@ int __esEntonces(char *token)
  * reservada del delimitador de las sentencias
  * condicionales: FINSI
  * 
- * ENTRADA: Un puntero de tipo char (cadena) del token.
+ * ENTRADA: Un puntero a una cadena de chars (token)
  * 
  * SALIDA: 0 si es verdad, 1 si es falso.
  * 

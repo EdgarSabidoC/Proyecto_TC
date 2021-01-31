@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     unsigned int lineas;
     lineas = __contarLineasArchivo(archivo);
     fclose(archivo); // Se cierra el archivo
-
+    archivo = NULL;
 
 
     // Cantidad de caracteres máximos de cada archivo:
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
     // Se guarda cada línea del archivo:
     __guardarLineas(parchivo, lineas, caracteres, array);
     fclose(parchivo); // Se cierra el archivo
-
+    parchivo = NULL;
 
     // Se generan los tokens:
     analizador(lexer, lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
@@ -120,7 +120,10 @@ int main(int argc, char **argv)
 
     // Se cierra el archivo .lex y el archivo .sim:
     fclose(lexer);
+    lexer = NULL;
+
     fclose(sim);
+    sim = NULL;
 
     // Programa exitoso:
     return EXIT_SUCCESS;
