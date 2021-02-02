@@ -40,7 +40,17 @@ IMPRIME
 IMPRIME
 [txt] TX02
 ~16
+SI
+[id] ID02
+[op_rel]
+[val]
+ENTONCES
+[id] ID03
+=
+[val]
+FINSI
+~17
 IMPRIME
 [id] ID02
-~17
+~18
 FINPROG

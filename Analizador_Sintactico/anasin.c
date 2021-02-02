@@ -69,6 +69,6 @@ int main(int argc, char **argv)
     }
     
     // Finalización exitosa del programa:
-    printf("¡COMPILACIÓN EXITOSA!\n");
+    printf("*******¡COMPILACIÓN EXITOSA!*******\n");
     return EXIT_SUCCESS;
 }
