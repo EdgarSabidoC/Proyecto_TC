@@ -802,7 +802,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                         printf("ERROR de sintaxis en línea [%u] --En declaración SI se esperaba --> FINSI.\n", num_lin_si);
                         num_errores++;
                     }
-
+                    
                     // Si se llegó al final de la lista:
                     // Si se encuentra una cadena de texto o una variable sin utilizar:
                     if(!nodo->sig && (__esTexto(nodo->token) == 0 || err_var != 0 || __esVal(nodo->token) == 0))
@@ -818,7 +818,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
             } // Fin if no __esFinSi.  
         
             // Si sigue un FINSI:
-            if(nodo->sig && __esFinSi(nodo->sig->token) == 0)
+            else if(nodo->sig && __esFinSi(nodo->sig->token) == 0)
             {
                 nodo = nodo->sig; // Se pasa al nodo con FINSI.
 
@@ -886,15 +886,11 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         else
             err_var++;
     } // Fin if __esVariable.
-
-    else if(strncmp(nodo->token, "FINPROG", strlen(nodo->token)+1) == 0)
-        return nodo;
-
+    
     // Si la sentencia es sólo un símbolo o un token no válido:
     else
         err_sent++;
-
-
+    
     // Si falta un SI y el token es una comparación:
     if(__esVariable(nodo->token) == 0 && __esOpRel(nodo->sig->token) == 0 && __esElem(nodo->sig->sig->token) == 0)
     {
@@ -930,10 +926,28 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         nodo = nodo->sig;
         num_errores++;
     }
-
+    
     // Si hubo error de sentencia o declaración:
     if(err_sent != 0)
-    {    
+    {           
+        // Si es FINPROG en cualquier otra parte del programa:
+        if(nodo->sig && strncmp(nodo->token, "FINPROG", strlen(nodo->token)+1) == 0)
+        {
+            printf("En err_sent\n");
+            if(__esFinRep(nodo->sig->token) == 0)
+            {
+                printf("ERROR de sintaxis en línea [%u] --En declaración REPITE se esperaba --> FINREP.\n", nodo->num_linea);
+            }   
+
+            else if(__esFinSi(nodo->sig->token) == 0)
+            {
+                printf("ERROR de sintaxis en línea [%u] --En declaración SI se esperaba --> FINSI.\n", nodo->num_linea);
+            }
+
+            num_errores++;
+            return nodo;
+        }
+
         printf("ERROR de sintaxis en línea [%u] --No es una sentencia o declaración válida --> %s.\n", nodo->num_linea, nodo->token);
         num_errores++;
         
@@ -1009,10 +1023,20 @@ int iniAnalSin(listaTok *lista)
         printf("%s\n", aux->token);
         aux = __esSent(aux); // Se continúa el ciclo con el siguiente nodo.
         printf("\n[%s]\n", aux->token);
+
+        // Si el analizador se detiene de manera abrupta:
+        if(!aux)
+        {
+            printf("ERROR --El analizador se detuvo de manera inesperada.\n");
+            num_errores++;
+            break;
+        }
     }    
     
+    printf("fin: [%s]\n", aux->token);
+
     // Se valida el retorno final de la función __esSent():
-    if(__esReservada(aux->token) == 0)
+    if(aux && __esReservada(aux->token) == 0)
     {
         printf("ERROR de sintaxis en línea [%u] --Declaración incompleta de --> %s.\n", aux->num_linea, aux->token);
         num_errores++;

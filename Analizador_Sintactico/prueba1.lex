@@ -17,6 +17,7 @@ REPITE
 [id] ID04
 VECES
 ~10
+FINPROG
 [id] ID03
 =
 [id] ID03
