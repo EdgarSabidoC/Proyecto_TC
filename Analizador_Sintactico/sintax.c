@@ -951,7 +951,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     if(err_sent != 0)
     {           
         // Si es FINPROG en cualquier otra parte del programa:
-        if(nodo->sig && s__esFinProg(nodo->token) == 0)
+        if(nodo->sig && __esFinProg(nodo->token) == 0)
         {
             printf("ERROR de sintaxis en línea [%u] --No se esperaba --> FINPROG.\n", nodo->num_linea);
             num_errores++;
@@ -1033,9 +1033,7 @@ int iniAnalSin(listaTok *lista)
     // las sentencias de la lista sean válidas:
     while(aux->sig)
     {
-        printf("%s\n", aux->token);
         aux = __esSent(aux); // Se continúa el ciclo con el siguiente nodo.
-        printf("\n[%s]\n", aux->token);
 
         // Si el analizador se detiene de manera abrupta:
         if(!aux)
@@ -1050,8 +1048,6 @@ int iniAnalSin(listaTok *lista)
             printf("ERROR de sintaxis en línea [%u] --Variable sin usar --> %s.\n", aux->num_linea, aux->token);
         }
     }    
-    
-    printf("fin: [%s]\n", aux->token);
 
     // Se valida el retorno final de la función __esSent():
     if(aux && __esReservada(aux->token) == 0)
