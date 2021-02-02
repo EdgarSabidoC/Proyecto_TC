@@ -17,7 +17,6 @@ REPITE
 [id] ID04
 VECES
 ~10
-FINPROG
 [id] ID03
 =
 [id] ID03
@@ -28,30 +27,21 @@ FINPROG
 =
 [id] ID02
 [op_ar]
-[id] ID03
-~12
+[id] ID02
 FINREP
-~13
-IMPRIME
-[txt] TX01
-~14
-IMPRIME
-[id] ID04
-~15
-IMPRIME
-[txt] TX02
-~16
+~12
 SI
 [id] ID02
 [op_rel]
-[val]
+[id] ID02
 ENTONCES
-[id] ID03
+[id] ID02
+=
+[val]
+SINO
+[id] ID02
 =
 [val]
 FINSI
-~17
-IMPRIME
-[id] ID02
-~18
+~13
 FINPROG

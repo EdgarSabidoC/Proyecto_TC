@@ -521,6 +521,28 @@ int __esFinSi(char *token)
 }
 
 
+/*
+ * DESCRIPCIÓN:
+ * Esta función valida si la cadena (token)
+ * que se le pasa como argumento es la palabra
+ * reservada del delimitador del programa 
+ * principal: FINPROG.
+ * 
+ * ENTRADA: Un puntero a una cadena de chars (token)
+ * 
+ * SALIDA: 0 si es verdad, 1 si es falso.
+ *   
+ */
+int __esFinProg(char *token)
+{   
+    // Se verifica si el token es FINPROG:
+    if(strncmp(token,"FINPROG", strlen(token)+1) == 0)
+        return 0; // Es FINPROG.
+
+    // No es FINPROG:
+    return 1; 
+}
+
 /* 
  * DESCRIPCIÓN:
  * Esta función identifica si se trata de una sentencia válida 
@@ -713,7 +735,6 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                     printf("ERROR de sintaxis en línea [%u] --En declaración SI se esperaba --> sentencia.\n", num_lin_si);
                     printf("ERROR de sintaxis en línea [%u] --En declaración SI se esperaba --> FINSI.\n", num_lin_si);
                     
-                    
                     num_errores+=3;
 
                     return nodo;
@@ -794,14 +815,6 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                             nodo = nodo->sig; // Se pasa al nodo.
                         break;
                     }
-
-                    // Se verifica si se llegó al final de la lista,
-                    // si se llegó al final, hubo error, pues falta FINSI:
-                    else if(!nodo->sig)
-                    {
-                        printf("ERROR de sintaxis en línea [%u] --En declaración SI se esperaba --> FINSI.\n", num_lin_si);
-                        num_errores++;
-                    }
                     
                     // Si se llegó al final de la lista:
                     // Si se encuentra una cadena de texto o una variable sin utilizar:
@@ -811,8 +824,15 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
                         num_errores++;
                         break;
                     }
-                    else
+                    // Se verifica si se llegó al final de la lista,
+                    // si se llegó al final, hubo error, pues falta FINSI:
+                    else if(!nodo->sig)
+                    {
+                        printf("ERROR de sintaxis en línea [%u] --En declaración SI se esperaba --> FINSI.\n", num_lin_si);
+                        num_errores++;
                         break;
+                    }
+                    
 
                 } // Fin while.
             } // Fin if no __esFinSi.  
@@ -892,7 +912,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         err_sent++;
     
     // Si falta un SI y el token es una comparación:
-    if(__esVariable(nodo->token) == 0 && __esOpRel(nodo->sig->token) == 0 && __esElem(nodo->sig->sig->token) == 0)
+    if(nodo->sig && __esVariable(nodo->token) == 0 && __esOpRel(nodo->sig->token) == 0 && __esElem(nodo->sig->sig->token) == 0)
     {
         printf("ERROR de sintaxis en línea [%u] --En declaración se esperaba --> SI antes de la comparación.\n", nodo->num_linea);
         nodo = nodo->sig->sig->sig; // Se mueve el nodo al token que está después de la comparación.
@@ -931,26 +951,19 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     if(err_sent != 0)
     {           
         // Si es FINPROG en cualquier otra parte del programa:
-        if(nodo->sig && strncmp(nodo->token, "FINPROG", strlen(nodo->token)+1) == 0)
+        if(nodo->sig && s__esFinProg(nodo->token) == 0)
         {
-            printf("En err_sent\n");
-            if(__esFinRep(nodo->sig->token) == 0)
-            {
-                printf("ERROR de sintaxis en línea [%u] --En declaración REPITE se esperaba --> FINREP.\n", nodo->num_linea);
-            }   
-
-            else if(__esFinSi(nodo->sig->token) == 0)
-            {
-                printf("ERROR de sintaxis en línea [%u] --En declaración SI se esperaba --> FINSI.\n", nodo->num_linea);
-            }
-
+            printf("ERROR de sintaxis en línea [%u] --No se esperaba --> FINPROG.\n", nodo->num_linea);
             num_errores++;
-            return nodo;
+        }
+        
+        // Si es error de sentencia:
+        else
+        {
+            printf("ERROR de sintaxis en línea [%u] --No es una sentencia o declaración válida --> %s.\n", nodo->num_linea, nodo->token);
+            num_errores++;
         }
 
-        printf("ERROR de sintaxis en línea [%u] --No es una sentencia o declaración válida --> %s.\n", nodo->num_linea, nodo->token);
-        num_errores++;
-        
         // Si hay un nodo después,
         // entonces se pasa a ese nodo:
         if(nodo->sig)
@@ -1031,6 +1044,11 @@ int iniAnalSin(listaTok *lista)
             num_errores++;
             break;
         }
+
+        if(!aux->sig && __esVariable(aux->token) == 0)
+        {
+            printf("ERROR de sintaxis en línea [%u] --Variable sin usar --> %s.\n", aux->num_linea, aux->token);
+        }
     }    
     
     printf("fin: [%s]\n", aux->token);
@@ -1043,7 +1061,7 @@ int iniAnalSin(listaTok *lista)
     }
 
     // Verifica que se halle la palabra reservada FINPROG al final del programa:
-    if(aux && strncmp(aux->token, "FINPROG", strlen(aux->token)+1) != 0)
+    if(aux && __esFinProg(aux->token) != 0)
     {
         printf("ERROR de sintaxis en línea [%u] --No se encuentra palabra reservada --> FINPROG.\n", aux->num_linea);
         num_errores++;
@@ -1054,4 +1072,3 @@ int iniAnalSin(listaTok *lista)
     // Retorna copia del contador global num_errores:
     return num_errores;
 }
-
