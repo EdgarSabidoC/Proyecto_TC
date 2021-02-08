@@ -45,9 +45,10 @@ int main(int argc, char **argv)
     // Archivo .lex:
         
     // Nombre del archivo .lex:
-    char nombre_lex[strlen(argv[1])+1];
-    strncpy(nombre_lex, argv[1], strlen(argv[1])-3);
-    strcat(nombre_lex, "lex");
+    int tam = strlen(argv[1]);
+    char nombre_lex[tam];
+    memcpy(nombre_lex, argv[1], tam-4); // Se copia el nombre sin la extensión.
+    strncat(nombre_lex, ".lex", tam-4); // Se concatena la nueva extensión.
 
     // Se crea el archivo .lex:
     FILE *lexer = fopen(nombre_lex, "w+");
@@ -57,12 +58,13 @@ int main(int argc, char **argv)
     // Archivo .sim:
         
     // Nombre del archivo .sim:
-    char nombre_sim[strlen(argv[1])+1];
-    strncpy(nombre_sim, argv[1], strlen(argv[1])-3);
-    strcat(nombre_sim, "sim");
+    char nombre_sim[tam];
+    memcpy(nombre_sim, argv[1], tam-4); // Se copia el nombre sin la extensión.
+    strncat(nombre_sim, ".sim", tam-4); // Se concatena la nueva extensión.
 
     // Se crea el archivo .sim:
     FILE *sim = fopen(nombre_sim, "w+");
+    
 
 
 
