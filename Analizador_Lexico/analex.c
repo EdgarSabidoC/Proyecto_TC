@@ -41,6 +41,18 @@ int main(int argc, char **argv)
     printf("%s\n", nombre_programa);
 
 
+    // Se verifica que exista el archivo:
+    FILE *prueba_archivo = fopen(argv[1], "r");
+    
+    if(!prueba_archivo)
+    {
+        printf("ERROR! El archivo %s no existe.\n", argv[1]);
+        return EXIT_FAILURE;
+    }
+
+    free(prueba_archivo);
+    prueba_archivo = NULL;
+
 
     // Archivo .lex:
         
