@@ -46,9 +46,8 @@ int main(int argc, char **argv)
     
     if(!prueba_archivo)
     {
-        printf("ERROR! El archivo %s no existe.\n", argv[1]);
+        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
 
-        fclose(prueba_archivo); // Se libera la memoria.
         prueba_archivo = NULL;
         
         return EXIT_FAILURE;
@@ -101,9 +100,8 @@ int main(int argc, char **argv)
     // Se valida que el archivo exista:
     if(!archivo)
     {
-        printf("ERROR! El archivo %s no existe.\n", argv[1]);
+        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
 
-        fclose(archivo); // Se libera la memoria.
         archivo = NULL;
         
         return EXIT_FAILURE;
@@ -127,9 +125,8 @@ int main(int argc, char **argv)
     // Se valida que el archivo exista:
     if(!parchivo)
     {
-        printf("ERROR! El archivo %s no existe.\n", argv[1]);
+        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
 
-        fclose(parchivo); // Se libera la memoria.
         parchivo = NULL;
         
         return EXIT_FAILURE;

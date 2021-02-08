@@ -34,13 +34,23 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+    // Punteros al archivo .lex:    
+    FILE *arch_lex = fopen(argv[1], "r");
+    
+    // Se verifica que exista el archivo:
+    if(!arch_lex)
+    {
+        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
+
+        arch_lex = NULL;
+
+        return EXIT_FAILURE;
+    }
+
     // Se declara e inicializa la lista:
     listaTok lista;
     iniListaTok(&lista);
 
-    // Punteros al archivo .lex:    
-    FILE *arch_lex = fopen(argv[1], "r");
-    
     // Se guardan los tokens del archivo dentro de la lista:
     guardarTokens(arch_lex, &lista);
 
