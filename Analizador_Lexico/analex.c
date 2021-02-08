@@ -81,6 +81,11 @@ int main(int argc, char **argv)
 
     // Se cuenta la cantidad de líneas del archivo .mio:
     FILE *archivo = fopen(argv[1], "r");
+
+    // Se valida que el archivo no esté vacío:
+    if(!archivo)
+        return EXIT_FAILURE;
+
     unsigned int lineas;
     lineas = __contarLineasArchivo(archivo);
     fclose(archivo); // Se cierra el archivo
@@ -93,10 +98,12 @@ int main(int argc, char **argv)
     // Arreglo que almacenará cada línea del archivo:
     char array[lineas][caracteres];
 
-
-
     // Puntero al archivo:
     FILE *parchivo = fopen(argv[1], "r");
+
+    // Se valida que el archivo no esté vacío:
+    if(!parchivo)
+        return EXIT_FAILURE;
     
     // Se guarda cada línea del archivo:
     __guardarLineas(parchivo, lineas, caracteres, array);
