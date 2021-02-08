@@ -324,7 +324,7 @@ int __esOpRel(char *cadena)
     // Se verifica si es un operador relacional:
     while(i < 3)
     {
-        if(strncmp(cadena, op_rel[i], strlen(cadena)) == 0)
+        if(strncmp(cadena, op_rel[i], strlen(op_rel[i])) == 0)
         {       
             return (0); 
         }

@@ -151,7 +151,6 @@ int main(int argc, char **argv)
     imprimeSim(sim, &lista_var, &lista_txt, &lista_val);
 
 
-
     // Se libera la memoria ocupada por las listas:
     liberaListaVarNum(&lista_var);
     liberaListaTxt(&lista_txt);
