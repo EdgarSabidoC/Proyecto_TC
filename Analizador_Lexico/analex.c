@@ -47,10 +47,14 @@ int main(int argc, char **argv)
     if(!prueba_archivo)
     {
         printf("ERROR! El archivo %s no existe.\n", argv[1]);
+
+        free(prueba_archivo); // Se libera la memoria.
+        prueba_archivo = NULL;
+        
         return EXIT_FAILURE;
     }
 
-    free(prueba_archivo);
+    free(prueba_archivo); // Se libera la memoria.
     prueba_archivo = NULL;
 
 
@@ -94,9 +98,16 @@ int main(int argc, char **argv)
     // Se cuenta la cantidad de líneas del archivo .mio:
     FILE *archivo = fopen(argv[1], "r");
 
-    // Se valida que el archivo no esté vacío:
+    // Se valida que el archivo exista:
     if(!archivo)
+    {
+        printf("ERROR! El archivo %s no existe.\n", argv[1]);
+
+        free(archivo); // Se libera la memoria.
+        archivo = NULL;
+        
         return EXIT_FAILURE;
+    }
 
     unsigned int lineas;
     lineas = __contarLineasArchivo(archivo);
@@ -113,10 +124,17 @@ int main(int argc, char **argv)
     // Puntero al archivo:
     FILE *parchivo = fopen(argv[1], "r");
 
-    // Se valida que el archivo no esté vacío:
+    // Se valida que el archivo exista:
     if(!parchivo)
+    {
+        printf("ERROR! El archivo %s no existe.\n", argv[1]);
+
+        free(parchivo); // Se libera la memoria.
+        parchivo = NULL;
+        
         return EXIT_FAILURE;
-    
+    }
+
     // Se guarda cada línea del archivo:
     __guardarLineas(parchivo, lineas, caracteres, array);
     fclose(parchivo); // Se cierra el archivo
