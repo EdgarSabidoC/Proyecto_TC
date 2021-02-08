@@ -4,13 +4,8 @@
 // NOTA: Para evitar errores inesperados
 // NO MODIFICAR ninguna de las funciones de este archivo.
 
-#include "listas.c"
-
-// NOTA: Para evitar errores inesperados
-// NO MODIFICAR ninguna de las funciones de este archivo.
-
 // Biblioteca que incluye las funciones necesarias para el uso de listas de tipo listaTok:
-#include "listas.c" 
+#include "listas.h" 
 
 //-----------------------------------------------------------------FUNCIONES------------------------------------------------------------
 

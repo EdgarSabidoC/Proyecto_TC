@@ -2,7 +2,7 @@
 // NO MODIFICAR ninguna de las funciones de este archivo.
 
 // Biblioteca que incluye las funciones necesarias para el uso de listas de tipo listaTok:
-#include "listas.c" 
+#include "listas.h" 
 
 // Contador global de errores del programa:
 unsigned int num_errores = 0;
@@ -577,7 +577,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     {   
         if(!nodo->sig)
         {
-            printf("ERROR de sintaxis en línea [%u] --Declaración incompleta --> %s", nodo->token);
+            printf("ERROR de sintaxis en línea [%u] --Declaración incompleta --> %s", nodo->num_linea, nodo->token);
             return nodo;
         }
 
@@ -634,7 +634,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
             if(nodo->sig && __esElem(nodo->sig->token) != 0)
             {
                 // Hubo error, no es un elemento:
-                printf("ERROR de sintaxis en línea [%u] --Se esperaba un --> identificador o número.\n", nodo->num_linea, nodo->sig->token);
+                printf("ERROR de sintaxis en línea [%u] --Se esperaba un --> identificador o número.\n", nodo->num_linea);
                 num_errores++;
 
             } // Fin if __esElem
@@ -661,7 +661,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
 
                 // Se recorren los nodos hasta hallar FINREP
                 // o hallar FINPROG:
-                while(nodo = __esSent(nodo))
+                while((nodo = __esSent(nodo)))
                 {
                     // Si es FINREP o se llega al final del programa:
                     if(__esFinRep(nodo->token) == 0)
@@ -772,7 +772,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
 
                 // Si el siguiente nodo no es NULL:
                 if(nodo->sig)
-                    nodo->sig; // Se pasa al nodo.
+                    nodo = nodo->sig; // Se pasa al nodo.
             }
 
             // Se verifica que lo que siga no sea un FINSI:
@@ -782,7 +782,7 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
 
                 // Se verifica que sea un nodo diferente de NULL y 
                 // que lo que siga sean sentencias válidas:
-                while(nodo = __esSent(nodo))
+                while((nodo = __esSent(nodo)))
                 {
                     // Si es un SINO:
                     if(__esSiNo(nodo->token) == 0)
