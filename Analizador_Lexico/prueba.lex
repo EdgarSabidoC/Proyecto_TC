@@ -47,8 +47,10 @@ SI
 [op_rel]
 [id] ID05
 ENTONCES
+~18
 IMPRIME
 [txt] TX03
+~19
 FINSI
-~18
+~20
 FINPROG

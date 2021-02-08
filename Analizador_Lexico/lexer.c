@@ -525,6 +525,9 @@ int __esVariable(char *cadena)
  */
 char __identifica(char *token, unsigned int num_linea)
 {
+    if(!token)
+        return 'e';
+
     if(isalpha(*token) != 0)
     {
         if(__esReservada(token) == 0)
@@ -785,9 +788,6 @@ void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cad
  */
 char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNum *lista_vars, listaText *lista_cadenas, listaVal *lista_valores)
 {
-    if(!cadena)
-        return 0;
-
     // Se crea un arreglo dinámico del tamaño de la cadena:
     char *copia_lex = malloc(strlen(cadena)+1 * sizeof(char));
 
@@ -803,10 +803,11 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
     // Se genera la unidad léxica a verificar:
     char *aux = NULL;  // Variable auxiliar para la función strtok_r.
     char *lexema; // Puntero al token que pasará por la función __Identifica.
-    
+
     // Se genera el puntero del lexema:
-    lexema = strtok_r(copia_lex, " \t", &aux);
-    
+    lexema = strtok_r(copia_lex, " \t\n", &aux);
+
+
     // Se identifica el tipo de unidad léxica:
     char ident = __identifica(lexema, num_linea);
     
@@ -953,10 +954,10 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
     {
         // Se ignora la línea si es un comentario o una línea en blanco:
         if(__esComentario(cadena[i]) == 0 || cadena[i][0] == '\0' || cadena[i][0] == '\n')
-        {
             // Se pasa a la siguiente línea:
             continue;
-        }
+        else if(strlen(cadena[i]) == 4 && (strncmp(cadena[i], "    ", 4) == 0 || cadena[i][0] == '\t'))
+            continue;
 
         // Se imprime el primer número de línea en el archivo:
         fprintf(archivo_lex,"~%u\n", i+1);
@@ -981,11 +982,10 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
         // Se genera el primer token:
         char *token;
         token = genTok(archivo_lex, copia, i+1, lista_vars, lista_strs, lista_vals);
-
+        
         // Si sólo hay un token en la línea:
         if(strlen(token) == strlen(cadena[i]))
         {
-            //printf("\n\n");
             
             // Se libera la memoria del token:
             free(token);
@@ -1000,7 +1000,7 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
         {
             // Puntero que apunta al resto de la cadena.
             char *ptr = copia;
-
+            
             // Se apunta a la siguiente unidad léxica de la cadena
             // (la siguiente porción de la cadena):
             ptr = ptr + strlen(token) + 1;
@@ -1012,10 +1012,13 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
             // Se generan el resto de tokens:
             while(*ptr != 10 && *ptr != 35 && *ptr != 0)
             {   
+                // Si al final de la línea sólo hay espacios:
+                if(strspn(ptr," ") == strlen(ptr))
+                    break; // Se rompe el while
                 
                 // Se genera el siguiente token de la línea:
                 token = genTok(archivo_lex, ptr, i+1, lista_vars, lista_strs, lista_vals);
-
+                
                 // Se genera el último o único token en la línea:
                 if(strlen(token) == strlen(ptr))
                 {
@@ -1037,6 +1040,11 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
                 token = NULL;
             } // Fin while
         } // Fin else
+
+        // Se libera el espacio ocupado por copia:
+        free(copia);
+        copia = NULL;
+
     } // Fin for
 }
 
