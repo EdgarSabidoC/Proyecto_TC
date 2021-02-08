@@ -164,7 +164,7 @@ int __esReservada(char *cadena)
     while(i < 11)
     {
         // Si es una palabra reservada:
-        if(strncmp(cadena, palabras_reservadas[i], sizeof(palabras_reservadas[i])) == 0)
+        if(strncmp(cadena, palabras_reservadas[i], strlen(cadena)) == 0)
         {   
             return (0);
         }
@@ -247,7 +247,7 @@ int __esOpAr(char *cadena)
     while(i < 4)
     {
         // Si es un operador aritmético:
-        if(strncmp(cadena, op_ar[i], sizeof(op_ar[i])) == 0)
+        if(strncmp(cadena, op_ar[i], strlen(cadena)) == 0)
         {       
             return (0); 
         }
@@ -292,6 +292,8 @@ int __esNum(char *cadena)
         // Si no es un número
         return (1);
     }
+
+    return (1);
 }
 
 
@@ -316,7 +318,7 @@ int __esOpRel(char *cadena)
     // Se verifica si es un operador relacional:
     while(i < 3)
     {
-        if(strncmp(cadena, op_rel[i], sizeof(op_rel[i])) == 0)
+        if(strncmp(cadena, op_rel[i], strlen(op_rel[i])) == 0)
         {       
             return (0); 
         }
@@ -552,11 +554,10 @@ char __identifica(char *token, unsigned int num_linea)
                 return 's'; // Es variable que comienza con un símbolo.
             
             else
-                return 'S'; // Es un símbolo:
-            
+                return 'S'; // Es un símbolo:  
         }
-    }
-        
+    } 
+    return 'e'; // Hubo error. 
 }
 
 
@@ -578,7 +579,6 @@ char *tokenCadena(char *cadena)
     
     tmp = cadena;
 
-    unsigned int cont = 0;
     // " == 34 en ASCII.
     // espacio == 32 en ASCII.
 
@@ -739,7 +739,7 @@ void imprimeSim(FILE *archivo_sim, listaVarNum *lista_vars, listaText *lista_cad
     nodo_Val *cont3 = lista_valores->raiz;
     while(cont3)
     {
-        fprintf(archivo_sim, "%d, %ld\n", cont3->valor_octal, cont3->valor_decimal);
+        fprintf(archivo_sim, "%d, %lld\n", cont3->valor_octal, cont3->valor_decimal);
         cont3 = cont3->sig;
     }
 
@@ -869,6 +869,11 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
         case 'S':
             // Se genera token con la copia:
             ptr_strok = strtok_r(copia, " \n\t", &aux);
+        break;
+
+        // Hubo error:
+        case 'e':
+            fprintf(stdout, "Hubo un error en la obtención del token.\n");
         break;
     }
 

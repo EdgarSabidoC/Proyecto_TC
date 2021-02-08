@@ -1,7 +1,7 @@
 // Programa principal del analizador léxico.
 
 // Biblioteca con las funciones del analizador léxico:
-#include "lexer.c" 
+#include "lexer.h" 
 
 /*
  * DESCRIPCIÓN: 

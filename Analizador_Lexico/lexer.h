@@ -5,7 +5,7 @@
 // NO MODIFICAR ninguna de las funciones de este archivo.
 
 #include <ctype.h> 
-#include "listas.c" // Funciones de listas.
+#include "listas.h" // Funciones de listas.
 
 long long OctADec(char *numero);
 
