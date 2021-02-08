@@ -556,11 +556,11 @@ char __identifica(char *token, unsigned int num_linea)
             else if(__esComilla(token) == 0)
                 return 'C'; // Es comilla.
 
-            else if(strlen(token) > 2)
+            else if(strlen(token) > 2 && isalpha(*(token+1)) == 0)
                 return 's'; // Es variable que comienza con un símbolo.
-            
+
             else
-                return 'S'; // Es un símbolo:  
+                return 'S'; // Es uno o son varios símbolos.
         }
     } 
     return 'e'; // Hubo error. 
@@ -875,6 +875,7 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
         case 'S':
             // Se genera token con la copia:
             ptr_strok = strtok_r(copia, " \n\t", &aux);
+            fprintf(stdout,"ERROR en línea: [%u] --Símbolo o cadena de símbolos no válida: %s\n", num_linea, ptr_strok);
         break;
 
         // Hubo error:
