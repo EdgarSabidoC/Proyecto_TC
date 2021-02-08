@@ -1,18 +1,12 @@
-# Programa que calcula el factorial de un número
-PROGRAMA factorial
-# VarX acumula los productos por iteración
-VarX = 1
-# VarY contiene el iterador del factor
-VarY = 0
-LEE Num
-# Aplica Num! = 1 * 2 * 3 * … * Num
-REPITE Num VECES
-VarY = VarY + 1
-VarX = VarX * VarY
-FINREP
-IMPRIME "Factorial de"
-IMPRIME Num
-IMPRIME " es "
-IMPRIME VarX
+PROGRAMA MIO
+
+# Se declaran las variables:
+
+_HOLA = 1
+MUNDO = 5
+
+# Se realiza una suma:
+SUMA = _HOLA + MUNDO
+
 FINPROG
 

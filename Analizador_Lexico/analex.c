@@ -48,13 +48,13 @@ int main(int argc, char **argv)
     {
         printf("ERROR! El archivo %s no existe.\n", argv[1]);
 
-        free(prueba_archivo); // Se libera la memoria.
+        fclose(prueba_archivo); // Se libera la memoria.
         prueba_archivo = NULL;
         
         return EXIT_FAILURE;
     }
 
-    free(prueba_archivo); // Se libera la memoria.
+    fclose(prueba_archivo); // Se libera la memoria.
     prueba_archivo = NULL;
 
 
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
     {
         printf("ERROR! El archivo %s no existe.\n", argv[1]);
 
-        free(archivo); // Se libera la memoria.
+        fclose(archivo); // Se libera la memoria.
         archivo = NULL;
         
         return EXIT_FAILURE;
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
     {
         printf("ERROR! El archivo %s no existe.\n", argv[1]);
 
-        free(parchivo); // Se libera la memoria.
+        fclose(parchivo); // Se libera la memoria.
         parchivo = NULL;
         
         return EXIT_FAILURE;
@@ -155,7 +155,6 @@ int main(int argc, char **argv)
     liberaListaVarNum(&lista_var);
     liberaListaTxt(&lista_txt);
     liberaListaVal(&lista_val);
-
 
 
     // Se cierra el archivo .lex y el archivo .sim:

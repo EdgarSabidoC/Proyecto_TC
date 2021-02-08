@@ -1,14 +1,10 @@
 IDS
-factorial, ID01
-VarX, ID02
-VarY, ID03
-Num, ID04
+MIO, ID01
+MUNDO, ID02
+SUMA, ID03
 
 TXT
-"Factorial de", TX01
-" es ", TX02
 
 VAL
 1, 1
-0, 0
-1, 1
+5, 5
