@@ -24,19 +24,19 @@ int main(int argc, char **argv)
     // Falló al correr el programa:
         return EXIT_FAILURE;
 
+    // Puntero al nombre del programa:
+    char *nombre_programa = argv[1];
+
     // Se verifica que el archivo sea extensión .mio:
     char *punto = strchr(argv[1], '.');
-    char *mio = ".mio";
+    //char *mio = ".mio";
 
     // Se verifica si la extensión es .mio
-    if(strncmp(punto, mio, sizeof(".mio") != 0))
+    if(strncmp(punto, ".mio", strlen("mio")) != 0)
     {
         printf("ERROR, no se encontró archivo .mio\n\n");
         return EXIT_FAILURE;
     }
-
-    // Puntero al nombre del programa:
-    char *nombre_programa = argv[1];
         
     printf("%s\n", nombre_programa);
 

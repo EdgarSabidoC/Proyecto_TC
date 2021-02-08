@@ -1,7 +1,7 @@
 # Programa que calcula el factorial de un número
 PROGRAMA factorial
 # VarX acumula los productos por iteración
-VarX = 1
+VarX = 13
 # VarY contiene el iterador del factor
 VarY = 0
 LEE Num
