@@ -407,9 +407,18 @@ int __esTexto(char *token, unsigned int num_linea)
         return (0);
     
     // Se verifica que tanto al inicio como al final de la cadena de texto hayan comillas "...":
-    else if(*token == 34 && *(token+strlen(token)-1) != 34)
-        fprintf(stdout,"ERROR en línea: [%u] --Se esperaba caracter terminal --> \" en %s\n", num_linea, token);
-    
+    unsigned int i;
+    for(i = 0; i < strlen(token); ++i)
+    {
+        if(*(token+i) == '\\' && *(token+i+1) == '\"')
+            i++; // Continúa después de la comilla.
+        else if(*(token+i) == '\"')
+            return 0;
+    }
+
+    // Hubo error:
+    fprintf(stdout,"ERROR en línea: [%u] --Se esperaba caracter terminal --> \" en %s\n\n", num_linea, token);
+
     // No es una cadena de texto:
     return (1);
 }
@@ -582,24 +591,30 @@ char __identifica(char *token, unsigned int num_linea)
 char *tokenCadena(char *cadena)
 {
     char *token, *tmp;
-    
+
     tmp = cadena;
 
     // " == 34 en ASCII.
     // espacio == 32 en ASCII.
 
     // Se recorre la cadena:
+    unsigned int i = 1; // Indicador del tamaño de la cadena a copiar.
+
     while(*tmp != '\0' || *tmp != '\n')
     {
-        if(strstr(tmp, "\"") || strstr(tmp, "\"\0"))
+        tmp++; // Se corre el apuntador al siguiente char.
+        i++; // Se aumenta el tamaño de la cadena.
+        
+        // Si el char actual de tmp es una comilla, entonces se rompe:
+        if(*tmp == '\"' || (*tmp == '\"' && *(tmp+1) == '\0'))
         { 
             break;
         }
-        tmp++;
     }
 
-    token = malloc(strlen(tmp) * sizeof(char));
-    strcpy(token, tmp);
+    // Se copia copia el pedazo de la cadena que va de 0 a i:
+    token = malloc(i * sizeof(char));
+    strncpy(token, cadena, i);
     
     //printf("EL TOKEN ES: %s", token);
     return token;
@@ -786,7 +801,7 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
     strncpy(copia, cadena, strlen(cadena)+1);
 
     // Se genera la unidad léxica a verificar:
-    char *aux;  // Variable auxiliar para la función strtok_r.
+    char *aux = NULL;  // Variable auxiliar para la función strtok_r.
     char *lexema; // Puntero al token que pasará por la función __Identifica.
     
     // Se genera el puntero del lexema:
