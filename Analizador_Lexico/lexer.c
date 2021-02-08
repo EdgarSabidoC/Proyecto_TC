@@ -556,7 +556,7 @@ char __identifica(char *token, unsigned int num_linea)
             else if(__esComilla(token) == 0)
                 return 'C'; // Es comilla.
 
-            else if(strlen(token) > 2 && isalpha(*(token+1)) == 0)
+            else if(strlen(token) > 2 && isalpha(*(token+1)) != 0)
                 return 's'; // Es variable que comienza con un símbolo.
 
             else
