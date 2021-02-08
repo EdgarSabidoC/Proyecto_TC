@@ -134,14 +134,6 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres
         // Se guarda la línea del archivo en el arreglo:
         if(fgets(cadena[i], sizeof(cadena[i]), archivo) != NULL)
         {
-            printf("%d: %d\n", cadena[i][0], i+1);
-            // Si es una línea vacía:
-            if(strlen(cadena[i]) == 1 && (cadena[i][0] == '\n' || cadena[i][0] == '\0'))
-            {
-                i++;
-                continue;
-            }
-
             // Se cambia el caracter '\n' por '\0';
             if(cadena[i][strlen(cadena[i])-1] == '\n')
                 cadena[i][strlen(cadena[i])-1] = '\0';
@@ -977,7 +969,7 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
         // Si sólo hay un token en la línea:
         if(strlen(token) == strlen(cadena[i]))
         {
-            printf("\n\n");
+            //printf("\n\n");
             
             // Se libera la memoria del token:
             free(token);
@@ -1011,7 +1003,7 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
                 // Se genera el último o único token en la línea:
                 if(strlen(token) == strlen(ptr))
                 {
-                    printf("\n\n");
+                    //printf("\n\n");
 
                     // Se libera la memoria del token:
                     free(token);
