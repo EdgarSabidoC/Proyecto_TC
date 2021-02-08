@@ -101,10 +101,12 @@ int main(int argc, char **argv)
     fclose(parchivo); // Se cierra el archivo
     parchivo = NULL;
 
+    printf("Se guardarons los tokens.\n");
+
     // Se generan los tokens:
     analizador(lexer, lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
 
-
+    printf("Finalizó el analizador.\n");
 
     // Se imprimen las listas en el archivo .sim:
     imprimeSim(sim, &lista_var, &lista_txt, &lista_val);

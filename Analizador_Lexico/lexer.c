@@ -102,8 +102,10 @@ int __contarLineasArchivo(FILE *archivo)
 
     // Se extra el primer caracter de cada línea y se guarda en c:
     for(c = getc(archivo); c != EOF; c = getc(archivo))
+    {
         if(c == '\n') // Si hay un salto de línea se incrementa el contador.
             numero_lineas++;
+    }
 
     printf("La cantidad de lineas es: %d\n", numero_lineas+1);
     return numero_lineas+1; // Se retorna la cantidad de líneas del archivo.
@@ -127,21 +129,26 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres
 {
     unsigned int i = 0;
 
-    while(1)
+    while(i < lineas)
     {
         // Se guarda la línea del archivo en el arreglo:
         if(fgets(cadena[i], sizeof(cadena[i]), archivo) != NULL)
         {
-            // Se cambia el caracter \n por \0;
+            printf("%d: %d\n", cadena[i][0], i+1);
+            // Si es una línea vacía:
+            if(strlen(cadena[i]) == 1 && (cadena[i][0] == '\n' || cadena[i][0] == '\0'))
+            {
+                i++;
+                continue;
+            }
+
+            // Se cambia el caracter '\n' por '\0';
             if(cadena[i][strlen(cadena[i])-1] == '\n')
                 cadena[i][strlen(cadena[i])-1] = '\0';
                 
-            i++; // Se pasa a la línea siguiente.
+            //i++; // Se pasa a la línea siguiente.
         }
-
-        // Si se llega al final del archivo:
-        else
-            break;
+        i++;
     }
 }
 
@@ -936,8 +943,8 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
     // Se recorre cada línea:
     for(i = 0; i < lineas; i++)
     {
-        // Se ignora la línea si es un comentario:
-        if(__esComentario(cadena[i]) == 0)
+        // Se ignora la línea si es un comentario o una línea en blanco:
+        if(__esComentario(cadena[i]) == 0 || cadena[i][0] == '\0' || cadena[i][0] == '\n')
         {
             // Se pasa a la siguiente línea:
             continue;
