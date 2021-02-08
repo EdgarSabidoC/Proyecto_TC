@@ -28,8 +28,8 @@ int main(int argc, char **argv)
     char *punto = strchr(argv[1], '.');
     char *mio = ".mio";
 
-    // Se verifica que la extensión sea .mio
-    if(strncmp(punto, mio, sizeof(".mio")))
+    // Se verifica si la extensión es .mio
+    if(strncmp(punto, mio, sizeof(".mio") != 0))
     {
         printf("ERROR, no se encontró archivo .mio\n\n");
         return EXIT_FAILURE;
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         
     // Nombre del archivo .lex:
     int tam = strlen(argv[1]);
-    char nombre_lex[tam];
+    char *nombre_lex = malloc(strlen(argv[1])+1 * sizeof(char));
     memcpy(nombre_lex, argv[1], tam-4); // Se copia el nombre sin la extensión.
     strncat(nombre_lex, ".lex", tam-4); // Se concatena la nueva extensión.
 
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
     // Archivo .sim:
         
     // Nombre del archivo .sim:
-    char nombre_sim[tam];
+    char *nombre_sim = malloc(strlen(argv[1])+1 * sizeof(char));
     memcpy(nombre_sim, argv[1], tam-4); // Se copia el nombre sin la extensión.
     strncat(nombre_sim, ".sim", tam-4); // Se concatena la nueva extensión.
 
@@ -128,6 +128,12 @@ int main(int argc, char **argv)
 
     fclose(sim);
     sim = NULL;
+
+    // Se libera la memoria de los punteros de los nombres:
+    free(nombre_lex);
+    free(nombre_sim);
+    nombre_lex = NULL;
+    nombre_sim = NULL;
 
     // Programa exitoso:
     return EXIT_SUCCESS;

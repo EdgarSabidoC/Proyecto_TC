@@ -3,11 +3,11 @@ PROGRAMA
 [id] ID01
 ~4
 [id] ID02
-=
+[op_rel]
 [val]
 ~6
 [id] ID03
-=
+[op_rel]
 [val]
 ~7
 LEE
@@ -18,13 +18,13 @@ REPITE
 VECES
 ~10
 [id] ID03
-=
+[op_rel]
 [id] ID03
 [op_ar]
 [val]
 ~11
 [id] ID02
-=
+[op_rel]
 [id] ID02
 [op_ar]
 [id] ID03
