@@ -42,6 +42,13 @@ unsigned int cont_txt = 0;
  */
 long long OctADec(char *numero)
 {
+    // Si se encuentra un número que no debería de estar, se arroja el error:
+    if(strchr(numero, '8') || strchr(numero, '9'))
+    {
+        printf("Error! El número ingresado no es está en base octal.\n");
+        exit(1);
+    }
+
     // La cadena se convierte en número:
     int octal = atoi(numero);
     
