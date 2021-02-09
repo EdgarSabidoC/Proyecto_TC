@@ -29,17 +29,17 @@ int main(int argc, char **argv)
 
     // Se verifica que el archivo sea extensión .mio:
     char *punto = strchr(argv[1], '.');
-    //char *mio = ".mio";
 
     // Se verifica si la extensión es .mio
     if(strncmp(punto, ".mio", strlen("mio")) != 0)
     {
-        printf("\n\nERROR, no se encontró archivo con extensión .mio\n\n");
+        printf("\n\nERROR: no se encontró archivo con extensión .mio\n\n");
         printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
+        
         return EXIT_FAILURE;
     }
         
-    printf("\n\nNombre del programa: %s\n\n", nombre_programa);
+    printf("\n\nNombre del archivo fuente: %s\n\n", nombre_programa);
 
 
     // Se verifica que exista el archivo:
@@ -47,8 +47,9 @@ int main(int argc, char **argv)
     
     if(!prueba_archivo)
     {
-        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
+        printf("\n\nERROR: El archivo [%s] no existe.\n", argv[1]);
         printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
+        
         prueba_archivo = NULL;
         
         return EXIT_FAILURE;
@@ -102,8 +103,9 @@ int main(int argc, char **argv)
     // Se valida que el archivo exista:
     if(!archivo)
     {
-        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
+        printf("\n\nERROR: El archivo [%s] no existe.\n", argv[1]);
         printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
+        
         archivo = NULL;
         
         return EXIT_FAILURE;
@@ -127,8 +129,9 @@ int main(int argc, char **argv)
     // Se valida que el archivo exista:
     if(!parchivo)
     {
-        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
+        printf("\n\nERROR: El archivo [%s] no existe.\n", argv[1]);
         printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
+        
         parchivo = NULL;
         
         return EXIT_FAILURE;

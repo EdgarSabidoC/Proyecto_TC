@@ -26,21 +26,26 @@ int main(int argc, char **argv)
 
     // Se verifica que el archivo sea extensión .lex:
     char *punto = strchr(argv[1], '.');
-    char *lex = ".lex";
 
-    if(strncmp(punto, lex, sizeof(".lex")))
+    // Se verifica si la extensión es .lex
+    if(strncmp(punto, ".lex", strlen("lex")) != 0)
     {
-        printf("ERROR, no se encontró archivo .lex\n\n");
+        printf("\n\nERROR: no se encontró archivo .lex\n\n");
+        printf("\nEl analizador sintáctico ha finalizado inesperadamente.\n\n\n");
+
         return EXIT_FAILURE;
     }
 
     // Punteros al archivo .lex:    
     FILE *arch_lex = fopen(argv[1], "r");
     
+    printf("\n\n\tArchivo: %s\n\n", argv[1]);
+
     // Se verifica que exista el archivo:
     if(!arch_lex)
     {
-        printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
+        printf("ERROR: El archivo [%s] no existe.\n\n", argv[1]);
+        printf("\nEl analizador sintáctico ha finalizado inesperadamente.\n\n\n");
 
         arch_lex = NULL;
 
@@ -69,16 +74,18 @@ int main(int argc, char **argv)
     {
         printf("\n\nERROR DURANTE LA COMPILACIÓN:\n");
         printf("Se encontraron %u errores.\n", errores);
+        printf("\n\nLa compilación se ha detenido inesperadamente.\n\n");
         return EXIT_FAILURE;
     }
     else if(errores == 1)
     {
         printf("\n\nERROR DURANTE LA COMPILACIÓN:\n");
         printf("Se encontró %u error.\n", errores);
+        printf("\n\nLa compilación se ha detenido inesperadamente.\n\n");
         return EXIT_FAILURE;
     }
     
     // Finalización exitosa del programa:
-    printf("*******¡COMPILACIÓN EXITOSA!*******\n");
+    printf("********¡COMPILACIÓN EXITOSA!********\n\n\n");
     return EXIT_SUCCESS;
 }
