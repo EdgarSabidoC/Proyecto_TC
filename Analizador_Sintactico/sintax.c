@@ -572,6 +572,8 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     // Si el nodo es nulo:
     if(!nodo)
         return NULL;
+    else if(__esFinProg(nodo->token) == 0)
+        return nodo;
 
     if(__esReservada(nodo->token) == 0)
     {   
@@ -856,55 +858,55 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
     // Se verifica si es una sentencia de asignación:
     else if(__esVariable(nodo->token) == 0)
     {
-        // Se verifica que el token siguiente sea un signo de '=':
-        if(nodo->sig && __esAsig(nodo->sig->token) == 0)
-        {            
-            nodo = nodo->sig; // Se pasa al nodo siguiente.
+        // Se verifica si lo que sigue es un operador de asignación '=':
+        if(nodo->sig && __esAsig(nodo->sig->token) != 0)
+        {
+            printf("ERROR de sintaxit en línea [%u] --En asignación se esperaba operador --> =\n", nodo->num_linea);
+            num_errores++;
+        }
+        else if(nodo->sig && __esAsig(nodo->sig->token) == 0)
+            nodo = nodo->sig; // Se avanza al nodo si es un operador de asignación,
+        
+        // Se verifica si lo que sigue es un elemento:
+        if(nodo->sig && __esElem(nodo->sig->token) != 0)
+        {
+            printf("ERROR de sintaxit en línea [%u] --En asignación se esperaba operador --> =\n", nodo->num_linea);
+            num_errores++;
+        }
+        else if(nodo->sig && __esElem(nodo->sig->token) == 0)
+        {
+            nodo = nodo->sig; // Se pasa al nodo si lo que sigue es un elemento.
 
-            // Se verifica si el token es un ELEM:
-            if(nodo->sig && __esElem(nodo->sig->token) == 0)
+            // Si después del elemento hay un operador aritmético:
+            if(nodo->sig && __esOpAr(nodo->sig->token) == 0)
             {
-                nodo = nodo->sig; // Se pasa al nodo.  
-                
-                // Se verifica si el token siguiente es un operador aritmético:
-                if(nodo->sig && __esOpAr(nodo->sig->token) == 0)
-                {  
+                nodo = nodo->sig; // Se pasa al nodo.
+                printf("%s\n", nodo->token);
+                // Se verifica si el token es un ELEM:
+                if(nodo->sig && __esElem(nodo->sig->token) == 0)
+                {
                     nodo = nodo->sig; // Se pasa al nodo.
                     
-                    // Se verifica si el token es un ELEM:
-                    if(nodo->sig && __esElem(nodo->sig->token) == 0)
+                    // Si lo que sigue es realmente una sentencia de
+                    // asignación:
+                    if(__esAsig(nodo->sig->token) == 0)
                     {
-                        nodo = nodo->sig; // Se pasa al nodo.
-                        
-                        // Si lo que sigue es realmente una sentencia de
-                        // asignación:
-                        if(__esAsig(nodo->sig->token) == 0)
-                        {
-                            printf("ERROR de sintaxis en línea [%u] --No es posible operar una asignación --> %s.\n", nodo->num_linea, nodo->token);
-                            num_errores++;
-                        }
-                        
-                        if(nodo->sig)
-                            nodo = nodo->sig; // Se pasa al siguiente nodo.
-                    }
-                    // Si no es un elemento:
-                    else
-                    {    
-                        printf("[ERROR de sintaxis en línea [%u] --Elemento no encontrado --> %s.\n", nodo->num_linea, nodo->token);
+                        printf("ERROR de sintaxis en línea [%u] --No es posible operar una asignación --> %s.\n", nodo->num_linea, nodo->token);
                         num_errores++;
-                    }   
-                } // Fin if __esOpAr.
-                else if(nodo->sig)
-                    nodo = nodo->sig; // Se pasa al nodo.
-            } // Fin if __esElem.
-            else
-            {    
-                printf("ERROR de sintaxis en línea [%u] --Elemento no encontrado --> %s.\n", nodo->num_linea, nodo->token);
-                num_errores++;
-            }     
-        } // Fin if __esAsig
-        else
-            err_var++;
+                    }
+                    
+                    if(nodo->sig)
+                        nodo = nodo->sig; // Se pasa al siguiente nodo si hay.
+                }
+                else
+                {
+                    printf("ERROR de sintaxis en línea [%u] --En asignación se esperaba operador --> =\n", nodo->num_linea);
+                    num_errores++;
+                }
+            }
+            else if(nodo->sig)
+                nodo = nodo->sig;
+        }
     } // Fin if __esVariable.
     
     // Si la sentencia es sólo un símbolo o un token no válido:
@@ -962,6 +964,21 @@ nodo_Tok *__esSent(nodo_Tok *nodo)
         {
             printf("ERROR de sintaxis en línea [%u] --No es una sentencia o declaración válida --> %s.\n", nodo->num_linea, nodo->token);
             num_errores++;
+            
+            while(__esFinProg(nodo->token) != 0)
+            {
+                if(!nodo->sig)
+                {
+                    printf("ERROR de sintaxis en línea [%u] --No se encontró --> FINPROG.\n", nodo->num_linea);
+                    num_errores++;
+
+                    return NULL;
+                }
+                    
+                nodo = nodo->sig;
+            }
+
+            return nodo;
         }
 
         // Si hay un nodo después,
@@ -1007,6 +1024,15 @@ int iniAnalSin(listaTok *lista)
 
     // Se analiza la estructura principal del programa:
 
+    // Verifica que se no sea FINPROG:
+    if(__esFinProg(aux->token) == 0)
+    {
+        printf("ERROR de sintaxis en línea [%u] --No se esperaba --> FINPROG.\n", aux->num_linea);
+        num_errores++;
+
+        return num_errores;
+    }
+    
     // Verifica que se halle la palabra reservada PROGRAMA:
     if(strncmp(aux->token, "PROGRAMA", strlen(aux->token)+1) == 0)
          aux = aux->sig;
@@ -1014,7 +1040,7 @@ int iniAnalSin(listaTok *lista)
     // Si PROGRAMA no se encuentra:
     else
     {
-        printf("ERROR de sintaxis en l%cnea [%u] --No se encuentra palabra reservada --> PROGRAMA.\n", 161, aux->num_linea);
+        printf("ERROR de sintaxis en línea [%u] --No se encuentra palabra reservada --> PROGRAMA.\n", aux->num_linea);
         num_errores++;
     }
 
@@ -1025,10 +1051,19 @@ int iniAnalSin(listaTok *lista)
     // Si el nombre del programa no se encuentra:
     else
     {
-        printf("ERROR de sintaxis en l%cnea [%u] --No se encuentra --> nombre del programa.\n", 161, aux->num_linea);
+        printf("ERROR de sintaxis en línea [%u] --No se encuentra --> nombre del programa.\n", aux->num_linea);
         num_errores++;
     }
     
+    // Verifica que no sea FINPROG:
+    if(__esFinProg(aux->token) == 0)
+    {
+        printf("ERROR de sintaxis en línea [%u] --No se esperaba --> FINPROG.\n", aux->num_linea);
+        num_errores++;
+
+        return num_errores;
+    }
+
     // Se llama a __esSent para verificar que todas
     // las sentencias de la lista sean válidas:
     while(aux->sig)
@@ -1043,10 +1078,10 @@ int iniAnalSin(listaTok *lista)
             break;
         }
 
-        if(!aux->sig && __esVariable(aux->token) == 0)
+        /*if(!aux->sig && __esVariable(aux->token) == 0)
         {
             printf("ERROR de sintaxis en línea [%u] --Variable sin usar --> %s.\n", aux->num_linea, aux->token);
-        }
+        }*/
     }    
 
     // Se valida el retorno final de la función __esSent():
