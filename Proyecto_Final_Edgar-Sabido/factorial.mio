@@ -10,8 +10,8 @@ REPITE Num VECES
 VarY = VarY + 1
 VarX = VarX * VarY
 FINREP
-IMPRIME “Factorial de ”
+IMPRIME "Factorial de "
 IMPRIME Num
-IMPRIME “ es “
+IMPRIME " es "
 IMPRIME VarX
 FINPROG

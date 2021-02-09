@@ -1,13 +1,13 @@
 all: analex
 
-analex: analex.c lexer.o listas.o
-	gcc -g -Wall -I ./ -o analex analex.c lexer.o listas.o
+analex: analex.c lexer.o listaslex.o
+	gcc -g -Wall -I ./ -o analex analex.c lexer.o listaslex.o
 
 lexer.o: lexer.c
 	gcc -g -Wall -I ./ -c lexer.c
 	
-listas.o: listas.c
-	gcc -g -Wall -I ./ -c listas.c
+listaslex.o: listaslex.c
+	gcc -g -Wall -I ./ -c listaslex.c
 	
 clean:
 	rm *.o analex

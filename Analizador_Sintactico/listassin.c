@@ -1,7 +1,7 @@
 // NOTA: Para evitar errores inesperados
 // NO MODIFICAR ninguna de las funciones de este archivo.
 
-#include "listas.h"
+#include "listassin.h"
 
 //-------------------------FUNCIONES DE LA LISTA DE TOKENS--------------------------
 
