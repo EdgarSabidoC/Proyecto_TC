@@ -137,8 +137,18 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres
             // Se cambia el carácter '\n' por '\0';
             if(cadena[i][strlen(cadena[i])-1] == '\n')
                 cadena[i][strlen(cadena[i])-1] = '\0';
-                
-            //i++; // Se pasa a la línea siguiente.
+
+            // Si hay espacios al principio de la línea:
+            if(cadena[i][0] == ' ')
+            {   
+                unsigned int tam = strlen(cadena[i]); // Tamaño de la cadena.
+                unsigned int espacios = strspn(cadena[i], " "); // Cantidad de espacios en blanco al principio.
+
+                // Se mueve la memoria:
+                memmove(cadena[i], cadena[i]+espacios, tam);
+                //cadena[i][--tam] = 0; // Se vuelven '\0' los char finales.
+                //printf("[%s]\n", cadena[i]);
+            }
         }
         i++;
     }
