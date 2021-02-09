@@ -1007,28 +1007,54 @@ int iniAnalSin(listaTok *lista)
 
     // Se analiza la estructura principal del programa:
 
+    if(!aux)
+    {
+        printf("\nERROR: Archivo vacío.\n");
+        return ++num_errores;
+    }
+
     // Verifica que se halle la palabra reservada PROGRAMA:
-    if(strncmp(aux->token, "PROGRAMA", strlen(aux->token)+1) == 0)
-         aux = aux->sig;
+    if(aux && strncmp(aux->token, "PROGRAMA", strlen(aux->token)+1) == 0)
+    {
+        if(aux->sig)
+            aux = aux->sig;
+        else
+        {
+            // Si en el archivo sólo hay PROGRAMA:
+            printf("ERROR de sintaxis en línea [%u] --No se encuentra --> nombre del programa.\n", aux->num_linea);
+            printf("ERROR de sintaxis en línea [%u] --No se encuentra palabra reservada --> FINPROG.\n", aux->num_linea);
+            num_errores++;
+            return num_errores;
+        }
+    }
     
     // Si PROGRAMA no se encuentra:
     else
     {
-        printf("ERROR de sintaxis en l%cnea [%u] --No se encuentra palabra reservada --> PROGRAMA.\n", 161, aux->num_linea);
+        printf("ERROR de sintaxis en línea [%u] --No se encuentra palabra reservada --> PROGRAMA.\n", aux->num_linea);
         num_errores++;
     }
 
     // Verifica que se halle el nombre del programa:
-    if(strncmp(aux->token, "[id] ID01", strlen(aux->token)+1) == 0)
-        aux = aux->sig;
+    if(aux && strncmp(aux->token, "[id] ID01", strlen(aux->token)+1) == 0)
+    {
+        if(aux->sig)
+            aux = aux->sig;
+        else
+        {
+            printf("ERROR de sintaxis en línea [%u] --No se encuentra palabra reservada --> FINPROG.\n", aux->num_linea);
+            num_errores++;
+            return num_errores;
+        }
     
+    }
     // Si el nombre del programa no se encuentra:
     else
     {
-        printf("ERROR de sintaxis en l%cnea [%u] --No se encuentra --> nombre del programa.\n", 161, aux->num_linea);
+        printf("ERROR de sintaxis en línea [%u] --No se encuentra --> nombre del programa.\n", aux->num_linea);
         num_errores++;
     }
-    
+
     // Se llama a __esSent para verificar que todas
     // las sentencias de la lista sean válidas:
     while(aux->sig)
