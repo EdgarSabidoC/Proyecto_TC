@@ -91,7 +91,7 @@ long long OctADec(char *numero)
 int __contarLineasArchivo(FILE *archivo)
 {
     int numero_lineas = 0;
-    char c; // Almacena el caracter leído del archivo.
+    char c; // Almacena el carácter leído del archivo.
 
     // Si el archivo no existe:
     if (!archivo)
@@ -100,7 +100,7 @@ int __contarLineasArchivo(FILE *archivo)
         return -1;
     }
 
-    // Se extra el primer caracter de cada línea y se guarda en c:
+    // Se extra el primer carácter de cada línea y se guarda en c:
     for(c = getc(archivo); c != EOF; c = getc(archivo))
     {
         if(c == '\n') // Si hay un salto de línea se incrementa el contador.
@@ -134,7 +134,7 @@ void __guardarLineas(FILE *archivo, unsigned int lineas, unsigned int caracteres
         // Se guarda la línea del archivo en el arreglo:
         if(fgets(cadena[i], sizeof(cadena[i]), archivo) != NULL)
         {
-            // Se cambia el caracter '\n' por '\0';
+            // Se cambia el carácter '\n' por '\0';
             if(cadena[i][strlen(cadena[i])-1] == '\n')
                 cadena[i][strlen(cadena[i])-1] = '\0';
                 
@@ -417,7 +417,7 @@ int __esTexto(char *token, unsigned int num_linea)
     }
 
     // Hubo error:
-    fprintf(stdout,"ERROR en línea: [%u] --Se esperaba caracter terminal --> \" en %s\n\n", num_linea, token);
+    fprintf(stdout,"ERROR en línea: [%u] --Se esperaba carácter terminal --> \" en %s\n\n", num_linea, token);
 
     // No es una cadena de texto:
     return (1);
@@ -499,8 +499,8 @@ int __esVariable(char *cadena)
  * DESCRIPCIÓN:
  * Esta función inicia el análisis léxico 
  * identifica el tipo de componente léxico 
- * de acuerdo al caracter con el que comienza 
- * la cadena y retorna un caracter indicando el 
+ * de acuerdo al carácter con el que comienza 
+ * la cadena y retorna un carácter indicando el 
  * tipo de componente léxico del que se trate.
  * 
  * TIpos de componentes léxicos:
@@ -520,7 +520,7 @@ int __esVariable(char *cadena)
  * ENTRADA: Un puntero de tipo char (cadena) del token,
  *          un unsigned int (número de línea de la sentencia).
  * 
- * SALIDA: Un caracter (char).
+ * SALIDA: Un carácter (char).
  * 
  */
 char __identifica(char *token, unsigned int num_linea)
@@ -849,7 +849,7 @@ char *genTok(FILE *archivo_lex, char *cadena, unsigned int num_linea, listaVarNu
         case 's':
             // Se genera token con la copia:
             ptr_strok = strtok_r(copia, " \n\t", &aux);
-            fprintf(stdout,"ERROR en línea: [%u] --La variable comienza con un caracter no válido: %s\n", num_linea, ptr_strok);
+            fprintf(stdout,"ERROR en línea: [%u] --La variable comienza con un carácter no válido: %s\n", num_linea, ptr_strok);
         break;
 
         // Es un número
@@ -976,7 +976,7 @@ void analizador(FILE *archivo_lex, unsigned int lineas, unsigned int chars, char
         // Se crea un arreglo dinámico del tamaño de la cadena menos la cantidad de espacios al principio:
         char *copia = malloc((strlen(cadena[i])+1-(espacios)) * sizeof(char));
 
-        // Se genera una copia dinámica de la cadena a partir del primero caracter que no sea espacio:
+        // Se genera una copia dinámica de la cadena a partir del primero carácter que no sea espacio:
         strncpy(copia, cadena[i]+espacios, strlen(cadena[i]) - (espacios) + 1);
 
         // Se genera el primer token:

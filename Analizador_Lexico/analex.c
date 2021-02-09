@@ -34,11 +34,12 @@ int main(int argc, char **argv)
     // Se verifica si la extensión es .mio
     if(strncmp(punto, ".mio", strlen("mio")) != 0)
     {
-        printf("ERROR, no se encontró archivo .mio\n\n");
+        printf("\n\nERROR, no se encontró archivo con extensión .mio\n\n");
+        printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
         return EXIT_FAILURE;
     }
         
-    printf("%s\n", nombre_programa);
+    printf("\n\nNombre del programa: %s\n\n", nombre_programa);
 
 
     // Se verifica que exista el archivo:
@@ -47,7 +48,7 @@ int main(int argc, char **argv)
     if(!prueba_archivo)
     {
         printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
-
+        printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
         prueba_archivo = NULL;
         
         return EXIT_FAILURE;
@@ -68,7 +69,7 @@ int main(int argc, char **argv)
     // Se crea el archivo .lex:
     FILE *lexer = fopen(nombre_lex, "w+");
         
-
+    printf("Se generó el archivo [%s] correctamente.\n", nombre_lex);
 
     // Archivo .sim:
         
@@ -81,6 +82,7 @@ int main(int argc, char **argv)
     FILE *sim = fopen(nombre_sim, "w+");
     
 
+    printf("Se generó el archivo [%s] correctamente.\n\n", nombre_sim);
 
 
     // Se inicializan las listas para almacenar la tabla de símbolos.
@@ -101,7 +103,7 @@ int main(int argc, char **argv)
     if(!archivo)
     {
         printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
-
+        printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
         archivo = NULL;
         
         return EXIT_FAILURE;
@@ -126,7 +128,7 @@ int main(int argc, char **argv)
     if(!parchivo)
     {
         printf("ERROR! El archivo [%s] no existe.\n", argv[1]);
-
+        printf("\n\nEl analizador léxico ha finalizado inesperadamente.\n\n\n");
         parchivo = NULL;
         
         return EXIT_FAILURE;
@@ -137,16 +139,21 @@ int main(int argc, char **argv)
     fclose(parchivo); // Se cierra el archivo
     parchivo = NULL;
 
-    printf("Se guardarons las líneas.\n");
+    printf("Se guardarons las líneas correctamente.\n\n\n");
+
+    printf("Proceso de análisis iniciado.\n\n\n");
 
     // Se generan los tokens:
     analizador(lexer, lineas, caracteres, array, &lista_var, &lista_txt, &lista_val);
 
-    printf("Finalizó el analizador.\n");
+    printf("\n\nProceso de análisis finalizado.\n");
+
+    printf("\n\nLa impresión de archivos ha iniciado.\n");
 
     // Se imprimen las listas en el archivo .sim:
     imprimeSim(sim, &lista_var, &lista_txt, &lista_val);
 
+    printf("La impresión de archivos ha finalizado.\n");
 
     // Se libera la memoria ocupada por las listas:
     liberaListaVarNum(&lista_var);
@@ -166,6 +173,8 @@ int main(int argc, char **argv)
     free(nombre_sim);
     nombre_lex = NULL;
     nombre_sim = NULL;
+
+    printf("\n\nEl analizador léxico ha finalizado correctamente.\n\n\n");
 
     // Programa exitoso:
     return EXIT_SUCCESS;
