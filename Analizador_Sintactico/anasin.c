@@ -35,26 +35,31 @@ int main(int argc, char **argv)
 
         return EXIT_FAILURE;
     }
-
-    // Punteros al archivo .lex:    
-    FILE *arch_lex = fopen(argv[1], "r");
     
     printf("\n\n\tArchivo: %s\n\n", argv[1]);
 
     // Se verifica que exista el archivo:
-    if(!arch_lex)
+    FILE *prueba_archivo = fopen(argv[1], "r");
+    
+    if(!prueba_archivo)
     {
         printf("ERROR: El archivo [%s] no existe.\n\n", argv[1]);
         printf("\nEl analizador sintáctico ha finalizado inesperadamente.\n\n\n");
 
-        arch_lex = NULL;
+        prueba_archivo = NULL;
 
         return EXIT_FAILURE;
     }
 
+    fclose(prueba_archivo); // Se libera la memoria.
+    prueba_archivo = NULL;
+    
     // Se declara e inicializa la lista:
     listaTok lista;
     iniListaTok(&lista);
+
+    // Punteros al archivo .lex:    
+    FILE *arch_lex = fopen(argv[1], "r");
 
     // Se guardan los tokens del archivo dentro de la lista:
     guardarTokens(arch_lex, &lista);
