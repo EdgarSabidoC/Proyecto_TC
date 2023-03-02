@@ -1,0 +1,8 @@
+~2
+PROGRAMA
+[id] ID01
+~3
+IMPRIME
+[txt] TX01
+~4
+FINPROG

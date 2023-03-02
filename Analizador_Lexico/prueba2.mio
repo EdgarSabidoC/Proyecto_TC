@@ -1,0 +1,12 @@
+PROGRAMA MIO
+
+# Se declaran las variables:
+
+_HOLA = 1
+MUNDO = 5
+
+# Se realiza una suma:
+SUMA = _HOLA + MUNDO
+
+FINPROG
+

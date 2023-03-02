@@ -1,1 +1,0 @@
-// Programa principal del analizador léxico.

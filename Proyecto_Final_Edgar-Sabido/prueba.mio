@@ -1,0 +1,4 @@
+# Programa que imprime una entrada.
+PROGRAMA imprime
+IMPRIME "Hola Mundo"
+FINPROG
