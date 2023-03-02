@@ -618,10 +618,19 @@ char *tokenCadena(char *cadena)
         tmp++; // Se corre el apuntador al siguiente char.
         i++; // Se aumenta el tamaño de la cadena.
         
+        // Si hay '\"' se ignora y continúa:
+        if(*tmp == '\\' && *(tmp+1) == '\"')
+        {
+            tmp+=2; // Se corre dos 2 chars el puntero.
+            i+=2; // El tamaño aumenta en dos.
+        }
+
         // Si el char actual de tmp es una comilla, entonces se rompe:
         if(*tmp == '\"' || (*tmp == '\"' && *(tmp+1) == '\0'))
         { 
-            break;
+            tmp++; // Se corre un char el puntero.
+            i++; // Se aumenta en uno el tamaño.
+            break; 
         }
     }
 
